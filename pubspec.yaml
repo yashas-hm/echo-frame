@@ -1,0 +1,38 @@
+name: echo_frame
+description: "Your offline sanctuary for memories; Say hello to clutter-free nostalgia"
+
+publish_to: 'none'
+
+version: 0.0.1+1
+
+environment:
+  sdk: '>=3.3.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Tools
+  flutter_riverpod: ^2.5.1
+  gap: ^3.0.1
+  shared_preferences: ^2.2.3
+#  window_size:
+#    git:
+#      url: https://github.com/google/flutter-desktop-embedding.git
+#      path: plugins/window_size
+  google_fonts: ^6.2.1
+#  window_manager: ^0.3.8
+
+  # Widgets
+  day_night_themed_switcher: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  assets:
+    - assets/images/
+    - assets/anim/
+    - assets/images/icons/
