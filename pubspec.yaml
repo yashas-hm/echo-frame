@@ -11,20 +11,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # Tools
-  flutter_riverpod: ^2.5.1
-  gap: ^3.0.1
-  shared_preferences: ^2.2.3
 #  window_size:
 #    git:
 #      url: https://github.com/google/flutter-desktop-embedding.git
 #      path: plugins/window_size
-  google_fonts: ^6.2.1
 #  window_manager: ^0.3.8
 
-  # Widgets
-  day_night_themed_switcher: ^1.1.0
+  flutter_riverpod: ^3.3.1
+  google_fonts: ^8.1.0
+  day_night_themed_switcher: ^2.0.2
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
