@@ -1,24 +1,26 @@
-import 'package:echo_frame/core/constants/app_constants.dart';
-import 'package:echo_frame/core/constants/app_theme.dart';
-import 'package:echo_frame/providers/ui_provider.dart';
+import 'package:echo_frame/utilities/shared_pref_utils.dart';
+import 'package:echo_frame/theme/provider/theme_provider.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main()async {
-  runApp(const Application());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Prefs.init();
+  runApp(const ProviderScope(child: Application()));
 }
 
-class Application extends StatelessWidget {
+class Application extends ConsumerWidget {
   const Application({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
-      navigatorKey: globalKey,
-      theme: EchoFrameTheme(context).light,
-      darkTheme: EchoFrameTheme(context).dark,
-      themeMode: ThemeMode.system,
+      theme: EchoFrameThemes.lightTheme,
+      darkTheme: EchoFrameThemes.darkTheme,
+      themeMode: ref.watch(appThemeProvider).mode,
       debugShowCheckedModeBanner: false,
-      title: kAppName,
+      title: 'Echo Frame',
       home: const Scaffold(
         body: Placeholder(),
       ),
