@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+part of 'utilities.dart';
 
 extension ContextExtension on BuildContext {
   double get height => MediaQuery.of(this).size.height;
