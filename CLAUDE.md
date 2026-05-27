@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Workflow
+
+After implementing any discrete piece of work — a new file, a completed function, a working feature — pause and suggest a commit message. Do not run `git commit` or any git write command. The user commits manually.
+
+Suggested message format: one short imperative subject line, no body required unless the change needs context.
+
 ## Commands
 
 ```bash
