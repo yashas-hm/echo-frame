@@ -27,11 +27,11 @@ test.*
 .pub/
 *build/
 
-*macos/
-*linux/
-*android/
-*windows/
-*ios/
-*web/
+#*macos/
+#*linux/
+#*android/
+#*windows/
+#*ios/
+#*web/
 
 docs/AI

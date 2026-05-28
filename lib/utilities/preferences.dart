@@ -16,4 +16,14 @@ class Prefs {
 
   static set themeMode(ThemeMode value) =>
       _prefs.setString(Keys.themeModePrefTag, value.name);
+
+  static String? get libraryRootPath => _prefs.getString(Keys.libraryRootPath);
+
+  static set libraryRootPath(String? value) {
+    if (value == null) {
+      _prefs.remove(Keys.libraryRootPath);
+    } else {
+      _prefs.setString(Keys.libraryRootPath, value);
+    }
+  }
 }
