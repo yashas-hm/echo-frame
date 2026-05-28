@@ -1,47 +1,49 @@
-import 'package:isar/isar.dart';
+import 'package:drift/drift.dart';
 
-part 'media_schema.g.dart';
+class MediaRecords extends Table {
+  IntColumn get id => integer().autoIncrement()();
 
-enum MediaType { image, video, unknown }
+  TextColumn get filePath => text()();
 
-@Collection()
-class MediaRecord {
-  Id id = Isar.autoIncrement;
+  TextColumn get driveId => text()();
 
-  @Index(unique: true)
-  late String filePath;
+  TextColumn get relativePath => text()();
 
-  late String driveId;
-  late String relativePath;
-  late String filename;
+  TextColumn get filename => text()();
 
-  @Enumerated(EnumType.name)
-  late MediaType mediaType;
+  TextColumn get mediaType => text().withDefault(const Constant('image'))();
 
-  @Index()
-  DateTime? capturedAt;
-  DateTime? modifiedAt;
-  late DateTime indexedAt;
+  DateTimeColumn get capturedAt => dateTime().nullable()();
 
-  @Index(composite: [CompositeIndex('capturedMonth')])
-  int? capturedYear;
-  int? capturedMonth;
+  DateTimeColumn get modifiedAt => dateTime().nullable()();
 
-  int? width;
-  int? height;
-  int? durationMs;
+  DateTimeColumn get indexedAt => dateTime()();
 
-  double? latitude;
-  double? longitude;
+  IntColumn get capturedYear => integer().nullable()();
 
-  String? cameraMake;
-  String? cameraModel;
+  IntColumn get capturedMonth => integer().nullable()();
 
-  bool isFavorite = false;
-  bool isTrashed = false;
-  bool hasJsonIndex = false;
+  IntColumn get width => integer().nullable()();
 
-  @Index(type: IndexType.value)
-  String get searchText =>
-      [filename, cameraMake, cameraModel].whereType<String>().join(' ');
+  IntColumn get height => integer().nullable()();
+
+  IntColumn get durationMs => integer().nullable()();
+
+  RealColumn get latitude => real().nullable()();
+
+  RealColumn get longitude => real().nullable()();
+
+  TextColumn get cameraMake => text().nullable()();
+
+  TextColumn get cameraModel => text().nullable()();
+
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+
+  BoolColumn get isTrashed => boolean().withDefault(const Constant(false))();
+
+  BoolColumn get hasJsonIndex => boolean().withDefault(const Constant(false))();
+
+  List<Set<Column>> get uniqueColumns => [
+        {filePath}
+      ];
 }
