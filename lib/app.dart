@@ -2,6 +2,7 @@ import 'package:echo_frame/theme/provider/theme_provider.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/organizer/organizer_screen.dart';
+import 'package:echo_frame/views/photo_view/photo_view_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/shell/shell_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
@@ -20,6 +21,12 @@ final _router = GoRouter(
         GoRoute(path: '/import', builder: (_, __) => const ImportScreen()),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
       ],
+    ),
+    GoRoute(
+      path: '/photo/:id',
+      builder: (_, state) => PhotoViewScreen(
+        mediaId: int.parse(state.pathParameters['id']!),
+      ),
     ),
   ],
 );

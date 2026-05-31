@@ -4,6 +4,8 @@ import 'package:echo_frame/models/month_folder.dart';
 import 'package:echo_frame/models/month_index.dart';
 import 'package:echo_frame/models/resolved_meta.dart';
 
+// ── Timeline queries ──────────────────────────────────────────────────────────
+
 class MediaDao {
   const MediaDao(this._db);
 
@@ -32,6 +34,53 @@ class MediaDao {
         .toList();
     await upsertBatch(companions);
   }
+
+  Future<List<({int year, int month, int count})>> listMonths() async {
+    final countExpr = countAll();
+    final query = _db.selectOnly(_db.mediaRecords)
+      ..addColumns([
+        _db.mediaRecords.capturedYear,
+        _db.mediaRecords.capturedMonth,
+        countExpr,
+      ])
+      ..where(_db.mediaRecords.isTrashed.equals(false) &
+          _db.mediaRecords.capturedYear.isNotNull())
+      ..groupBy([
+        _db.mediaRecords.capturedYear,
+        _db.mediaRecords.capturedMonth,
+      ])
+      ..orderBy([
+        OrderingTerm(
+            expression: _db.mediaRecords.capturedYear,
+            mode: OrderingMode.desc),
+        OrderingTerm(
+            expression: _db.mediaRecords.capturedMonth,
+            mode: OrderingMode.desc),
+      ]);
+
+    return query
+        .map((row) => (
+              year: row.read(_db.mediaRecords.capturedYear) ?? 0,
+              month: row.read(_db.mediaRecords.capturedMonth) ?? 0,
+              count: row.read(countExpr) ?? 0,
+            ))
+        .get();
+  }
+
+  Future<List<MediaRecord>> queryByMonth(int year, int month) =>
+      (_db.select(_db.mediaRecords)
+            ..where((r) =>
+                r.capturedYear.equals(year) &
+                r.capturedMonth.equals(month) &
+                r.isTrashed.equals(false))
+            ..orderBy([
+              (r) => OrderingTerm(expression: r.capturedAt),
+            ]))
+          .get();
+
+  Future<MediaRecord?> getById(int id) =>
+      (_db.select(_db.mediaRecords)..where((r) => r.id.equals(id)))
+          .getSingleOrNull();
 
   MediaRecordsCompanion _toCompanion(
     ResolvedMeta meta,

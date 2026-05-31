@@ -5,19 +5,23 @@ import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/services/indexing_pipeline.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
+import 'package:echo_frame/views/timeline/photo_tile.dart';
+import 'package:echo_frame/views/timeline/timeline_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TimelineScreen extends StatefulWidget {
+class TimelineScreen extends ConsumerStatefulWidget {
   const TimelineScreen({super.key});
 
   @override
-  State<TimelineScreen> createState() => _TimelineScreenState();
+  ConsumerState<TimelineScreen> createState() => _TimelineScreenState();
 }
 
-class _TimelineScreenState extends State<TimelineScreen> {
+class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   bool _hasLibrary = false;
   IndexingProgress? _progress;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -25,6 +29,20 @@ class _TimelineScreenState extends State<TimelineScreen> {
     _hasLibrary = Prefs.libraryRootPath != null;
     if (!_hasLibrary) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _showSetupDialog());
+    }
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      ref.read(timelineProvider.notifier).loadNextPage();
     }
   }
 
@@ -86,15 +104,63 @@ class _TimelineScreenState extends State<TimelineScreen> {
       if (!mounted) return;
       setState(() => _progress = progress.isDone ? null : progress);
     }
+
+    // Trigger the timeline provider to load from the newly populated DB.
+    ref.invalidate(timelineProvider);
   }
 
   @override
   Widget build(BuildContext context) {
     if (_progress != null) return _buildIndexing(context);
     if (!_hasLibrary) return _buildEmptyState(context);
+    return _buildTimeline(context);
+  }
 
-    // Phase 3: replace with actual photo grid
-    return const Scaffold(body: Center(child: Text('Timeline')));
+  Widget _buildTimeline(BuildContext context) {
+    final state = ref.watch(timelineProvider);
+    return state.when(
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (e, _) =>
+          Scaffold(body: Center(child: Text('Error loading library: $e'))),
+      data: (timeline) {
+        if (timeline.loaded.isEmpty) {
+          return const Scaffold(
+            body: Center(child: Text('No photos indexed yet.')),
+          );
+        }
+        return Scaffold(
+          body: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              for (final month in timeline.loaded) ...[
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _MonthHeaderDelegate(month),
+                ),
+                SliverGrid.builder(
+                  gridDelegate:
+                      const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 180,
+                    crossAxisSpacing: 2,
+                    mainAxisSpacing: 2,
+                  ),
+                  itemCount: month.items.length,
+                  itemBuilder: (_, i) => PhotoTile(item: month.items[i]),
+                ),
+              ],
+              if (timeline.hasMore)
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildIndexing(BuildContext context) {
@@ -149,4 +215,36 @@ class _TimelineScreenState extends State<TimelineScreen> {
       ),
     );
   }
+}
+
+class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
+  _MonthHeaderDelegate(this.month);
+
+  final MonthData month;
+
+  @override
+  double get minExtent => 52;
+  @override
+  double get maxExtent => 52;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        child: Text(
+          '${month.monthName} ${month.year}',
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_MonthHeaderDelegate old) =>
+      month.year != old.month.year || month.month != old.month.month;
 }
