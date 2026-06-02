@@ -1,7 +1,7 @@
 import 'package:echo_frame/models/google_takeout/import_result.dart';
 import 'package:echo_frame/services/takeout_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
-import 'package:echo_frame/views/timeline/timeline_provider.dart';
+import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum ImportPhase { idle, discovering, review, importing, done, error }

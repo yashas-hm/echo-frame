@@ -6,7 +6,7 @@ import 'package:echo_frame/services/indexing_pipeline.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:echo_frame/views/timeline/photo_tile.dart';
-import 'package:echo_frame/views/timeline/timeline_provider.dart';
+import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -1,5 +1,5 @@
 import 'package:echo_frame/views/organizer/operation_preview_list.dart';
-import 'package:echo_frame/views/organizer/organizer_provider.dart';
+import 'package:echo_frame/views/organizer/provider/organizer_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -3,7 +3,7 @@ import 'package:echo_frame/models/organizer_result.dart';
 import 'package:echo_frame/services/indexing_pipeline.dart';
 import 'package:echo_frame/services/organizer_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
-import 'package:echo_frame/views/timeline/timeline_provider.dart';
+import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum OrganizerPhase { idle, previewing, preview, applying, done, error }
