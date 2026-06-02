@@ -31,6 +31,7 @@ dev_dependencies:
   drift_dev: ^2.21.0
 
 flutter:
+  uses-material-design: true
   assets:
     - assets/images/
     - assets/anim/

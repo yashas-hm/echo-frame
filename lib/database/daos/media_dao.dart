@@ -82,6 +82,13 @@ class MediaDao {
       (_db.select(_db.mediaRecords)..where((r) => r.id.equals(id)))
           .getSingleOrNull();
 
+  Future<void> upsertMeta(
+    ResolvedMeta meta,
+    String driveId,
+    String libraryRoot,
+  ) =>
+      upsertBatch([_toCompanion(meta, driveId, libraryRoot)]);
+
   MediaRecordsCompanion _toCompanion(
     ResolvedMeta meta,
     String driveId,

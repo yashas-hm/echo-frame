@@ -1,4 +1,5 @@
 import 'package:echo_frame/app.dart';
+import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:flutter/material.dart';
@@ -15,6 +16,18 @@ void main() async {
   if (root != null) {
     await EchoDatabase.open(root);
   }
+
+  const windowOptions = WindowOptions(
+    size: Size(Sizes.kInitWindowWidth, Sizes.kInitWindowHeight),
+    minimumSize: Sizes.kMinWindowSize,
+    center: true,
+    title: 'Echo Frame',
+  );
+
+  await windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
 
   runApp(const ProviderScope(child: EchoFrameApp()));
 }
