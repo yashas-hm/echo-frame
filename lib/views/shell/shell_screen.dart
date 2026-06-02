@@ -8,6 +8,8 @@ class ShellScreen extends StatelessWidget {
 
   static const _destinations = [
     (route: '/timeline', icon: Icons.grid_view_rounded, label: 'Library'),
+    (route: '/search', icon: Icons.search_rounded, label: 'Search'),
+    (route: '/favorites', icon: Icons.favorite_outline_rounded, label: 'Favourites'),
     (route: '/organize', icon: Icons.drive_folder_upload_outlined, label: 'Organize'),
     (route: '/import', icon: Icons.download_rounded, label: 'Import'),
     (route: '/settings', icon: Icons.settings_outlined, label: 'Settings'),

@@ -1,8 +1,10 @@
 import 'package:echo_frame/theme/provider/theme_provider.dart';
 import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/views/favorites/favorites_screen.dart';
 import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/organizer/organizer_screen.dart';
 import 'package:echo_frame/views/photo_view/photo_view_screen.dart';
+import 'package:echo_frame/views/search/search_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/shell/shell_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
@@ -17,6 +19,8 @@ final _router = GoRouter(
       builder: (_, __, child) => ShellScreen(child: child),
       routes: [
         GoRoute(path: '/timeline', builder: (_, __) => const TimelineScreen()),
+        GoRoute(path: '/search', builder: (_, __) => const SearchScreen()),
+        GoRoute(path: '/favorites', builder: (_, __) => const FavoritesScreen()),
         GoRoute(path: '/organize', builder: (_, __) => const OrganizerScreen()),
         GoRoute(path: '/import', builder: (_, __) => const ImportScreen()),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),

@@ -1,10 +1,48 @@
+import 'package:echo_frame/database/daos/media_dao.dart';
+import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
+import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PhotoDetailPanel extends StatelessWidget {
+class PhotoDetailPanel extends ConsumerStatefulWidget {
   const PhotoDetailPanel({super.key, required this.item});
 
   final MediaItem item;
+
+  @override
+  ConsumerState<PhotoDetailPanel> createState() => _PhotoDetailPanelState();
+}
+
+class _PhotoDetailPanelState extends ConsumerState<PhotoDetailPanel> {
+  late bool _isFavorite;
+  bool _toggling = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.item.isFavorite;
+  }
+
+  @override
+  void didUpdateWidget(PhotoDetailPanel old) {
+    super.didUpdateWidget(old);
+    if (old.item.id != widget.item.id) {
+      _isFavorite = widget.item.isFavorite;
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    if (_toggling || !EchoDatabase.isOpen) return;
+    setState(() {
+      _toggling = true;
+      _isFavorite = !_isFavorite;
+    });
+    await MediaDao(EchoDatabase.instance)
+        .setFavorite(widget.item.id, value: _isFavorite);
+    ref.invalidate(favoritesProvider);
+    if (mounted) setState(() => _toggling = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,19 +56,49 @@ class PhotoDetailPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Info', style: theme.textTheme.labelLarge),
+          // ── Favourite toggle ─────────────────────────────────────────
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _toggling ? null : _toggleFavorite,
+              icon: Icon(
+                _isFavorite
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_outline_rounded,
+                color: _isFavorite ? colors.error : null,
+                size: 18,
+              ),
+              label: Text(_isFavorite ? 'Favourited' : 'Add to favourites'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor:
+                    _isFavorite ? colors.error : colors.onSurface,
+              ),
+            ),
+          ),
           const SizedBox(height: 20),
-          _Row(Icons.calendar_today_outlined, _formatDate(item.capturedAt)),
-          if (item.width != null && item.height != null)
+
+          // ── Metadata ─────────────────────────────────────────────────
+          Text('Info', style: theme.textTheme.labelLarge),
+          const SizedBox(height: 12),
+          _Row(Icons.calendar_today_outlined,
+              _formatDate(widget.item.capturedAt)),
+          if (widget.item.width != null && widget.item.height != null)
             _Row(Icons.photo_size_select_actual_outlined,
-                '${item.width} × ${item.height}'),
-          if (item.cameraMake != null || item.cameraModel != null)
-            _Row(Icons.camera_outlined,
-                [item.cameraMake, item.cameraModel].nonNulls.join(' ')),
-          if (item.latitude != null && item.longitude != null)
-            _Row(Icons.location_on_outlined,
-                '${item.latitude!.toStringAsFixed(4)}, ${item.longitude!.toStringAsFixed(4)}'),
-          _Row(Icons.insert_drive_file_outlined, item.filePath.split('/').last),
+                '${widget.item.width} × ${widget.item.height}'),
+          if (widget.item.cameraMake != null ||
+              widget.item.cameraModel != null)
+            _Row(
+                Icons.camera_outlined,
+                [widget.item.cameraMake, widget.item.cameraModel]
+                    .nonNulls
+                    .join(' ')),
+          if (widget.item.latitude != null && widget.item.longitude != null)
+            _Row(
+                Icons.location_on_outlined,
+                '${widget.item.latitude!.toStringAsFixed(4)}, '
+                '${widget.item.longitude!.toStringAsFixed(4)}'),
+          _Row(Icons.insert_drive_file_outlined,
+              widget.item.filePath.split('/').last),
         ],
       ),
     );
@@ -65,11 +133,13 @@ class _Row extends StatelessWidget {
           Icon(icon, size: 15, color: colors.outline),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(text,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: colors.onSurface)),
+            child: Text(
+              text,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: colors.onSurface),
+            ),
           ),
         ],
       ),

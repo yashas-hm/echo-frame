@@ -82,6 +82,39 @@ class MediaDao {
       (_db.select(_db.mediaRecords)..where((r) => r.id.equals(id)))
           .getSingleOrNull();
 
+  // ── Search ───────────────────────────────────────────────────────────────
+
+  Future<List<MediaRecord>> search(String query) {
+    final like = '%$query%';
+    return (_db.select(_db.mediaRecords)
+          ..where((r) =>
+              r.isTrashed.equals(false) &
+              (r.filename.like(like) |
+               r.cameraMake.like(like) |
+               r.cameraModel.like(like)))
+          ..orderBy([
+            (r) => OrderingTerm(
+                expression: r.capturedAt, mode: OrderingMode.desc),
+          ]))
+        .get();
+  }
+
+  // ── Favorites ─────────────────────────────────────────────────────────────
+
+  Future<List<MediaRecord>> listFavorites() =>
+      (_db.select(_db.mediaRecords)
+            ..where((r) =>
+                r.isFavorite.equals(true) & r.isTrashed.equals(false))
+            ..orderBy([
+              (r) => OrderingTerm(
+                  expression: r.capturedAt, mode: OrderingMode.desc),
+            ]))
+          .get();
+
+  Future<void> setFavorite(int id, {required bool value}) =>
+      (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))
+          .write(MediaRecordsCompanion(isFavorite: Value(value)));
+
   Future<void> upsertMeta(
     ResolvedMeta meta,
     String driveId,
