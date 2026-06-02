@@ -1,4 +1,4 @@
-import 'package:echo_frame/models/import_result.dart';
+import 'package:echo_frame/models/google_takeout/import_result.dart';
 import 'package:echo_frame/services/takeout_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:echo_frame/views/timeline/timeline_provider.dart';

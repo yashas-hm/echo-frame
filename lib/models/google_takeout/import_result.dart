@@ -1,4 +1,4 @@
-import 'package:echo_frame/models/takeout_meta.dart';
+import 'package:echo_frame/models/google_takeout/takeout_meta.dart';
 
 class MatchedPair {
   final String mediaPath;

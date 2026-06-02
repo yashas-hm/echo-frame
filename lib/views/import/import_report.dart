@@ -1,4 +1,4 @@
-import 'package:echo_frame/models/import_result.dart';
+import 'package:echo_frame/models/google_takeout/import_result.dart';
 import 'package:flutter/material.dart';
 
 class ImportReport extends StatefulWidget {
