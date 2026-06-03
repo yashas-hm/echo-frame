@@ -86,6 +86,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
       jsonEncode({
         'version': 1,
         'createdAt': DateTime.now().toUtc().toIso8601String(),
+        'themeMode': Prefs.themeMode.name,
       }),
     );
 
