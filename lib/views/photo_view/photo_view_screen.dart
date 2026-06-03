@@ -5,6 +5,7 @@ import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/views/photo_view/photo_detail_panel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 class PhotoViewScreen extends StatefulWidget {
@@ -66,6 +67,31 @@ class _PhotoViewScreenState extends State<PhotoViewScreen> {
     }
   }
 
+  void _goToPage(int index) {
+    if (index < 0 || index >= _siblings.length) return;
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  KeyEventResult _handleKey(FocusNode _, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    switch (event.logicalKey) {
+      case LogicalKeyboardKey.arrowRight:
+        _goToPage(_currentIndex + 1);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowLeft:
+        _goToPage(_currentIndex - 1);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.escape:
+        context.pop();
+        return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -92,7 +118,10 @@ class _PhotoViewScreenState extends State<PhotoViewScreen> {
 
     final current = _siblings[_currentIndex];
 
-    return Scaffold(
+    return Focus(
+      autofocus: true,
+      onKeyEvent: _handleKey,
+      child: Scaffold(
       backgroundColor: Colors.black,
       body: Row(
         children: [
@@ -136,6 +165,6 @@ class _PhotoViewScreenState extends State<PhotoViewScreen> {
           PhotoDetailPanel(item: current),
         ],
       ),
-    );
+    ));
   }
 }

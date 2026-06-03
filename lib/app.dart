@@ -9,6 +9,7 @@ import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/shell/shell_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -41,13 +42,30 @@ class EchoFrameApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(appThemeProvider).mode;
-    return MaterialApp.router(
-      routerConfig: _router,
-      theme: EchoFrameThemes.lightTheme,
-      darkTheme: EchoFrameThemes.darkTheme,
-      themeMode: themeMode,
-      debugShowCheckedModeBanner: false,
-      title: 'Echo Frame',
+    return Shortcuts(
+      shortcuts: const {
+        SingleActivator(LogicalKeyboardKey.keyF, meta: true): _SearchIntent(),
+        SingleActivator(LogicalKeyboardKey.keyF, control: true): _SearchIntent(),
+      },
+      child: Actions(
+        actions: {
+          _SearchIntent: CallbackAction<_SearchIntent>(
+            onInvoke: (_) { _router.go('/search'); return null; },
+          ),
+        },
+        child: MaterialApp.router(
+          routerConfig: _router,
+          theme: EchoFrameThemes.lightTheme,
+          darkTheme: EchoFrameThemes.darkTheme,
+          themeMode: themeMode,
+          debugShowCheckedModeBanner: false,
+          title: 'Echo Frame',
+        ),
+      ),
     );
   }
+}
+
+class _SearchIntent extends Intent {
+  const _SearchIntent();
 }

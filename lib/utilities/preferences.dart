@@ -26,4 +26,46 @@ class Prefs {
       _prefs.setString(Keys.libraryRootPath, value);
     }
   }
+
+  // ── Window geometry ───────────────────────────────────────────────────────
+
+  static double? get windowWidth => _prefs.getDouble(Keys.windowWidth);
+
+  static set windowWidth(double? v) {
+    if (v == null) {
+      _prefs.remove(Keys.windowWidth);
+    } else {
+      _prefs.setDouble(Keys.windowWidth, v);
+    }
+  }
+
+  static double? get windowHeight => _prefs.getDouble(Keys.windowHeight);
+
+  static set windowHeight(double? v) {
+    if (v == null) {
+      _prefs.remove(Keys.windowHeight);
+    } else {
+      _prefs.setDouble(Keys.windowHeight, v);
+    }
+  }
+
+  static double? get windowX => _prefs.getDouble(Keys.windowX);
+
+  static set windowX(double? v) {
+    if (v == null) {
+      _prefs.remove(Keys.windowX);
+    } else {
+      _prefs.setDouble(Keys.windowX, v);
+    }
+  }
+
+  static double? get windowY => _prefs.getDouble(Keys.windowY);
+
+  static set windowY(double? v) {
+    if (v == null) {
+      _prefs.remove(Keys.windowY);
+    } else {
+      _prefs.setDouble(Keys.windowY, v);
+    }
+  }
 }

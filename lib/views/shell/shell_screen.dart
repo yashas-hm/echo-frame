@@ -1,3 +1,4 @@
+import 'package:echo_frame/widgets/title_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -23,22 +24,31 @@ class ShellScreen extends StatelessWidget {
         .clamp(0, _destinations.length - 1);
 
     return Scaffold(
-      body: Row(
+      body: Column(
         children: [
-          NavigationRail(
-            selectedIndex: selectedIndex,
-            onDestinationSelected: (i) => context.go(_destinations[i].route),
-            labelType: NavigationRailLabelType.all,
-            destinations: [
-              for (final d in _destinations)
-                NavigationRailDestination(
-                  icon: Icon(d.icon),
-                  label: Text(d.label),
+          const TitleBar(),
+          const Divider(height: 1, thickness: 1),
+          Expanded(
+            child: Row(
+              children: [
+                NavigationRail(
+                  selectedIndex: selectedIndex,
+                  onDestinationSelected: (i) =>
+                      context.go(_destinations[i].route),
+                  labelType: NavigationRailLabelType.all,
+                  destinations: [
+                    for (final d in _destinations)
+                      NavigationRailDestination(
+                        icon: Icon(d.icon),
+                        label: Text(d.label),
+                      ),
+                  ],
                 ),
-            ],
+                const VerticalDivider(width: 1, thickness: 1),
+                Expanded(child: child),
+              ],
+            ),
           ),
-          const VerticalDivider(width: 1, thickness: 1),
-          Expanded(child: child),
         ],
       ),
     );

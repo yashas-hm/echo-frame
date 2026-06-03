@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:echo_frame/app.dart';
 import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/database/database.dart';
@@ -17,17 +19,57 @@ void main() async {
     await EchoDatabase.open(root);
   }
 
-  const windowOptions = WindowOptions(
-    size: Size(Sizes.kInitWindowWidth, Sizes.kInitWindowHeight),
+  final savedW = Prefs.windowWidth;
+  final savedH = Prefs.windowHeight;
+  final savedX = Prefs.windowX;
+  final savedY = Prefs.windowY;
+  final hasSavedGeometry = savedW != null && savedH != null;
+
+  final windowOptions = WindowOptions(
+    size: hasSavedGeometry
+        ? Size(savedW, savedH)
+        : const Size(Sizes.kInitWindowWidth, Sizes.kInitWindowHeight),
     minimumSize: Sizes.kMinWindowSize,
-    center: true,
+    center: !hasSavedGeometry,
+    titleBarStyle: TitleBarStyle.hidden,
     title: 'Echo Frame',
   );
 
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
+    if (hasSavedGeometry && savedX != null && savedY != null) {
+      await windowManager.setPosition(Offset(savedX, savedY));
+    }
     await windowManager.show();
     await windowManager.focus();
   });
 
+  windowManager.addListener(_EchoWindowListener());
+
   runApp(const ProviderScope(child: EchoFrameApp()));
+}
+
+class _EchoWindowListener extends WindowListener {
+  Timer? _debounce;
+
+  void _scheduleWrite() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), _persist);
+  }
+
+  Future<void> _persist() async {
+    try {
+      final size = await windowManager.getSize();
+      final pos = await windowManager.getPosition();
+      Prefs.windowWidth = size.width;
+      Prefs.windowHeight = size.height;
+      Prefs.windowX = pos.dx;
+      Prefs.windowY = pos.dy;
+    } catch (_) {}
+  }
+
+  @override
+  void onWindowResize() => _scheduleWrite();
+
+  @override
+  void onWindowMove() => _scheduleWrite();
 }
