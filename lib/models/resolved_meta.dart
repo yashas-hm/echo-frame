@@ -25,10 +25,12 @@ class ResolvedMeta {
     this.mediaType = MediaType.image,
   });
 
-  factory ResolvedMeta.fallback({required String path, required DateTime mtime}) =>
+  factory ResolvedMeta.fallback(
+          {required String path, required DateTime mtime}) =>
       ResolvedMeta(path: path, capturedAt: mtime, mediaType: MediaType.unknown);
 
-  factory ResolvedMeta.fromJson(Map<String, dynamic> json, {required String folderPath}) {
+  factory ResolvedMeta.fromJson(Map<String, dynamic> json,
+      {required String folderPath}) {
     final filename = json['filename'] as String;
     final durationMs = json['durationMs'] as int?;
     return ResolvedMeta(

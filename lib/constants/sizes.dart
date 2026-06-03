@@ -1,6 +1,6 @@
 part of 'constants.dart';
 
-final class Sizes{
+final class Sizes {
   Sizes._();
 
   static const Size kMinWindowSize = Size(801.0, 572.0);
@@ -10,5 +10,4 @@ final class Sizes{
   static const double kInitWindowWidth = 1200.0;
 
   static const double kInitWindowHeight = 800.0;
-
 }

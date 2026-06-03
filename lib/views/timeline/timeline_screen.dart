@@ -139,8 +139,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                   delegate: _MonthHeaderDelegate(month),
                 ),
                 SliverGrid.builder(
-                  gridDelegate:
-                      const SliverGridDelegateWithMaxCrossAxisExtent(
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 180,
                     crossAxisSpacing: 2,
                     mainAxisSpacing: 2,
@@ -224,11 +223,13 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   double get minExtent => 52;
+
   @override
   double get maxExtent => 52;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     return ColoredBox(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Padding(

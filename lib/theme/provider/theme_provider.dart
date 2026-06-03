@@ -11,12 +11,12 @@ class AppThemeState {
   final AppThemeColors colors;
 
   bool get isDark => switch (mode) {
-    ThemeMode.dark => true,
-    ThemeMode.light => false,
-    ThemeMode.system =>
-      SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-          Brightness.dark,
-  };
+        ThemeMode.dark => true,
+        ThemeMode.light => false,
+        ThemeMode.system =>
+          SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark,
+      };
 }
 
 class AppThemeNotifier extends Notifier<AppThemeState> {

@@ -119,52 +119,52 @@ class _PhotoViewScreenState extends State<PhotoViewScreen> {
     final current = _siblings[_currentIndex];
 
     return Focus(
-      autofocus: true,
-      onKeyEvent: _handleKey,
-      child: Scaffold(
-      backgroundColor: Colors.black,
-      body: Row(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (i) => setState(() => _currentIndex = i),
-                  itemCount: _siblings.length,
-                  itemBuilder: (_, i) => InteractiveViewer(
-                    child: Center(
-                      child: Image.file(
-                        File(_siblings[i].filePath),
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(Icons.broken_image_outlined,
-                                size: 64, color: Colors.white38),
-                            SizedBox(height: 8),
-                            Text('File not available',
-                                style: TextStyle(color: Colors.white54)),
-                          ],
+        autofocus: true,
+        onKeyEvent: _handleKey,
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Row(
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (i) => setState(() => _currentIndex = i),
+                      itemCount: _siblings.length,
+                      itemBuilder: (_, i) => InteractiveViewer(
+                        child: Center(
+                          child: Image.file(
+                            File(_siblings[i].filePath),
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.broken_image_outlined,
+                                    size: 64, color: Colors.white38),
+                                SizedBox(height: 8),
+                                Text('File not available',
+                                    style: TextStyle(color: Colors.white54)),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    Positioned(
+                      top: 16,
+                      left: 16,
+                      child: IconButton.filledTonal(
+                        onPressed: context.pop,
+                        icon: const Icon(Icons.arrow_back_rounded),
+                      ),
+                    ),
+                  ],
                 ),
-                Positioned(
-                  top: 16,
-                  left: 16,
-                  child: IconButton.filledTonal(
-                    onPressed: context.pop,
-                    icon: const Icon(Icons.arrow_back_rounded),
-                  ),
-                ),
-              ],
-            ),
+              ),
+              PhotoDetailPanel(item: current),
+            ],
           ),
-          PhotoDetailPanel(item: current),
-        ],
-      ),
-    ));
+        ));
   }
 }

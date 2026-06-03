@@ -12,6 +12,8 @@ class OperationResult {
   });
 
   String get filename => sourcePath.split('/').last;
+
   String get destFilename => destRelative.split('/').last;
+
   String get monthKey => destRelative.split('/').take(2).join('/');
 }

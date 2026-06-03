@@ -16,7 +16,8 @@ class OperationPreviewList extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.folder_off_outlined, size: 48, color: colors.outlineVariant),
+            Icon(Icons.folder_off_outlined,
+                size: 48, color: colors.outlineVariant),
             const SizedBox(height: 16),
             Text('No media files found in the selected folder',
                 style: theme.textTheme.bodyMedium

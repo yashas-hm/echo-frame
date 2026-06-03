@@ -9,7 +9,8 @@ class MonthData {
   final int month;
   final List<MediaItem> items;
 
-  const MonthData({required this.year, required this.month, required this.items});
+  const MonthData(
+      {required this.year, required this.month, required this.items});
 
   String get monthName => MonthFolder.monthNames[month - 1];
 }
@@ -61,22 +62,19 @@ class TimelineNotifier extends AsyncNotifier<TimelineState> {
     final current = state.value;
     if (current == null || !current.hasMore) return;
 
-    final nextMonths = current.allMonths
-        .skip(current.loaded.length)
-        .take(_pageSize)
-        .toList();
+    final nextMonths =
+        current.allMonths.skip(current.loaded.length).take(_pageSize).toList();
     if (nextMonths.isEmpty) return;
 
     final loaded = await _loadPage(nextMonths);
     state = AsyncData(current.copyWith(
       loaded: [...current.loaded, ...loaded],
-      hasMore:
-          current.loaded.length + loaded.length < current.allMonths.length,
+      hasMore: current.loaded.length + loaded.length < current.allMonths.length,
     ));
   }
 
   Future<List<MonthData>> _loadPage(
-      List<({int year, int month, int count})> months) =>
+          List<({int year, int month, int count})> months) =>
       Future.wait(months.map((s) async {
         final records =
             await MediaDao(EchoDatabase.instance).queryByMonth(s.year, s.month);
@@ -88,7 +86,6 @@ class TimelineNotifier extends AsyncNotifier<TimelineState> {
       }));
 }
 
-final timelineProvider =
-    AsyncNotifierProvider<TimelineNotifier, TimelineState>(
+final timelineProvider = AsyncNotifierProvider<TimelineNotifier, TimelineState>(
   TimelineNotifier.new,
 );

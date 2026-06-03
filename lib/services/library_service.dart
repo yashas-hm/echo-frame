@@ -11,8 +11,19 @@ class LibraryStructure {
 
 class LibraryService {
   static const _mediaExts = {
-    'jpg', 'jpeg', 'png', 'heic', 'heif', 'webp', 'tiff', 'tif',
-    'mp4', 'mov', 'avi', 'mkv', 'm4v',
+    'jpg',
+    'jpeg',
+    'png',
+    'heic',
+    'heif',
+    'webp',
+    'tiff',
+    'tif',
+    'mp4',
+    'mov',
+    'avi',
+    'mkv',
+    'm4v',
   };
 
   static bool isMedia(String path) =>

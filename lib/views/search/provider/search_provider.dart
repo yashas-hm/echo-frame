@@ -21,6 +21,5 @@ class SearchNotifier extends AsyncNotifier<List<MediaRecord>> {
   void clear() => state = const AsyncData([]);
 }
 
-final searchProvider =
-    AsyncNotifierProvider<SearchNotifier, List<MediaRecord>>(
-        SearchNotifier.new);
+final searchProvider = AsyncNotifierProvider<SearchNotifier, List<MediaRecord>>(
+    SearchNotifier.new);

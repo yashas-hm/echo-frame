@@ -18,8 +18,7 @@ class OperationDao {
   Future<void> markRolledBack(String batchId) async {
     final now = DateTime.now().toUtc();
     await (_db.update(_db.operationRecords)
-          ..where(
-              (r) => r.batchId.equals(batchId) & r.rolledBackAt.isNull()))
+          ..where((r) => r.batchId.equals(batchId) & r.rolledBackAt.isNull()))
         .write(OperationRecordsCompanion(rolledBackAt: Value(now)));
   }
 }

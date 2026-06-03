@@ -1,5 +1,5 @@
-import 'package:echo_frame/views/import/provider/import_provider.dart';
 import 'package:echo_frame/views/import/import_report.dart';
+import 'package:echo_frame/views/import/provider/import_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,8 +27,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
     return switch (state.phase) {
       ImportPhase.idle => _buildIdle(context, state),
-      ImportPhase.discovering =>
-        _buildSpinner('Scanning Takeout folder…'),
+      ImportPhase.discovering => _buildSpinner('Scanning Takeout folder…'),
       ImportPhase.review => _buildReview(context, state),
       ImportPhase.importing => _buildImporting(context, state),
       ImportPhase.done => _buildDone(context, state),
@@ -64,8 +63,8 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                 'Point to your Google Takeout export folder. EchoFrame will '
                 'match metadata sidecars, fix timestamps, and copy photos into '
                 'your library.',
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(color: colors.outline),
+                style:
+                    theme.textTheme.bodyMedium?.copyWith(color: colors.outline),
               ),
               const SizedBox(height: 32),
               _Label('Takeout folder'),
@@ -188,8 +187,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
   Widget _buildImporting(BuildContext context, ImportState state) {
     final theme = Theme.of(context);
-    final fraction =
-        state.total == 0 ? null : state.imported / state.total;
+    final fraction = state.total == 0 ? null : state.imported / state.total;
 
     return Scaffold(
       body: Center(
@@ -316,6 +314,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
 class _Label extends StatelessWidget {
   const _Label(this.text);
+
   final String text;
 
   @override

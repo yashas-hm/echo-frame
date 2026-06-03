@@ -77,10 +77,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           // ── Results ─────────────────────────────────────────────────────
           Expanded(
             child: state.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (e, _) =>
-                  Center(child: Text('Error: $e')),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Error: $e')),
               data: (records) {
                 if (_controller.text.trim().isEmpty) {
                   return _buildHint(context, colors);
@@ -104,8 +102,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         SliverPadding(
           padding: const EdgeInsets.all(2),
           sliver: SliverGrid.builder(
-            gridDelegate:
-                const SliverGridDelegateWithMaxCrossAxisExtent(
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 180,
               crossAxisSpacing: 2,
               mainAxisSpacing: 2,

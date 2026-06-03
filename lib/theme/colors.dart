@@ -8,10 +8,14 @@ class KnownColors {
   static const Color transparent = Color(0x00000000);
 
   // Sky palette – EchoFrame brand (light-theme primary → secondary)
-  static const Color sky200 = Color(0xFF6BB5F2); // soft sky (light-theme primary)
-  static const Color sky300 = Color(0xFF5E9FF2); // medium sky (light-theme secondary)
-  static const Color sky400 = Color(0xFF36A0F7); // bright sky (dark-theme primary)
-  static const Color sky500 = Color(0xFF3187F5); // deep sky (dark-theme secondary)
+  static const Color sky200 =
+      Color(0xFF6BB5F2); // soft sky (light-theme primary)
+  static const Color sky300 =
+      Color(0xFF5E9FF2); // medium sky (light-theme secondary)
+  static const Color sky400 =
+      Color(0xFF36A0F7); // bright sky (dark-theme primary)
+  static const Color sky500 =
+      Color(0xFF3187F5); // deep sky (dark-theme secondary)
 
   // Neutral palette – app backgrounds / text
   static const Color neutral100 = Color(0xFFFAFAFA); // near-white bg (light)

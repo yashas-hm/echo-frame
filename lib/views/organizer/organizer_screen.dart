@@ -42,9 +42,8 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final destRoot = state.destRoot;
-    final canPreview = _sourceDir != null &&
-        destRoot != null &&
-        _sourceDir != destRoot;
+    final canPreview =
+        _sourceDir != null && destRoot != null && _sourceDir != destRoot;
 
     if (destRoot == null) {
       return _buildCentered(
@@ -154,8 +153,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
 
   Widget _buildApplying(BuildContext context, OrganizerState state) {
     final theme = Theme.of(context);
-    final fraction =
-        state.total == 0 ? null : state.applied / state.total;
+    final fraction = state.total == 0 ? null : state.applied / state.total;
 
     return Scaffold(
       body: Center(
@@ -165,8 +163,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Sorting photos…',
-                  style: theme.textTheme.titleMedium),
+              Text('Sorting photos…', style: theme.textTheme.titleMedium),
               const SizedBox(height: 16),
               LinearProgressIndicator(value: fraction),
               const SizedBox(height: 8),
@@ -201,8 +198,8 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
               const SizedBox(height: 8),
               Text(
                 '${state.rolledBack} file${state.rolledBack == 1 ? '' : 's'} rolled back',
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: colors.outline),
+                style:
+                    theme.textTheme.bodySmall?.copyWith(color: colors.outline),
               ),
             ],
             const SizedBox(height: 32),
@@ -239,19 +236,17 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline_rounded,
-                size: 56, color: colors.error),
+            Icon(Icons.error_outline_rounded, size: 56, color: colors.error),
             const SizedBox(height: 16),
-            Text('Something went wrong',
-                style: theme.textTheme.titleMedium),
+            Text('Something went wrong', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             SizedBox(
               width: 360,
               child: Text(
                 state.error ?? 'Unknown error',
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: colors.outline),
+                style:
+                    theme.textTheme.bodySmall?.copyWith(color: colors.outline),
               ),
             ),
             const SizedBox(height: 24),

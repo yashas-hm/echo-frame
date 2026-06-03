@@ -42,8 +42,7 @@ class FavoritesScreen extends ConsumerWidget {
               SliverPadding(
                 padding: const EdgeInsets.all(2),
                 sliver: SliverGrid.builder(
-                  gridDelegate:
-                      const SliverGridDelegateWithMaxCrossAxisExtent(
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 180,
                     crossAxisSpacing: 2,
                     mainAxisSpacing: 2,

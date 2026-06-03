@@ -51,8 +51,7 @@ class MediaDao {
       ])
       ..orderBy([
         OrderingTerm(
-            expression: _db.mediaRecords.capturedYear,
-            mode: OrderingMode.desc),
+            expression: _db.mediaRecords.capturedYear, mode: OrderingMode.desc),
         OrderingTerm(
             expression: _db.mediaRecords.capturedMonth,
             mode: OrderingMode.desc),
@@ -90,26 +89,24 @@ class MediaDao {
           ..where((r) =>
               r.isTrashed.equals(false) &
               (r.filename.like(like) |
-               r.cameraMake.like(like) |
-               r.cameraModel.like(like)))
+                  r.cameraMake.like(like) |
+                  r.cameraModel.like(like)))
           ..orderBy([
-            (r) => OrderingTerm(
-                expression: r.capturedAt, mode: OrderingMode.desc),
+            (r) =>
+                OrderingTerm(expression: r.capturedAt, mode: OrderingMode.desc),
           ]))
         .get();
   }
 
   // ── Favorites ─────────────────────────────────────────────────────────────
 
-  Future<List<MediaRecord>> listFavorites() =>
-      (_db.select(_db.mediaRecords)
-            ..where((r) =>
-                r.isFavorite.equals(true) & r.isTrashed.equals(false))
-            ..orderBy([
-              (r) => OrderingTerm(
-                  expression: r.capturedAt, mode: OrderingMode.desc),
-            ]))
-          .get();
+  Future<List<MediaRecord>> listFavorites() => (_db.select(_db.mediaRecords)
+        ..where((r) => r.isFavorite.equals(true) & r.isTrashed.equals(false))
+        ..orderBy([
+          (r) =>
+              OrderingTerm(expression: r.capturedAt, mode: OrderingMode.desc),
+        ]))
+      .get();
 
   Future<void> setFavorite(int id, {required bool value}) =>
       (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))

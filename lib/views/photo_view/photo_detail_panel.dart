@@ -70,8 +70,7 @@ class _PhotoDetailPanelState extends ConsumerState<PhotoDetailPanel> {
               ),
               label: Text(_isFavorite ? 'Favourited' : 'Add to favourites'),
               style: OutlinedButton.styleFrom(
-                foregroundColor:
-                    _isFavorite ? colors.error : colors.onSurface,
+                foregroundColor: _isFavorite ? colors.error : colors.onSurface,
               ),
             ),
           ),
@@ -85,8 +84,7 @@ class _PhotoDetailPanelState extends ConsumerState<PhotoDetailPanel> {
           if (widget.item.width != null && widget.item.height != null)
             _Row(Icons.photo_size_select_actual_outlined,
                 '${widget.item.width} × ${widget.item.height}'),
-          if (widget.item.cameraMake != null ||
-              widget.item.cameraModel != null)
+          if (widget.item.cameraMake != null || widget.item.cameraModel != null)
             _Row(
                 Icons.camera_outlined,
                 [widget.item.cameraMake, widget.item.cameraModel]
@@ -107,8 +105,18 @@ class _PhotoDetailPanelState extends ConsumerState<PhotoDetailPanel> {
   static String _formatDate(DateTime? dt) {
     if (dt == null) return 'Unknown date';
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final h = dt.hour.toString().padLeft(2, '0');
     final m = dt.minute.toString().padLeft(2, '0');

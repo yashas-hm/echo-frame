@@ -7,13 +7,17 @@ class MetadataService {
   static Future<ResolvedMeta> read(String filePath) async {
     final mtime = File(filePath).statSync().modified.toUtc();
     final meta = await MediaMetadata.read(filePath);
-    return meta != null ? _fromPlugin(filePath, meta, mtime) : ResolvedMeta.fallback(path: filePath, mtime: mtime);
+    return meta != null
+        ? _fromPlugin(filePath, meta, mtime)
+        : ResolvedMeta.fallback(path: filePath, mtime: mtime);
   }
 
   // Rust/Rayon handles parallelism internally — no compute() needed.
   static Future<List<ResolvedMeta?>> readAll(List<String> paths) async {
     if (paths.isEmpty) return [];
-    final mtimes = {for (final p in paths) p: File(p).statSync().modified.toUtc()};
+    final mtimes = {
+      for (final p in paths) p: File(p).statSync().modified.toUtc()
+    };
     final metas = await MediaMetadata.readAll(paths);
     return [
       for (int i = 0; i < paths.length; i++)
@@ -23,7 +27,8 @@ class MetadataService {
     ];
   }
 
-  static ResolvedMeta _fromPlugin(String path, MediaMetadata meta, DateTime mtime) =>
+  static ResolvedMeta _fromPlugin(
+          String path, MediaMetadata meta, DateTime mtime) =>
       ResolvedMeta(
         path: path,
         capturedAt: meta.capturedAt ?? mtime,

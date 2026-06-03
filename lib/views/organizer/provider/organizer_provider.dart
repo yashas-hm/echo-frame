@@ -75,8 +75,7 @@ class OrganizerNotifier extends Notifier<OrganizerState> {
       );
       state = state.copyWith(phase: OrganizerPhase.preview, operations: ops);
     } catch (e) {
-      state = state.copyWith(
-          phase: OrganizerPhase.error, error: e.toString());
+      state = state.copyWith(phase: OrganizerPhase.error, error: e.toString());
     }
   }
 
@@ -112,8 +111,7 @@ class OrganizerNotifier extends Notifier<OrganizerState> {
       ref.invalidate(timelineProvider);
       state = state.copyWith(phase: OrganizerPhase.done);
     } catch (e) {
-      state = state.copyWith(
-          phase: OrganizerPhase.error, error: e.toString());
+      state = state.copyWith(phase: OrganizerPhase.error, error: e.toString());
     }
   }
 
@@ -129,8 +127,7 @@ class OrganizerNotifier extends Notifier<OrganizerState> {
         rolledBack: count,
       );
     } catch (e) {
-      state = state.copyWith(
-          phase: OrganizerPhase.error, error: e.toString());
+      state = state.copyWith(phase: OrganizerPhase.error, error: e.toString());
     }
   }
 

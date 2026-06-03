@@ -21,7 +21,8 @@ final _router = GoRouter(
       routes: [
         GoRoute(path: '/timeline', builder: (_, __) => const TimelineScreen()),
         GoRoute(path: '/search', builder: (_, __) => const SearchScreen()),
-        GoRoute(path: '/favorites', builder: (_, __) => const FavoritesScreen()),
+        GoRoute(
+            path: '/favorites', builder: (_, __) => const FavoritesScreen()),
         GoRoute(path: '/organize', builder: (_, __) => const OrganizerScreen()),
         GoRoute(path: '/import', builder: (_, __) => const ImportScreen()),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
@@ -45,12 +46,16 @@ class EchoFrameApp extends ConsumerWidget {
     return Shortcuts(
       shortcuts: const {
         SingleActivator(LogicalKeyboardKey.keyF, meta: true): _SearchIntent(),
-        SingleActivator(LogicalKeyboardKey.keyF, control: true): _SearchIntent(),
+        SingleActivator(LogicalKeyboardKey.keyF, control: true):
+            _SearchIntent(),
       },
       child: Actions(
         actions: {
           _SearchIntent: CallbackAction<_SearchIntent>(
-            onInvoke: (_) { _router.go('/search'); return null; },
+            onInvoke: (_) {
+              _router.go('/search');
+              return null;
+            },
           ),
         },
         child: MaterialApp.router(
