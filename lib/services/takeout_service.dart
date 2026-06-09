@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -64,7 +65,9 @@ class TakeoutService {
           continue;
         }
         meta = TakeoutMeta.fromJson(json);
-      } catch (_) {
+      } catch (e, st) {
+        dev.log('Failed to parse sidecar $jsonPath: $e',
+            stackTrace: st, name: 'TakeoutService.discover');
         continue;
       }
 
@@ -174,7 +177,10 @@ class TakeoutService {
         );
 
         await mediaDao.upsertMeta(mergedMeta, driveId, libraryRoot);
-      } catch (_) {}
+      } catch (e, st) {
+        dev.log('Import failed for ${pair.mediaPath}: $e',
+            stackTrace: st, name: 'TakeoutService.apply');
+      }
 
       yield ImportProgress(
         imported: i + 1,

@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -107,7 +108,10 @@ class OrganizerService {
           await src.rename(record.sourcePath);
           count++;
         }
-      } catch (_) {}
+      } catch (e, st) {
+        dev.log('Rollback failed for ${record.destPath}: $e',
+            stackTrace: st, name: 'OrganizerService.rollback');
+      }
     }
 
     await dao.markRolledBack(batchId);

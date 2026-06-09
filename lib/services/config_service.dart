@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -17,7 +18,9 @@ class ConfigService {
     if (!await file.exists()) return null;
     try {
       return jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-    } catch (_) {
+    } catch (e, st) {
+      dev.log('Failed to read echo_config.json at $libraryRoot: $e',
+          stackTrace: st, name: 'ConfigService');
       return null;
     }
   }

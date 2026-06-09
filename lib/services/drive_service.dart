@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 
 class DriveService {
@@ -10,7 +11,10 @@ class DriveService {
               .firstMatch(result.stdout as String);
           if (match != null) return match.group(1)!;
         }
-      } catch (_) {}
+      } catch (e, st) {
+        dev.log('diskutil info failed for $path: $e',
+            stackTrace: st, name: 'DriveService.volumeUuid');
+      }
     }
     return path.hashCode.abs().toRadixString(16).padLeft(8, '0');
   }
@@ -24,7 +28,10 @@ class DriveService {
               .firstMatch(result.stdout as String);
           if (match != null) return match.group(1)!.trim();
         }
-      } catch (_) {}
+      } catch (e, st) {
+        dev.log('diskutil info failed for $path: $e',
+            stackTrace: st, name: 'DriveService.volumeLabel');
+      }
     }
     return path.split('/').last;
   }

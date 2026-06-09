@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:echo_frame/app.dart';
 import 'package:echo_frame/constants/constants.dart';
@@ -66,7 +67,10 @@ class _EchoWindowListener extends WindowListener {
       Prefs.windowHeight = size.height;
       Prefs.windowX = pos.dx;
       Prefs.windowY = pos.dy;
-    } catch (_) {}
+    } catch (e, st) {
+      dev.log('Failed to persist window geometry: $e',
+          stackTrace: st, name: 'EchoWindowListener');
+    }
   }
 
   @override
