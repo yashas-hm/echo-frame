@@ -75,7 +75,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   }
 
   Future<void> _pickLibraryFolder() async {
-    final path = await FilePicker.platform.getDirectoryPath(
+    final path = await FilePicker.getDirectoryPath(
       dialogTitle: 'Choose your EchoFrame library folder',
     );
     if (path == null || !mounted) return;

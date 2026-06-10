@@ -15,7 +15,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
   String? _takeoutDir;
 
   Future<void> _pickTakeout() async {
-    final path = await FilePicker.platform.getDirectoryPath(
+    final path = await FilePicker.getDirectoryPath(
       dialogTitle: 'Choose Google Photos Takeout folder',
     );
     if (path != null && mounted) setState(() => _takeoutDir = path);

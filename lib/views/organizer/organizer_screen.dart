@@ -15,7 +15,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
   String? _sourceDir;
 
   Future<void> _pickSource() async {
-    final path = await FilePicker.platform.getDirectoryPath(
+    final path = await FilePicker.getDirectoryPath(
       dialogTitle: 'Choose folder with unsorted photos',
     );
     if (path != null && mounted) setState(() => _sourceDir = path);
