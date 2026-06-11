@@ -1,3 +1,5 @@
+part of 'timeline_models.dart';
+
 class MonthFolder implements Comparable<MonthFolder> {
   static const monthNames = [
     'January',

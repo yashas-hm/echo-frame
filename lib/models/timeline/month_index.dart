@@ -1,3 +1,5 @@
+part of 'timeline_models.dart';
+
 class MonthIndex {
   final int version;
   final DateTime generatedAt;

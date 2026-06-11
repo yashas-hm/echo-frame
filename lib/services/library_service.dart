@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:echo_frame/models/month_folder.dart';
+import 'package:echo_frame/models/timeline/timeline_models.dart';
 
 class LibraryStructure {
   final List<MonthFolder> months;

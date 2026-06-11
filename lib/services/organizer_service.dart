@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:echo_frame/database/daos/operation_dao.dart';
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/month_folder.dart';
+import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/models/organizer_result.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/services/metadata_service.dart';

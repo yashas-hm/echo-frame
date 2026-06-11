@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/month_folder.dart';
-import 'package:echo_frame/models/month_index.dart';
+import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/models/echo_metadata.dart';
 
 // ── Timeline queries ──────────────────────────────────────────────────────────

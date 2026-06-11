@@ -7,7 +7,7 @@ import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/daos/operation_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/google_takeout/takeout_models.dart';
-import 'package:echo_frame/models/month_folder.dart';
+import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/models/echo_metadata.dart';
 import 'package:echo_frame/services/drive_service.dart';
 import 'package:echo_frame/services/library_service.dart';
