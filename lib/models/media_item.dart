@@ -3,50 +3,47 @@ import 'package:echo_frame/models/echo_metadata.dart';
 
 class MediaItem {
   final int id;
-  final String filePath;
-  final DateTime? capturedAt;
-  final int? width;
-  final int? height;
-  final int? durationMs;
-  final String? cameraMake;
-  final String? cameraModel;
-  final double? latitude;
-  final double? longitude;
   final bool isFavorite;
-  final MediaType mediaType;
+  final EchoMetadata meta;
 
   const MediaItem({
     required this.id,
-    required this.filePath,
-    required this.mediaType,
-    this.capturedAt,
-    this.width,
-    this.height,
-    this.durationMs,
-    this.cameraMake,
-    this.cameraModel,
-    this.latitude,
-    this.longitude,
-    this.isFavorite = false,
+    required this.isFavorite,
+    required this.meta,
   });
 
   factory MediaItem.fromRecord(MediaRecord r) => MediaItem(
         id: r.id,
-        filePath: r.filePath,
-        capturedAt: r.capturedAt,
-        width: r.width,
-        height: r.height,
-        durationMs: r.durationMs,
-        cameraMake: r.cameraMake,
-        cameraModel: r.cameraModel,
-        latitude: r.latitude,
-        longitude: r.longitude,
         isFavorite: r.isFavorite,
-        mediaType: MediaType.values.firstWhere(
-          (m) => m.name == r.mediaType,
-          orElse: () => MediaType.unknown,
+        meta: EchoMetadata(
+          path: r.filePath,
+          capturedAt: r.capturedAt ?? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+          width: r.width,
+          height: r.height,
+          durationMs: r.durationMs,
+          cameraMake: r.cameraMake,
+          cameraModel: r.cameraModel,
+          latitude: r.latitude,
+          longitude: r.longitude,
+          altitude: r.altitude,
+          mediaType: MediaType.values.firstWhere(
+            (m) => m.name == r.mediaType,
+            orElse: () => MediaType.unknown,
+          ),
         ),
       );
 
-  bool get isVideo => mediaType == MediaType.video;
+  // Convenience accessors — delegates to meta so UI call sites are unchanged.
+  String get filePath => meta.path;
+  DateTime get capturedAt => meta.capturedAt;
+  int? get width => meta.width;
+  int? get height => meta.height;
+  int? get durationMs => meta.durationMs;
+  String? get cameraMake => meta.cameraMake;
+  String? get cameraModel => meta.cameraModel;
+  double? get latitude => meta.latitude;
+  double? get longitude => meta.longitude;
+  double? get altitude => meta.altitude;
+  MediaType get mediaType => meta.mediaType;
+  bool get isVideo => meta.mediaType == MediaType.video;
 }
