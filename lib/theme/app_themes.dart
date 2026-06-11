@@ -50,6 +50,7 @@ class EchoFrameThemes {
         selectionColor: colors.selectionColor,
       ),
       dividerColor: colors.dividerColor,
+      extensions: [colors],
     );
   }
 }

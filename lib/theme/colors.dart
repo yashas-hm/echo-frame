@@ -37,7 +37,7 @@ class KnownColors {
   static const Color slate500 = Color(0xFF6C757D);
 }
 
-abstract class AppThemeColors {
+abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
   Brightness get brightness;
 
   // Primary brand color (sky blue)
@@ -88,4 +88,78 @@ abstract class AppThemeColors {
 
   // Hover (defaults to primary)
   Color get hoverColor => primaryColor;
+
+  @override
+  AppThemeColors lerp(AppThemeColors b, double t) => _LerpedColors(
+        brightness: t < 0.5 ? brightness : b.brightness,
+        primaryColor: Color.lerp(primaryColor, b.primaryColor, t)!,
+        secondaryColor: Color.lerp(secondaryColor, b.secondaryColor, t)!,
+        tertiaryColor: Color.lerp(tertiaryColor, b.tertiaryColor, t)!,
+        background: Color.lerp(background, b.background, t)!,
+        textPrimary: Color.lerp(textPrimary, b.textPrimary, t)!,
+        textSecondary: Color.lerp(textSecondary, b.textSecondary, t)!,
+        shadowColor: Color.lerp(shadowColor, b.shadowColor, t)!,
+        errorPrimary: Color.lerp(errorPrimary, b.errorPrimary, t)!,
+        cursorColor: Color.lerp(cursorColor, b.cursorColor, t)!,
+        selectionColor: Color.lerp(selectionColor, b.selectionColor, t)!,
+        selectionHandleColor:
+            Color.lerp(selectionHandleColor, b.selectionHandleColor, t)!,
+        navigationColor: Color.lerp(navigationColor, b.navigationColor, t)!,
+        borderPrimary: Color.lerp(borderPrimary, b.borderPrimary, t)!,
+      );
+}
+
+final class _LerpedColors extends AppThemeColors {
+  _LerpedColors({
+    required this.brightness,
+    required this.primaryColor,
+    required this.secondaryColor,
+    required this.tertiaryColor,
+    required this.background,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.shadowColor,
+    required this.errorPrimary,
+    required this.cursorColor,
+    required this.selectionColor,
+    required this.selectionHandleColor,
+    required this.navigationColor,
+    required this.borderPrimary,
+  });
+
+  @override
+  final Brightness brightness;
+  @override
+  final Color primaryColor;
+  @override
+  final Color secondaryColor;
+  @override
+  final Color tertiaryColor;
+  @override
+  final Color background;
+  @override
+  final Color textPrimary;
+  @override
+  final Color textSecondary;
+  @override
+  final Color shadowColor;
+  @override
+  final Color errorPrimary;
+  @override
+  final Color cursorColor;
+  @override
+  final Color selectionColor;
+  @override
+  final Color selectionHandleColor;
+  @override
+  final Color navigationColor;
+  @override
+  final Color borderPrimary;
+
+  @override
+  _LerpedColors copyWith() => this;
+}
+
+extension AppThemeColorsX on BuildContext {
+  AppThemeColors get colors => Theme.of(this).extension<AppThemeColors>()!;
 }

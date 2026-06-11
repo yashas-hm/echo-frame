@@ -42,4 +42,7 @@ class LightColors extends AppThemeColors {
 
   @override
   Color get borderPrimary => KnownColors.neutral200;
+
+  @override
+  LightColors copyWith() => LightColors();
 }

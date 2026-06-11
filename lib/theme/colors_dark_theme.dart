@@ -42,4 +42,7 @@ class DarkColors extends AppThemeColors {
 
   @override
   Color get borderPrimary => KnownColors.neutral800;
+
+  @override
+  DarkColors copyWith() => DarkColors();
 }
