@@ -234,7 +234,7 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
     return ColoredBox(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 17),
         child: Text(
           '${month.monthName} ${month.year}',
           style: Theme.of(context)

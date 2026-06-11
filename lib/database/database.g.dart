@@ -8,9 +8,7 @@ class $MediaRecordsTable extends MediaRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-
   $MediaRecordsTable(this.attachedDatabase, [this._alias]);
-
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -110,6 +108,12 @@ class $MediaRecordsTable extends MediaRecords
   late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
       'longitude', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _altitudeMeta =
+      const VerificationMeta('altitude');
+  @override
+  late final GeneratedColumn<double> altitude = GeneratedColumn<double>(
+      'altitude', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _cameraMakeMeta =
       const VerificationMeta('cameraMake');
   @override
@@ -152,7 +156,6 @@ class $MediaRecordsTable extends MediaRecords
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("has_json_index" IN (0, 1))'),
       defaultValue: const Constant(false));
-
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -171,20 +174,18 @@ class $MediaRecordsTable extends MediaRecords
         durationMs,
         latitude,
         longitude,
+        altitude,
         cameraMake,
         cameraModel,
         isFavorite,
         isTrashed,
         hasJsonIndex
       ];
-
   @override
   String get aliasedName => _alias ?? actualTableName;
-
   @override
   String get actualTableName => $name;
   static const String $name = 'media_records';
-
   @override
   VerificationContext validateIntegrity(Insertable<MediaRecord> instance,
       {bool isInserting = false}) {
@@ -275,6 +276,10 @@ class $MediaRecordsTable extends MediaRecords
       context.handle(_longitudeMeta,
           longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta));
     }
+    if (data.containsKey('altitude')) {
+      context.handle(_altitudeMeta,
+          altitude.isAcceptableOrUnknown(data['altitude']!, _altitudeMeta));
+    }
     if (data.containsKey('camera_make')) {
       context.handle(
           _cameraMakeMeta,
@@ -308,7 +313,6 @@ class $MediaRecordsTable extends MediaRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
-
   @override
   MediaRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -345,6 +349,8 @@ class $MediaRecordsTable extends MediaRecords
           .read(DriftSqlType.double, data['${effectivePrefix}latitude']),
       longitude: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}longitude']),
+      altitude: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}altitude']),
       cameraMake: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}camera_make']),
       cameraModel: attachedDatabase.typeMapping
@@ -381,12 +387,12 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final int? durationMs;
   final double? latitude;
   final double? longitude;
+  final double? altitude;
   final String? cameraMake;
   final String? cameraModel;
   final bool isFavorite;
   final bool isTrashed;
   final bool hasJsonIndex;
-
   const MediaRecord(
       {required this.id,
       required this.filePath,
@@ -404,12 +410,12 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       this.durationMs,
       this.latitude,
       this.longitude,
+      this.altitude,
       this.cameraMake,
       this.cameraModel,
       required this.isFavorite,
       required this.isTrashed,
       required this.hasJsonIndex});
-
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -446,6 +452,9 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
     }
     if (!nullToAbsent || longitude != null) {
       map['longitude'] = Variable<double>(longitude);
+    }
+    if (!nullToAbsent || altitude != null) {
+      map['altitude'] = Variable<double>(altitude);
     }
     if (!nullToAbsent || cameraMake != null) {
       map['camera_make'] = Variable<String>(cameraMake);
@@ -493,6 +502,9 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       longitude: longitude == null && nullToAbsent
           ? const Value.absent()
           : Value(longitude),
+      altitude: altitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(altitude),
       cameraMake: cameraMake == null && nullToAbsent
           ? const Value.absent()
           : Value(cameraMake),
@@ -525,6 +537,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       durationMs: serializer.fromJson<int?>(json['durationMs']),
       latitude: serializer.fromJson<double?>(json['latitude']),
       longitude: serializer.fromJson<double?>(json['longitude']),
+      altitude: serializer.fromJson<double?>(json['altitude']),
       cameraMake: serializer.fromJson<String?>(json['cameraMake']),
       cameraModel: serializer.fromJson<String?>(json['cameraModel']),
       isFavorite: serializer.fromJson<bool>(json['isFavorite']),
@@ -532,7 +545,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       hasJsonIndex: serializer.fromJson<bool>(json['hasJsonIndex']),
     );
   }
-
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -553,6 +565,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       'durationMs': serializer.toJson<int?>(durationMs),
       'latitude': serializer.toJson<double?>(latitude),
       'longitude': serializer.toJson<double?>(longitude),
+      'altitude': serializer.toJson<double?>(altitude),
       'cameraMake': serializer.toJson<String?>(cameraMake),
       'cameraModel': serializer.toJson<String?>(cameraModel),
       'isFavorite': serializer.toJson<bool>(isFavorite),
@@ -578,6 +591,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
           Value<int?> durationMs = const Value.absent(),
           Value<double?> latitude = const Value.absent(),
           Value<double?> longitude = const Value.absent(),
+          Value<double?> altitude = const Value.absent(),
           Value<String?> cameraMake = const Value.absent(),
           Value<String?> cameraModel = const Value.absent(),
           bool? isFavorite,
@@ -602,13 +616,13 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         durationMs: durationMs.present ? durationMs.value : this.durationMs,
         latitude: latitude.present ? latitude.value : this.latitude,
         longitude: longitude.present ? longitude.value : this.longitude,
+        altitude: altitude.present ? altitude.value : this.altitude,
         cameraMake: cameraMake.present ? cameraMake.value : this.cameraMake,
         cameraModel: cameraModel.present ? cameraModel.value : this.cameraModel,
         isFavorite: isFavorite ?? this.isFavorite,
         isTrashed: isTrashed ?? this.isTrashed,
         hasJsonIndex: hasJsonIndex ?? this.hasJsonIndex,
       );
-
   MediaRecord copyWithCompanion(MediaRecordsCompanion data) {
     return MediaRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -636,6 +650,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
           data.durationMs.present ? data.durationMs.value : this.durationMs,
       latitude: data.latitude.present ? data.latitude.value : this.latitude,
       longitude: data.longitude.present ? data.longitude.value : this.longitude,
+      altitude: data.altitude.present ? data.altitude.value : this.altitude,
       cameraMake:
           data.cameraMake.present ? data.cameraMake.value : this.cameraMake,
       cameraModel:
@@ -668,6 +683,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
           ..write('durationMs: $durationMs, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
+          ..write('altitude: $altitude, ')
           ..write('cameraMake: $cameraMake, ')
           ..write('cameraModel: $cameraModel, ')
           ..write('isFavorite: $isFavorite, ')
@@ -695,13 +711,13 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         durationMs,
         latitude,
         longitude,
+        altitude,
         cameraMake,
         cameraModel,
         isFavorite,
         isTrashed,
         hasJsonIndex
       ]);
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -722,6 +738,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
           other.durationMs == this.durationMs &&
           other.latitude == this.latitude &&
           other.longitude == this.longitude &&
+          other.altitude == this.altitude &&
           other.cameraMake == this.cameraMake &&
           other.cameraModel == this.cameraModel &&
           other.isFavorite == this.isFavorite &&
@@ -746,12 +763,12 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<int?> durationMs;
   final Value<double?> latitude;
   final Value<double?> longitude;
+  final Value<double?> altitude;
   final Value<String?> cameraMake;
   final Value<String?> cameraModel;
   final Value<bool> isFavorite;
   final Value<bool> isTrashed;
   final Value<bool> hasJsonIndex;
-
   const MediaRecordsCompanion({
     this.id = const Value.absent(),
     this.filePath = const Value.absent(),
@@ -769,13 +786,13 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.durationMs = const Value.absent(),
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
+    this.altitude = const Value.absent(),
     this.cameraMake = const Value.absent(),
     this.cameraModel = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.isTrashed = const Value.absent(),
     this.hasJsonIndex = const Value.absent(),
   });
-
   MediaRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String filePath,
@@ -793,6 +810,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.durationMs = const Value.absent(),
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
+    this.altitude = const Value.absent(),
     this.cameraMake = const Value.absent(),
     this.cameraModel = const Value.absent(),
     this.isFavorite = const Value.absent(),
@@ -803,7 +821,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
         relativePath = Value(relativePath),
         filename = Value(filename),
         indexedAt = Value(indexedAt);
-
   static Insertable<MediaRecord> custom({
     Expression<int>? id,
     Expression<String>? filePath,
@@ -821,6 +838,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     Expression<int>? durationMs,
     Expression<double>? latitude,
     Expression<double>? longitude,
+    Expression<double>? altitude,
     Expression<String>? cameraMake,
     Expression<String>? cameraModel,
     Expression<bool>? isFavorite,
@@ -844,6 +862,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       if (durationMs != null) 'duration_ms': durationMs,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
+      if (altitude != null) 'altitude': altitude,
       if (cameraMake != null) 'camera_make': cameraMake,
       if (cameraModel != null) 'camera_model': cameraModel,
       if (isFavorite != null) 'is_favorite': isFavorite,
@@ -869,6 +888,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       Value<int?>? durationMs,
       Value<double?>? latitude,
       Value<double?>? longitude,
+      Value<double?>? altitude,
       Value<String?>? cameraMake,
       Value<String?>? cameraModel,
       Value<bool>? isFavorite,
@@ -891,6 +911,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       durationMs: durationMs ?? this.durationMs,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      altitude: altitude ?? this.altitude,
       cameraMake: cameraMake ?? this.cameraMake,
       cameraModel: cameraModel ?? this.cameraModel,
       isFavorite: isFavorite ?? this.isFavorite,
@@ -950,6 +971,9 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     if (longitude.present) {
       map['longitude'] = Variable<double>(longitude.value);
     }
+    if (altitude.present) {
+      map['altitude'] = Variable<double>(altitude.value);
+    }
     if (cameraMake.present) {
       map['camera_make'] = Variable<String>(cameraMake.value);
     }
@@ -987,6 +1011,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
           ..write('durationMs: $durationMs, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
+          ..write('altitude: $altitude, ')
           ..write('cameraMake: $cameraMake, ')
           ..write('cameraModel: $cameraModel, ')
           ..write('isFavorite: $isFavorite, ')
@@ -1002,9 +1027,7 @@ class $DriveRecordsTable extends DriveRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-
   $DriveRecordsTable(this.attachedDatabase, [this._alias]);
-
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1052,18 +1075,14 @@ class $DriveRecordsTable extends DriveRecords
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_online" IN (0, 1))'),
       defaultValue: const Constant(false));
-
   @override
   List<GeneratedColumn> get $columns =>
       [id, uuid, label, lastMountPath, firstIndexedAt, lastScannedAt, isOnline];
-
   @override
   String get aliasedName => _alias ?? actualTableName;
-
   @override
   String get actualTableName => $name;
   static const String $name = 'drive_records';
-
   @override
   VerificationContext validateIntegrity(Insertable<DriveRecord> instance,
       {bool isInserting = false}) {
@@ -1113,7 +1132,6 @@ class $DriveRecordsTable extends DriveRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
-
   @override
   DriveRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1149,7 +1167,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
   final DateTime firstIndexedAt;
   final DateTime? lastScannedAt;
   final bool isOnline;
-
   const DriveRecord(
       {required this.id,
       required this.uuid,
@@ -1158,7 +1175,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
       required this.firstIndexedAt,
       this.lastScannedAt,
       required this.isOnline});
-
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1205,7 +1221,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
       isOnline: serializer.fromJson<bool>(json['isOnline']),
     );
   }
-
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -1239,7 +1254,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
             lastScannedAt.present ? lastScannedAt.value : this.lastScannedAt,
         isOnline: isOnline ?? this.isOnline,
       );
-
   DriveRecord copyWithCompanion(DriveRecordsCompanion data) {
     return DriveRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -1275,7 +1289,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
   @override
   int get hashCode => Object.hash(
       id, uuid, label, lastMountPath, firstIndexedAt, lastScannedAt, isOnline);
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1297,7 +1310,6 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
   final Value<DateTime> firstIndexedAt;
   final Value<DateTime?> lastScannedAt;
   final Value<bool> isOnline;
-
   const DriveRecordsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
@@ -1307,7 +1319,6 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
     this.lastScannedAt = const Value.absent(),
     this.isOnline = const Value.absent(),
   });
-
   DriveRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
@@ -1319,7 +1330,6 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
   })  : uuid = Value(uuid),
         label = Value(label),
         firstIndexedAt = Value(firstIndexedAt);
-
   static Insertable<DriveRecord> custom({
     Expression<int>? id,
     Expression<String>? uuid,
@@ -1406,9 +1416,7 @@ class $OperationRecordsTable extends OperationRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-
   $OperationRecordsTable(this.attachedDatabase, [this._alias]);
-
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1463,7 +1471,6 @@ class $OperationRecordsTable extends OperationRecords
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_dry_run" IN (0, 1))'),
       defaultValue: const Constant(false));
-
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1475,14 +1482,11 @@ class $OperationRecordsTable extends OperationRecords
         rolledBackAt,
         isDryRun
       ];
-
   @override
   String get aliasedName => _alias ?? actualTableName;
-
   @override
   String get actualTableName => $name;
   static const String $name = 'operation_records';
-
   @override
   VerificationContext validateIntegrity(Insertable<OperationRecord> instance,
       {bool isInserting = false}) {
@@ -1538,7 +1542,6 @@ class $OperationRecordsTable extends OperationRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
-
   @override
   OperationRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1577,7 +1580,6 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
   final DateTime appliedAt;
   final DateTime? rolledBackAt;
   final bool isDryRun;
-
   const OperationRecord(
       {required this.id,
       required this.batchId,
@@ -1587,7 +1589,6 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
       required this.appliedAt,
       this.rolledBackAt,
       required this.isDryRun});
-
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1633,7 +1634,6 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
       isDryRun: serializer.fromJson<bool>(json['isDryRun']),
     );
   }
-
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -1669,7 +1669,6 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
             rolledBackAt.present ? rolledBackAt.value : this.rolledBackAt,
         isDryRun: isDryRun ?? this.isDryRun,
       );
-
   OperationRecord copyWithCompanion(OperationRecordsCompanion data) {
     return OperationRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -1704,7 +1703,6 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
   @override
   int get hashCode => Object.hash(id, batchId, opType, sourcePath, destPath,
       appliedAt, rolledBackAt, isDryRun);
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1728,7 +1726,6 @@ class OperationRecordsCompanion extends UpdateCompanion<OperationRecord> {
   final Value<DateTime> appliedAt;
   final Value<DateTime?> rolledBackAt;
   final Value<bool> isDryRun;
-
   const OperationRecordsCompanion({
     this.id = const Value.absent(),
     this.batchId = const Value.absent(),
@@ -1739,7 +1736,6 @@ class OperationRecordsCompanion extends UpdateCompanion<OperationRecord> {
     this.rolledBackAt = const Value.absent(),
     this.isDryRun = const Value.absent(),
   });
-
   OperationRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String batchId,
@@ -1754,7 +1750,6 @@ class OperationRecordsCompanion extends UpdateCompanion<OperationRecord> {
         sourcePath = Value(sourcePath),
         destPath = Value(destPath),
         appliedAt = Value(appliedAt);
-
   static Insertable<OperationRecord> custom({
     Expression<int>? id,
     Expression<String>? batchId,
@@ -1846,17 +1841,14 @@ class OperationRecordsCompanion extends UpdateCompanion<OperationRecord> {
 
 abstract class _$EchoDatabase extends GeneratedDatabase {
   _$EchoDatabase(QueryExecutor e) : super(e);
-
   $EchoDatabaseManager get managers => $EchoDatabaseManager(this);
   late final $MediaRecordsTable mediaRecords = $MediaRecordsTable(this);
   late final $DriveRecordsTable driveRecords = $DriveRecordsTable(this);
   late final $OperationRecordsTable operationRecords =
       $OperationRecordsTable(this);
-
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
-
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
       [mediaRecords, driveRecords, operationRecords];
@@ -1880,6 +1872,7 @@ typedef $$MediaRecordsTableCreateCompanionBuilder = MediaRecordsCompanion
   Value<int?> durationMs,
   Value<double?> latitude,
   Value<double?> longitude,
+  Value<double?> altitude,
   Value<String?> cameraMake,
   Value<String?> cameraModel,
   Value<bool> isFavorite,
@@ -1904,6 +1897,7 @@ typedef $$MediaRecordsTableUpdateCompanionBuilder = MediaRecordsCompanion
   Value<int?> durationMs,
   Value<double?> latitude,
   Value<double?> longitude,
+  Value<double?> altitude,
   Value<String?> cameraMake,
   Value<String?> cameraModel,
   Value<bool> isFavorite,
@@ -1920,7 +1914,6 @@ class $$MediaRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -1969,6 +1962,9 @@ class $$MediaRecordsTableFilterComposer
   ColumnFilters<double> get longitude => $composableBuilder(
       column: $table.longitude, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<double> get altitude => $composableBuilder(
+      column: $table.altitude, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get cameraMake => $composableBuilder(
       column: $table.cameraMake, builder: (column) => ColumnFilters(column));
 
@@ -1994,7 +1990,6 @@ class $$MediaRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -2046,6 +2041,9 @@ class $$MediaRecordsTableOrderingComposer
   ColumnOrderings<double> get longitude => $composableBuilder(
       column: $table.longitude, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<double> get altitude => $composableBuilder(
+      column: $table.altitude, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get cameraMake => $composableBuilder(
       column: $table.cameraMake, builder: (column) => ColumnOrderings(column));
 
@@ -2072,7 +2070,6 @@ class $$MediaRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -2120,6 +2117,9 @@ class $$MediaRecordsTableAnnotationComposer
 
   GeneratedColumn<double> get longitude =>
       $composableBuilder(column: $table.longitude, builder: (column) => column);
+
+  GeneratedColumn<double> get altitude =>
+      $composableBuilder(column: $table.altitude, builder: (column) => column);
 
   GeneratedColumn<String> get cameraMake => $composableBuilder(
       column: $table.cameraMake, builder: (column) => column);
@@ -2179,6 +2179,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             Value<int?> durationMs = const Value.absent(),
             Value<double?> latitude = const Value.absent(),
             Value<double?> longitude = const Value.absent(),
+            Value<double?> altitude = const Value.absent(),
             Value<String?> cameraMake = const Value.absent(),
             Value<String?> cameraModel = const Value.absent(),
             Value<bool> isFavorite = const Value.absent(),
@@ -2202,6 +2203,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             durationMs: durationMs,
             latitude: latitude,
             longitude: longitude,
+            altitude: altitude,
             cameraMake: cameraMake,
             cameraModel: cameraModel,
             isFavorite: isFavorite,
@@ -2225,6 +2227,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             Value<int?> durationMs = const Value.absent(),
             Value<double?> latitude = const Value.absent(),
             Value<double?> longitude = const Value.absent(),
+            Value<double?> altitude = const Value.absent(),
             Value<String?> cameraMake = const Value.absent(),
             Value<String?> cameraModel = const Value.absent(),
             Value<bool> isFavorite = const Value.absent(),
@@ -2248,6 +2251,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             durationMs: durationMs,
             latitude: latitude,
             longitude: longitude,
+            altitude: altitude,
             cameraMake: cameraMake,
             cameraModel: cameraModel,
             isFavorite: isFavorite,
@@ -2306,7 +2310,6 @@ class $$DriveRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -2339,7 +2342,6 @@ class $$DriveRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -2374,7 +2376,6 @@ class $$DriveRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -2512,7 +2513,6 @@ class $$OperationRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -2547,7 +2547,6 @@ class $$OperationRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -2583,7 +2582,6 @@ class $$OperationRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -2700,15 +2698,11 @@ typedef $$OperationRecordsTableProcessedTableManager = ProcessedTableManager<
 
 class $EchoDatabaseManager {
   final _$EchoDatabase _db;
-
   $EchoDatabaseManager(this._db);
-
   $$MediaRecordsTableTableManager get mediaRecords =>
       $$MediaRecordsTableTableManager(_db, _db.mediaRecords);
-
   $$DriveRecordsTableTableManager get driveRecords =>
       $$DriveRecordsTableTableManager(_db, _db.driveRecords);
-
   $$OperationRecordsTableTableManager get operationRecords =>
       $$OperationRecordsTableTableManager(_db, _db.operationRecords);
 }

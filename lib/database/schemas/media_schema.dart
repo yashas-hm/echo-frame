@@ -33,6 +33,8 @@ class MediaRecords extends Table {
 
   RealColumn get longitude => real().nullable()();
 
+  RealColumn get altitude => real().nullable()();
+
   TextColumn get cameraMake => text().nullable()();
 
   TextColumn get cameraModel => text().nullable()();

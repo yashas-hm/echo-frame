@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:echo_frame/models/month_folder.dart';
 import 'package:echo_frame/models/month_index.dart';
 import 'package:echo_frame/services/library_service.dart';
@@ -38,7 +39,12 @@ class IndexService {
 
     final items = <Map<String, dynamic>>[];
     for (int i = 0; i < files.length; i++) {
-      if (metas[i] != null) items.add(metas[i]!.toJson());
+      final m = metas[i];
+      debugPrint('[index] ${files[i].split('/').last} → '
+          'w=${m?.width} h=${m?.height} '
+          'capturedAt=${m?.capturedAt} '
+          'camera=${m?.cameraMake} ${m?.cameraModel}');
+      if (m != null) items.add(m.toJson());
     }
 
     final index = MonthIndex(

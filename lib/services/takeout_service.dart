@@ -6,10 +6,9 @@ import 'package:drift/drift.dart';
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/daos/operation_dao.dart';
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/google_takeout/import_result.dart';
-import 'package:echo_frame/models/google_takeout/takeout_meta.dart';
+import 'package:echo_frame/models/google_takeout/takeout_models.dart';
 import 'package:echo_frame/models/month_folder.dart';
-import 'package:echo_frame/models/resolved_meta.dart';
+import 'package:echo_frame/models/echo_metadata.dart';
 import 'package:echo_frame/services/drive_service.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/services/metadata_service.dart';
@@ -57,14 +56,14 @@ class TakeoutService {
 
     for (final jsonPath in jsonPaths) {
       // Parse JSON — skip if it doesn't look like a Takeout meta file
-      TakeoutMeta? meta;
+      TakeoutSidecar? meta;
       try {
         final raw = await File(jsonPath).readAsString();
         final json = jsonDecode(raw) as Map<String, dynamic>;
         if (json['photoTakenTime'] == null && json['creationTime'] == null) {
           continue;
         }
-        meta = TakeoutMeta.fromJson(json);
+        meta = TakeoutSidecar.fromJson(json);
       } catch (e, st) {
         dev.log('Failed to parse sidecar $jsonPath: $e',
             stackTrace: st, name: 'TakeoutService.discover');
@@ -162,8 +161,16 @@ class TakeoutService {
         await Directory(destPath).parent.create(recursive: true);
         await File(pair.mediaPath).copy(destPath);
 
+        dev.log(
+          '[import] ${pair.filename} → '
+          'w=${exifMeta.width} h=${exifMeta.height} '
+          'capturedAt=$capturedAt '
+          'camera=${exifMeta.cameraMake} ${exifMeta.cameraModel}',
+          name: 'TakeoutService.apply',
+        );
+
         // Merge: Takeout GPS + timestamp > EXIF
-        final mergedMeta = ResolvedMeta(
+        final mergedMeta = EchoMetadata(
           path: destPath,
           capturedAt: capturedAt,
           width: exifMeta.width,
@@ -173,6 +180,7 @@ class TakeoutService {
           cameraModel: exifMeta.cameraModel,
           latitude: pair.meta?.latitude ?? exifMeta.latitude,
           longitude: pair.meta?.longitude ?? exifMeta.longitude,
+          altitude: pair.meta?.altitude ?? exifMeta.altitude,
           mediaType: exifMeta.mediaType,
         );
 

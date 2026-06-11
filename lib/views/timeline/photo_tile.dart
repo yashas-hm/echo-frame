@@ -14,14 +14,17 @@ class PhotoTile extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () => context.push('/photo/${item.id}'),
-      child: Image.file(
-        File(item.filePath),
-        cacheWidth: 150,
-        cacheHeight: 150,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => ColoredBox(
-          color: colors.surfaceContainerHighest,
-          child: Icon(Icons.hide_image_outlined, color: colors.outlineVariant),
+      child: SizedBox.expand(
+        child: Image.file(
+          File(item.filePath),
+          cacheWidth: item.width == null ? 180 : item.width! ~/ 10,
+          cacheHeight: item.height == null ? 180 : item.height! ~/ 10,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => ColoredBox(
+            color: colors.surfaceContainerHighest,
+            child:
+                Icon(Icons.hide_image_outlined, color: colors.outlineVariant),
+          ),
         ),
       ),
     );

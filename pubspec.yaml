@@ -21,7 +21,7 @@ dependencies:
   sqlite3_flutter_libs: ^0.6.0+eol
   file_picker: ^11.0.2
   window_manager: ^0.5.1
-  media_metadata_plus: ^1.2.0
+  media_metadata_plus: ^1.2.1
 
 dev_dependencies:
   flutter_test:

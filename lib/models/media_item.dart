@@ -1,5 +1,5 @@
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/resolved_meta.dart';
+import 'package:echo_frame/models/echo_metadata.dart';
 
 class MediaItem {
   final int id;

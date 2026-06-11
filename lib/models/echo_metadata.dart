@@ -1,6 +1,6 @@
 enum MediaType { image, video, unknown }
 
-class ResolvedMeta {
+class EchoMetadata {
   final String path;
   final DateTime capturedAt;
   final int? width;
@@ -10,9 +10,10 @@ class ResolvedMeta {
   final String? cameraModel;
   final double? latitude;
   final double? longitude;
+  final double? altitude;
   final MediaType mediaType;
 
-  const ResolvedMeta({
+  const EchoMetadata({
     required this.path,
     required this.capturedAt,
     this.width,
@@ -22,18 +23,19 @@ class ResolvedMeta {
     this.cameraModel,
     this.latitude,
     this.longitude,
+    this.altitude,
     this.mediaType = MediaType.image,
   });
 
-  factory ResolvedMeta.fallback(
+  factory EchoMetadata.fallback(
           {required String path, required DateTime mtime}) =>
-      ResolvedMeta(path: path, capturedAt: mtime, mediaType: MediaType.unknown);
+      EchoMetadata(path: path, capturedAt: mtime, mediaType: MediaType.unknown);
 
-  factory ResolvedMeta.fromJson(Map<String, dynamic> json,
+  factory EchoMetadata.fromJson(Map<String, dynamic> json,
       {required String folderPath}) {
     final filename = json['filename'] as String;
     final durationMs = json['durationMs'] as int?;
-    return ResolvedMeta(
+    return EchoMetadata(
       path: '$folderPath/$filename',
       capturedAt: DateTime.parse(json['capturedAt'] as String),
       width: json['width'] as int?,
@@ -42,6 +44,7 @@ class ResolvedMeta {
       cameraModel: json['cameraModel'] as String?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
+      altitude: (json['altitude'] as num?)?.toDouble(),
       durationMs: durationMs,
       mediaType: durationMs != null ? MediaType.video : MediaType.image,
     );
@@ -56,6 +59,7 @@ class ResolvedMeta {
         if (cameraModel != null) 'cameraModel': cameraModel,
         if (latitude != null) 'latitude': latitude,
         if (longitude != null) 'longitude': longitude,
+        if (altitude != null) 'altitude': altitude,
         if (durationMs != null) 'durationMs': durationMs,
       };
 }

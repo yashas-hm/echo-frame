@@ -2,7 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/month_folder.dart';
 import 'package:echo_frame/models/month_index.dart';
-import 'package:echo_frame/models/resolved_meta.dart';
+import 'package:echo_frame/models/echo_metadata.dart';
 
 // ── Timeline queries ──────────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ class MediaDao {
   }) async {
     final companions = index.items
         .map((item) => _toCompanion(
-              ResolvedMeta.fromJson(item, folderPath: folder.path),
+              EchoMetadata.fromJson(item, folderPath: folder.path),
               driveId,
               libraryRoot,
             ))
@@ -113,14 +113,14 @@ class MediaDao {
           .write(MediaRecordsCompanion(isFavorite: Value(value)));
 
   Future<void> upsertMeta(
-    ResolvedMeta meta,
+    EchoMetadata meta,
     String driveId,
     String libraryRoot,
   ) =>
       upsertBatch([_toCompanion(meta, driveId, libraryRoot)]);
 
   MediaRecordsCompanion _toCompanion(
-    ResolvedMeta meta,
+    EchoMetadata meta,
     String driveId,
     String libraryRoot,
   ) {
@@ -142,6 +142,7 @@ class MediaDao {
       durationMs: Value(meta.durationMs),
       latitude: Value(meta.latitude),
       longitude: Value(meta.longitude),
+      altitude: Value(meta.altitude),
       cameraMake: Value(meta.cameraMake),
       cameraModel: Value(meta.cameraModel),
       hasJsonIndex: const Value(true),
