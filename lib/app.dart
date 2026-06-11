@@ -14,26 +14,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final _router = GoRouter(
-  initialLocation: '/timeline',
+  initialLocation: TimelineScreen.path,
   routes: [
     ShellRoute(
-      builder: (_, __, child) => ShellScreen(child: child),
+      builder: (_, __, child) {
+        return ShellScreen(child: child);
+      },
       routes: [
-        GoRoute(path: '/timeline', builder: (_, __) => const TimelineScreen()),
-        GoRoute(path: '/search', builder: (_, __) => const SearchScreen()),
-        GoRoute(
-            path: '/favorites', builder: (_, __) => const FavoritesScreen()),
-        GoRoute(path: '/organize', builder: (_, __) => const OrganizerScreen()),
-        GoRoute(path: '/import', builder: (_, __) => const ImportScreen()),
-        GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
+        TimelineScreen.route,
+        SearchScreen.route,
+        FavoritesScreen.route,
+        OrganizerScreen.route,
+        ImportScreen.route,
+        SettingsScreen.route,
       ],
     ),
-    GoRoute(
-      path: '/photo/:id',
-      builder: (_, state) => PhotoViewScreen(
-        mediaId: int.parse(state.pathParameters['id']!),
-      ),
-    ),
+    PhotoViewScreen.routeDef,
   ],
 );
 
@@ -53,7 +49,7 @@ class EchoFrameApp extends ConsumerWidget {
         actions: {
           _SearchIntent: CallbackAction<_SearchIntent>(
             onInvoke: (_) {
-              _router.go('/search');
+              _router.go(SearchScreen.path);
               return null;
             },
           ),

@@ -13,6 +13,15 @@ class PhotoViewScreen extends StatefulWidget {
 
   final int mediaId;
 
+  static const String path = '/photo';
+  static String route(int id) => '$path/$id';
+  static GoRoute get routeDef => GoRoute(
+        path: '$path/:id',
+        builder: (_, state) => PhotoViewScreen(
+          mediaId: int.parse(state.pathParameters['id']!),
+        ),
+      );
+
   @override
   State<PhotoViewScreen> createState() => _PhotoViewScreenState();
 }

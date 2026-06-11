@@ -3,9 +3,13 @@ import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:echo_frame/views/timeline/photo_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
+
+  static const String path = '/favorites';
+  static GoRoute get route => GoRoute(path: path, builder: (_, __) => const FavoritesScreen());
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

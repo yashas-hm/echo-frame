@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:echo_frame/models/media_item.dart';
+import 'package:echo_frame/views/photo_view/photo_view_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,7 +14,7 @@ class PhotoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return GestureDetector(
-      onTap: () => context.push('/photo/${item.id}'),
+      onTap: () => context.push(PhotoViewScreen.route(item.id)),
       child: SizedBox.expand(
         child: Image.file(
           File(item.filePath),

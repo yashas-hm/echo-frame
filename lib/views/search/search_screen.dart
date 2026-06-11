@@ -6,9 +6,13 @@ import 'package:echo_frame/views/search/provider/search_provider.dart';
 import 'package:echo_frame/views/timeline/photo_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
+
+  static const String path = '/search';
+  static GoRoute get route => GoRoute(path: path, builder: (_, __) => const SearchScreen());
 
   @override
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
