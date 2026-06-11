@@ -500,10 +500,10 @@ packages:
     dependency: "direct main"
     description:
       name: media_metadata_plus
-      sha256: e5aea06f1d73b20fee31bf5904d5782464db9554203ee917b2a8adbd7ae9a4f7
+      sha256: dcb05afa382fd84e50d3cb87de206cf1b5006570fbe7d70cc07045d7ff64e698
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.1"
+    version: "1.3.0"
   meta:
     dependency: transitive
     description:
