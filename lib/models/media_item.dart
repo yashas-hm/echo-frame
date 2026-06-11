@@ -1,10 +1,10 @@
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/echo_metadata.dart';
+import 'package:echo_frame/models/metadata.dart';
 
 class MediaItem {
   final int id;
   final bool isFavorite;
-  final EchoMetadata meta;
+  final Metadata meta;
 
   const MediaItem({
     required this.id,
@@ -15,7 +15,7 @@ class MediaItem {
   factory MediaItem.fromRecord(MediaRecord r) => MediaItem(
         id: r.id,
         isFavorite: r.isFavorite,
-        meta: EchoMetadata(
+        meta: Metadata(
           path: r.filePath,
           capturedAt: r.capturedAt ?? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
           width: r.width,

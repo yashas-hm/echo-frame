@@ -1,19 +1,19 @@
 import 'dart:io';
 
-import 'package:echo_frame/models/echo_metadata.dart';
+import 'package:echo_frame/models/metadata.dart';
 import 'package:media_metadata_plus/media_metadata_plus.dart';
 
 class MetadataService {
-  static Future<EchoMetadata> read(String filePath) async {
+  static Future<Metadata> read(String filePath) async {
     final mtime = File(filePath).statSync().modified.toUtc();
     final meta = await MediaMetadata.read(filePath);
     return meta != null
         ? _fromPlugin(filePath, meta, mtime)
-        : EchoMetadata.fallback(path: filePath, mtime: mtime);
+        : Metadata.fallback(path: filePath, mtime: mtime);
   }
 
   // Rust/Rayon handles parallelism internally — no compute() needed.
-  static Future<List<EchoMetadata?>> readAll(List<String> paths) async {
+  static Future<List<Metadata?>> readAll(List<String> paths) async {
     if (paths.isEmpty) return [];
     final mtimes = {
       for (final p in paths) p: File(p).statSync().modified.toUtc()
@@ -23,13 +23,13 @@ class MetadataService {
       for (int i = 0; i < paths.length; i++)
         metas[i] != null
             ? _fromPlugin(paths[i], metas[i]!, mtimes[paths[i]]!)
-            : EchoMetadata.fallback(path: paths[i], mtime: mtimes[paths[i]]!),
+            : Metadata.fallback(path: paths[i], mtime: mtimes[paths[i]]!),
     ];
   }
 
-  static EchoMetadata _fromPlugin(
+  static Metadata _fromPlugin(
           String path, MediaMetadata meta, DateTime mtime) =>
-      EchoMetadata(
+      Metadata(
         path: path,
         capturedAt: meta.capturedAt ?? mtime,
         width: meta.width,

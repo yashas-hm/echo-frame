@@ -1,6 +1,6 @@
 enum MediaType { image, video, unknown }
 
-class EchoMetadata {
+class Metadata {
   final String path;
   final DateTime capturedAt;
   final int? width;
@@ -13,7 +13,7 @@ class EchoMetadata {
   final double? altitude;
   final MediaType mediaType;
 
-  const EchoMetadata({
+  const Metadata({
     required this.path,
     required this.capturedAt,
     this.width,
@@ -27,15 +27,15 @@ class EchoMetadata {
     this.mediaType = MediaType.image,
   });
 
-  factory EchoMetadata.fallback(
+  factory Metadata.fallback(
           {required String path, required DateTime mtime}) =>
-      EchoMetadata(path: path, capturedAt: mtime, mediaType: MediaType.unknown);
+      Metadata(path: path, capturedAt: mtime, mediaType: MediaType.unknown);
 
-  factory EchoMetadata.fromJson(Map<String, dynamic> json,
+  factory Metadata.fromJson(Map<String, dynamic> json,
       {required String folderPath}) {
     final filename = json['filename'] as String;
     final durationMs = json['durationMs'] as int?;
-    return EchoMetadata(
+    return Metadata(
       path: '$folderPath/$filename',
       capturedAt: DateTime.parse(json['capturedAt'] as String),
       width: json['width'] as int?,

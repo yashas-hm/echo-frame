@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
-import 'package:echo_frame/models/echo_metadata.dart';
+import 'package:echo_frame/models/metadata.dart';
 
 // ── Timeline queries ──────────────────────────────────────────────────────────
 
@@ -26,7 +26,7 @@ class MediaDao {
   }) async {
     final companions = index.items
         .map((item) => _toCompanion(
-              EchoMetadata.fromJson(item, folderPath: folder.path),
+              Metadata.fromJson(item, folderPath: folder.path),
               driveId,
               libraryRoot,
             ))
@@ -112,14 +112,14 @@ class MediaDao {
           .write(MediaRecordsCompanion(isFavorite: Value(value)));
 
   Future<void> upsertMeta(
-    EchoMetadata meta,
+    Metadata meta,
     String driveId,
     String libraryRoot,
   ) =>
       upsertBatch([_toCompanion(meta, driveId, libraryRoot)]);
 
   MediaRecordsCompanion _toCompanion(
-    EchoMetadata meta,
+    Metadata meta,
     String driveId,
     String libraryRoot,
   ) {
