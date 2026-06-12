@@ -2,6 +2,7 @@ import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,11 +48,10 @@ class _PhotoDetailPanelState extends ConsumerState<PhotoDetailPanel> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     return Container(
       width: 260,
-      color: colors.surfaceContainer,
+      color: context.colors.tertiaryColor,
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,12 +65,12 @@ class _PhotoDetailPanelState extends ConsumerState<PhotoDetailPanel> {
                 _isFavorite
                     ? Icons.favorite_rounded
                     : Icons.favorite_outline_rounded,
-                color: _isFavorite ? colors.error : null,
+                color: _isFavorite ? context.colors.errorPrimary : null,
                 size: 18,
               ),
               label: Text(_isFavorite ? 'Favourited' : 'Add to favourites'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: _isFavorite ? colors.error : colors.onSurface,
+                foregroundColor: _isFavorite ? context.colors.errorPrimary : context.colors.textPrimary,
               ),
             ),
           ),
@@ -132,13 +132,12 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 15, color: colors.outline),
+          Icon(icon, size: 15, color: context.colors.textSecondary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -146,7 +145,7 @@ class _Row extends StatelessWidget {
               style: Theme.of(context)
                   .textTheme
                   .bodySmall
-                  ?.copyWith(color: colors.onSurface),
+                  ?.copyWith(color: context.colors.textPrimary),
             ),
           ),
         ],

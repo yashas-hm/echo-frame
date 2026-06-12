@@ -1,4 +1,5 @@
 import 'package:echo_frame/models/google_takeout/takeout_models.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class ImportReport extends StatefulWidget {
@@ -16,7 +17,6 @@ class _ImportReportState extends State<ImportReport> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     if (widget.unmatched.isEmpty) return const SizedBox.shrink();
 
@@ -33,14 +33,14 @@ class _ImportReportState extends State<ImportReport> {
                 Icon(
                   Icons.warning_amber_rounded,
                   size: 16,
-                  color: colors.tertiary,
+                  color: context.colors.tertiaryColor,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   '${widget.unmatched.length} sidecar${widget.unmatched.length == 1 ? '' : 's'} '
                   'with no matching file',
                   style: theme.textTheme.bodySmall
-                      ?.copyWith(color: colors.tertiary),
+                      ?.copyWith(color: context.colors.tertiaryColor),
                 ),
                 const Spacer(),
                 Icon(
@@ -48,7 +48,7 @@ class _ImportReportState extends State<ImportReport> {
                       ? Icons.expand_less_rounded
                       : Icons.expand_more_rounded,
                   size: 16,
-                  color: colors.outline,
+                  color: context.colors.textSecondary,
                 ),
               ],
             ),
@@ -59,9 +59,9 @@ class _ImportReportState extends State<ImportReport> {
           Container(
             constraints: const BoxConstraints(maxHeight: 200),
             decoration: BoxDecoration(
-              color: colors.surfaceContainerLow,
+              color: context.colors.tertiaryColor,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colors.outlineVariant),
+              border: Border.all(color: context.colors.borderPrimary),
             ),
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 4),
@@ -74,7 +74,7 @@ class _ImportReportState extends State<ImportReport> {
                   child: Row(
                     children: [
                       Icon(Icons.insert_drive_file_outlined,
-                          size: 13, color: colors.outlineVariant),
+                          size: 13, color: context.colors.borderPrimary),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -87,7 +87,7 @@ class _ImportReportState extends State<ImportReport> {
                       Text(
                         err.reason,
                         style: theme.textTheme.bodySmall
-                            ?.copyWith(color: colors.outline),
+                            ?.copyWith(color: context.colors.textSecondary),
                       ),
                     ],
                   ),

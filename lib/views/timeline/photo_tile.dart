@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:echo_frame/models/media_item.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/views/photo_view/photo_view_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -12,7 +13,6 @@ class PhotoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () => context.push(PhotoViewScreen.route(item.id)),
       child: SizedBox.expand(
@@ -22,9 +22,9 @@ class PhotoTile extends StatelessWidget {
           cacheHeight: item.height == null ? 180 : item.height! ~/ 10,
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => ColoredBox(
-            color: colors.surfaceContainerHighest,
+            color: context.colors.tertiaryColor,
             child:
-                Icon(Icons.hide_image_outlined, color: colors.outlineVariant),
+                Icon(Icons.hide_image_outlined, color: context.colors.borderPrimary),
           ),
         ),
       ),

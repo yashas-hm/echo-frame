@@ -1,3 +1,4 @@
+import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/views/import/import_report.dart';
 import 'package:echo_frame/views/import/provider/import_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -43,7 +44,6 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
   Widget _buildIdle(BuildContext context, ImportState state) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final libraryRoot = state.libraryRoot;
     final canScan = _takeoutDir != null && libraryRoot != null;
 
@@ -68,7 +68,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                 'match metadata sidecars, fix timestamps, and copy photos into '
                 'your library.',
                 style:
-                    theme.textTheme.bodyMedium?.copyWith(color: colors.outline),
+                    theme.textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
               ),
               const SizedBox(height: 32),
               _Label('Takeout folder'),
@@ -109,7 +109,6 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
   Widget _buildReview(BuildContext context, ImportState state) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final d = state.discovered!;
     final notifier = ref.read(importProvider.notifier);
     final total = d.pairs.length;
@@ -129,14 +128,14 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
               if (total == 0)
                 _SummaryRow(
                   icon: Icons.folder_off_outlined,
-                  color: colors.outline,
+                  color: context.colors.textSecondary,
                   text: 'No media files found in the selected folder',
                 )
               else ...[
                 if (d.withSidecar > 0)
                   _SummaryRow(
                     icon: Icons.check_circle_outline_rounded,
-                    color: colors.primary,
+                    color: context.colors.primaryColor,
                     text:
                         '${d.withSidecar} photo${d.withSidecar == 1 ? '' : 's'} '
                         'with Takeout metadata',
@@ -145,7 +144,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                   const SizedBox(height: 10),
                   _SummaryRow(
                     icon: Icons.info_outline_rounded,
-                    color: colors.secondary,
+                    color: context.colors.secondaryColor,
                     text:
                         '${d.withoutSidecar} photo${d.withoutSidecar == 1 ? '' : 's'} '
                         'without sidecar (will use EXIF)',
@@ -155,7 +154,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                   const SizedBox(height: 10),
                   _SummaryRow(
                     icon: Icons.warning_amber_rounded,
-                    color: colors.tertiary,
+                    color: context.colors.tertiaryColor,
                     text:
                         '${d.unmatched.length} sidecar${d.unmatched.length == 1 ? '' : 's'} '
                         'with no matching file — will be skipped',
@@ -217,7 +216,6 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
   Widget _buildDone(BuildContext context, ImportState state) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final notifier = ref.read(importProvider.notifier);
     final unmatched = state.discovered?.unmatched ?? [];
 
@@ -232,7 +230,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
               Row(
                 children: [
                   Icon(Icons.check_circle_outline_rounded,
-                      color: colors.primary, size: 28),
+                      color: context.colors.primaryColor, size: 28),
                   const SizedBox(width: 10),
                   Text(
                     '${state.total} photo${state.total == 1 ? '' : 's'} imported',
@@ -264,7 +262,6 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
   Widget _buildError(BuildContext context, ImportState state) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final notifier = ref.read(importProvider.notifier);
 
     return Scaffold(
@@ -272,7 +269,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline_rounded, size: 56, color: colors.error),
+            Icon(Icons.error_outline_rounded, size: 56, color: context.colors.errorPrimary),
             const SizedBox(height: 16),
             Text('Import failed', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
@@ -282,7 +279,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                 state.error ?? 'Unknown error',
                 textAlign: TextAlign.center,
                 style:
-                    theme.textTheme.bodySmall?.copyWith(color: colors.outline),
+                    theme.textTheme.bodySmall?.copyWith(color: context.colors.textSecondary),
               ),
             ),
             const SizedBox(height: 24),
@@ -327,7 +324,7 @@ class _Label extends StatelessWidget {
         style: Theme.of(context)
             .textTheme
             .labelMedium
-            ?.copyWith(color: Theme.of(context).colorScheme.outline),
+            ?.copyWith(color: context.colors.textSecondary),
       );
 }
 
@@ -347,14 +344,13 @@ class _PathRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: context.colors.tertiaryColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colors.outlineVariant),
+        border: Border.all(color: context.colors.borderPrimary),
       ),
       child: Row(
         children: [
@@ -365,14 +361,14 @@ class _PathRow extends StatelessWidget {
                     ? Icons.folder_open_rounded
                     : Icons.folder_outlined),
             size: 18,
-            color: path != null ? colors.primary : colors.outlineVariant,
+            color: path != null ? context.colors.primaryColor : context.colors.borderPrimary,
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               path ?? placeholder ?? '',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: path != null ? colors.onSurface : colors.outlineVariant,
+                color: path != null ? context.colors.textPrimary : context.colors.borderPrimary,
                 fontFamily: 'monospace',
               ),
               overflow: TextOverflow.ellipsis,

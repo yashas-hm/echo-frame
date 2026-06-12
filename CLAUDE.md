@@ -65,7 +65,12 @@ The theme lives entirely in `lib/theme/` and uses Dart `part`/`part of` to form 
 - `app_themes.dart` — `EchoFrameThemes` builds `ThemeData` from an `AppThemeColors`
 
 To add a new color token: add it to `AppThemeColors` as an abstract getter, then implement it in both `LightColors` and
-`DarkColors`. Never reference `KnownColors` directly outside of the theme files.
+`DarkColors`.
+
+**Accessing colors in widgets:** always use `context.colors` (a `BuildContext` extension from
+`package:echo_frame/theme/theme.dart`). Use `KnownColors` directly only when the color you need has no semantic
+equivalent in `AppThemeColors` (e.g. a fixed overlay color that is always black regardless of theme). Never use
+`Theme.of(context).colorScheme` or `Theme.of(context).scaffoldBackgroundColor` for colors.
 
 **Brand palette:** sky blues (`sky200`–`sky500`) for primary/secondary, neutral grays (`neutral100`, `neutral800`,
 `neutral950`) for backgrounds.
@@ -75,8 +80,9 @@ To add a new color token: add it to `AppThemeColors` as an abstract getter, then
 Riverpod with the `Notifier`/`NotifierProvider` pattern throughout. The only current provider is `appThemeProvider` in
 `lib/theme/provider/theme_provider.dart`.
 
-`AppThemeState` carries both `ThemeMode` and the resolved `AppThemeColors` — widgets that need color tokens read
-`ref.watch(appThemeProvider).colors` rather than `Theme.of(context)`.
+`AppThemeState` carries both `ThemeMode` and the resolved `AppThemeColors`. Widgets read color tokens via
+`context.colors`, not via `ref.watch(appThemeProvider)` — the Riverpod provider is only needed when reacting to theme
+mode changes (e.g. toggling dark/light).
 
 `Prefs` (`lib/utilities/shared_pref_utils.dart`) is a static wrapper around `SharedPreferences`, initialized in `main()`
 before `runApp()`. Currently only persists `themeMode`.

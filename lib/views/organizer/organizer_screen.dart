@@ -1,3 +1,4 @@
+import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/views/organizer/operation_preview_list.dart';
 import 'package:echo_frame/views/organizer/provider/organizer_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -44,14 +45,13 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
 
   Widget _buildIdle(BuildContext context, OrganizerState state) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final destRoot = state.destRoot;
     final canPreview =
         _sourceDir != null && destRoot != null && _sourceDir != destRoot;
 
     if (destRoot == null) {
       return _buildCentered(
-        Icon(Icons.folder_off_outlined, size: 56, color: colors.outlineVariant),
+        Icon(Icons.folder_off_outlined, size: 56, color: context.colors.borderPrimary),
         'No library selected — set up a library first',
       );
     }
@@ -71,7 +71,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
               Text(
                 'Sort a folder of unsorted photos into your library by date.',
                 style:
-                    theme.textTheme.bodyMedium?.copyWith(color: colors.outline),
+                    theme.textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
               ),
               const SizedBox(height: 32),
               _SectionLabel('Source folder'),
@@ -111,8 +111,6 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
   // ── Preview ───────────────────────────────────────────────────────────────
 
   Widget _buildPreview(BuildContext context, OrganizerState state) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final ops = state.operations;
     final notifier = ref.read(organizerProvider.notifier);
 
@@ -122,8 +120,6 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
           _PreviewHeader(
             count: ops.length,
             destRoot: state.destRoot ?? '',
-            colors: colors,
-            theme: theme,
           ),
           const Divider(height: 1),
           Expanded(child: OperationPreviewList(operations: ops)),
@@ -183,7 +179,6 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
 
   Widget _buildDone(BuildContext context, OrganizerState state) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final notifier = ref.read(organizerProvider.notifier);
 
     return Scaffold(
@@ -192,7 +187,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.check_circle_outline_rounded,
-                size: 64, color: colors.primary),
+                size: 64, color: context.colors.primaryColor),
             const SizedBox(height: 16),
             Text(
               '${state.total} photo${state.total == 1 ? '' : 's'} sorted',
@@ -203,7 +198,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
               Text(
                 '${state.rolledBack} file${state.rolledBack == 1 ? '' : 's'} rolled back',
                 style:
-                    theme.textTheme.bodySmall?.copyWith(color: colors.outline),
+                    theme.textTheme.bodySmall?.copyWith(color: context.colors.textSecondary),
               ),
             ],
             const SizedBox(height: 32),
@@ -232,7 +227,6 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
 
   Widget _buildError(BuildContext context, OrganizerState state) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final notifier = ref.read(organizerProvider.notifier);
 
     return Scaffold(
@@ -240,7 +234,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline_rounded, size: 56, color: colors.error),
+            Icon(Icons.error_outline_rounded, size: 56, color: context.colors.errorPrimary),
             const SizedBox(height: 16),
             Text('Something went wrong', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
@@ -250,7 +244,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
                 state.error ?? 'Unknown error',
                 textAlign: TextAlign.center,
                 style:
-                    theme.textTheme.bodySmall?.copyWith(color: colors.outline),
+                    theme.textTheme.bodySmall?.copyWith(color: context.colors.textSecondary),
               ),
             ),
             const SizedBox(height: 24),
@@ -296,7 +290,7 @@ class _SectionLabel extends StatelessWidget {
       style: Theme.of(context)
           .textTheme
           .labelMedium
-          ?.copyWith(color: Theme.of(context).colorScheme.outline),
+          ?.copyWith(color: context.colors.textSecondary),
     );
   }
 }
@@ -317,14 +311,13 @@ class _PathRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: context.colors.tertiaryColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colors.outlineVariant),
+        border: Border.all(color: context.colors.borderPrimary),
       ),
       child: Row(
         children: [
@@ -335,14 +328,14 @@ class _PathRow extends StatelessWidget {
                     ? Icons.folder_open_rounded
                     : Icons.folder_outlined),
             size: 18,
-            color: path != null ? colors.primary : colors.outlineVariant,
+            color: path != null ? context.colors.primaryColor : context.colors.borderPrimary,
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               path ?? placeholder ?? '',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: path != null ? colors.onSurface : colors.outlineVariant,
+                color: path != null ? context.colors.textPrimary : context.colors.borderPrimary,
                 fontFamily: 'monospace',
               ),
               overflow: TextOverflow.ellipsis,
@@ -362,23 +355,20 @@ class _PreviewHeader extends StatelessWidget {
   const _PreviewHeader({
     required this.count,
     required this.destRoot,
-    required this.colors,
-    required this.theme,
   });
 
   final int count;
   final String destRoot;
-  final ColorScheme colors;
-  final ThemeData theme;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       child: Row(
         children: [
           Icon(Icons.drive_folder_upload_outlined,
-              size: 20, color: colors.primary),
+              size: 20, color: context.colors.primaryColor),
           const SizedBox(width: 10),
           Expanded(
             child: count == 0

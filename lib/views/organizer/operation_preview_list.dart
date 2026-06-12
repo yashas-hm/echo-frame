@@ -1,4 +1,5 @@
 import 'package:echo_frame/models/organizer_result.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class OperationPreviewList extends StatelessWidget {
@@ -9,7 +10,6 @@ class OperationPreviewList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     if (operations.isEmpty) {
       return Center(
@@ -17,11 +17,11 @@ class OperationPreviewList extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.folder_off_outlined,
-                size: 48, color: colors.outlineVariant),
+                size: 48, color: context.colors.borderPrimary),
             const SizedBox(height: 16),
             Text('No media files found in the selected folder',
                 style: theme.textTheme.bodyMedium
-                    ?.copyWith(color: colors.outline)),
+                    ?.copyWith(color: context.colors.textSecondary)),
           ],
         ),
       );
@@ -41,7 +41,7 @@ class OperationPreviewList extends StatelessWidget {
             child: Text(
               entry.key,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: colors.outline,
+                color: context.colors.textSecondary,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.6,
               ),
@@ -56,7 +56,7 @@ class OperationPreviewList extends StatelessWidget {
                     ? Icons.drive_file_rename_outline_rounded
                     : Icons.subdirectory_arrow_right_rounded,
                 size: 16,
-                color: op.hasConflict ? colors.tertiary : colors.primary,
+                color: op.hasConflict ? context.colors.tertiaryColor : context.colors.primaryColor,
               ),
               title: Text(
                 op.filename,
@@ -67,7 +67,7 @@ class OperationPreviewList extends StatelessWidget {
                   ? Text(
                       'Renamed → ${op.destFilename}',
                       style: theme.textTheme.bodySmall
-                          ?.copyWith(color: colors.tertiary),
+                          ?.copyWith(color: context.colors.tertiaryColor),
                     )
                   : null,
             ),

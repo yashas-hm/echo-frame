@@ -4,6 +4,7 @@ import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/views/photo_view/photo_detail_panel.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -131,7 +132,7 @@ class _PhotoViewScreenState extends State<PhotoViewScreen> {
         autofocus: true,
         onKeyEvent: _handleKey,
         child: Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: KnownColors.basicBlack,
           body: Row(
             children: [
               Expanded(
@@ -148,12 +149,12 @@ class _PhotoViewScreenState extends State<PhotoViewScreen> {
                             fit: BoxFit.contain,
                             errorBuilder: (_, __, ___) => Column(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
+                              children: [
                                 Icon(Icons.broken_image_outlined,
-                                    size: 64, color: Colors.white38),
-                                SizedBox(height: 8),
+                                    size: 64, color: KnownColors.basicWhite.withValues(alpha: 0.38)),
+                                const SizedBox(height: 8),
                                 Text('File not available',
-                                    style: TextStyle(color: Colors.white54)),
+                                    style: TextStyle(color: KnownColors.basicWhite.withValues(alpha: 0.54))),
                               ],
                             ),
                           ),

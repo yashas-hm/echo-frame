@@ -8,6 +8,7 @@ import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:echo_frame/views/timeline/photo_tile.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -169,7 +170,6 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
 
   Widget _buildIndexing(BuildContext context) {
     final p = _progress!;
-    final colors = Theme.of(context).colorScheme;
     return Scaffold(
       body: Center(
         child: SizedBox(
@@ -187,7 +187,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
               if (p.currentFolder != null) ...[
                 const SizedBox(height: 4),
                 Text(p.currentFolder!,
-                    style: TextStyle(color: colors.outline, fontSize: 12)),
+                    style: TextStyle(color: context.colors.textSecondary, fontSize: 12)),
               ],
             ],
           ),
@@ -197,14 +197,13 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.photo_library_outlined,
-                size: 72, color: colors.outlineVariant),
+                size: 72, color: context.colors.borderPrimary),
             const SizedBox(height: 20),
             Text('No library selected',
                 style: Theme.of(context).textTheme.titleMedium),
@@ -236,7 +235,7 @@ class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return ColoredBox(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: context.colors.background,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 17),
         child: Text(

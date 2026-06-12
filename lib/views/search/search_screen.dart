@@ -4,6 +4,7 @@ import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/views/search/provider/search_provider.dart';
 import 'package:echo_frame/views/timeline/photo_tile.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -45,8 +46,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(searchProvider);
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     return Scaffold(
       body: Column(
@@ -68,7 +67,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               onChanged: _onChanged,
               elevation: const WidgetStatePropertyAll(0),
               side: WidgetStatePropertyAll(
-                BorderSide(color: colors.outlineVariant),
+                BorderSide(color: context.colors.borderPrimary),
               ),
               shape: const WidgetStatePropertyAll(
                 RoundedRectangleBorder(
@@ -85,10 +84,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               error: (e, _) => Center(child: Text('Error: $e')),
               data: (records) {
                 if (_controller.text.trim().isEmpty) {
-                  return _buildHint(context, colors);
+                  return _buildHint(context);
                 }
                 if (records.isEmpty) {
-                  return _buildNoResults(context, colors);
+                  return _buildNoResults(context);
                 }
                 return _buildGrid(records);
               },
@@ -124,7 +123,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 style: Theme.of(context)
                     .textTheme
                     .bodySmall
-                    ?.copyWith(color: Theme.of(context).colorScheme.outline),
+                    ?.copyWith(color: context.colors.textSecondary),
               ),
             ),
           ),
@@ -133,12 +132,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildHint(BuildContext context, ColorScheme colors) {
+  Widget _buildHint(BuildContext context) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.search_rounded, size: 56, color: colors.outlineVariant),
+          Icon(Icons.search_rounded, size: 56, color: context.colors.borderPrimary),
           const SizedBox(height: 16),
           Text(
             'Search your library',
@@ -150,20 +149,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             style: Theme.of(context)
                 .textTheme
                 .bodySmall
-                ?.copyWith(color: colors.outline),
+                ?.copyWith(color: context.colors.textSecondary),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildNoResults(BuildContext context, ColorScheme colors) {
+  Widget _buildNoResults(BuildContext context) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.image_search_rounded,
-              size: 56, color: colors.outlineVariant),
+              size: 56, color: context.colors.borderPrimary),
           const SizedBox(height: 16),
           Text(
             'No results for "${_controller.text.trim()}"',

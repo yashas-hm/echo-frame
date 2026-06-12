@@ -1,6 +1,7 @@
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:echo_frame/views/timeline/photo_tile.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +15,6 @@ class FavoritesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(favoritesProvider);
-    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: state.when(
@@ -22,7 +22,7 @@ class FavoritesScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (records) {
           if (records.isEmpty) {
-            return _buildEmpty(context, colors);
+            return _buildEmpty(context);
           }
           final items = records.map(MediaItem.fromRecord).toList();
           return CustomScrollView(
@@ -37,7 +37,7 @@ class FavoritesScreen extends ConsumerWidget {
                       style: Theme.of(context)
                           .textTheme
                           .labelSmall
-                          ?.copyWith(color: colors.outline),
+                          ?.copyWith(color: context.colors.textSecondary),
                     ),
                   ),
                 ),
@@ -62,13 +62,13 @@ class FavoritesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmpty(BuildContext context, ColorScheme colors) {
+  Widget _buildEmpty(BuildContext context) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.favorite_outline_rounded,
-              size: 56, color: colors.outlineVariant),
+              size: 56, color: context.colors.borderPrimary),
           const SizedBox(height: 16),
           Text(
             'No favourites yet',
@@ -80,7 +80,7 @@ class FavoritesScreen extends ConsumerWidget {
             style: Theme.of(context)
                 .textTheme
                 .bodySmall
-                ?.copyWith(color: colors.outline),
+                ?.copyWith(color: context.colors.textSecondary),
           ),
         ],
       ),

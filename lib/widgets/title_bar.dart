@@ -1,3 +1,4 @@
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -8,8 +9,6 @@ class TitleBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
     return DragToMoveArea(
       child: SizedBox(
         height: height,
@@ -22,7 +21,7 @@ class TitleBar extends StatelessWidget {
                 child: Text(
                   'Echo Frame',
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: colors.onSurface.withValues(alpha: 0.4),
+                        color: context.colors.textPrimary.withValues(alpha: 0.4),
                         letterSpacing: 0.3,
                       ),
                 ),
