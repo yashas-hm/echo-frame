@@ -10,6 +10,11 @@ class LibraryStructure {
 }
 
 class LibraryService {
+  static const _videoExts = {'mp4', 'mov', 'avi', 'mkv', 'm4v'};
+
+  static bool isVideo(String path) =>
+      _videoExts.contains(path.split('.').last.toLowerCase());
+
   static const _mediaExts = {
     'jpg',
     'jpeg',

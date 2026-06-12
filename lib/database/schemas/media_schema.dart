@@ -39,6 +39,8 @@ class MediaRecords extends Table {
 
   TextColumn get cameraModel => text().nullable()();
 
+  TextColumn get thumbnailPath => text().nullable()();
+
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
 
   BoolColumn get isTrashed => boolean().withDefault(const Constant(false))();

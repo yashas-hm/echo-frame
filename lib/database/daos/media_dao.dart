@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/models/metadata.dart';
+import 'package:echo_frame/services/thumbnail_service.dart';
 
 // ── Timeline queries ──────────────────────────────────────────────────────────
 
@@ -118,6 +121,11 @@ class MediaDao {
   ) =>
       upsertBatch([_toCompanion(meta, driveId, libraryRoot)]);
 
+  static String? _existingThumbnail(String filePath) {
+    final path = ThumbnailService.pathFor(filePath);
+    return File(path).existsSync() ? path : null;
+  }
+
   MediaRecordsCompanion _toCompanion(
     Metadata meta,
     String driveId,
@@ -144,6 +152,7 @@ class MediaDao {
       altitude: Value(meta.altitude),
       cameraMake: Value(meta.cameraMake),
       cameraModel: Value(meta.cameraModel),
+      thumbnailPath: Value(_existingThumbnail(meta.path)),
       hasJsonIndex: const Value(true),
     );
   }

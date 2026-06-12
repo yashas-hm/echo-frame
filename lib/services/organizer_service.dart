@@ -8,6 +8,7 @@ import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/models/organizer_result.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/services/metadata_service.dart';
+import 'package:echo_frame/services/thumbnail_service.dart';
 
 class OrganizerProgress {
   final int applied;
@@ -85,6 +86,10 @@ class OrganizerService {
 
       await Directory(op.destPath).parent.create(recursive: true);
       await File(op.sourcePath).rename(op.destPath);
+
+      if (LibraryService.isVideo(op.destPath)) {
+        await ThumbnailService.generate(op.destPath);
+      }
 
       yield OrganizerProgress(
         applied: i + 1,

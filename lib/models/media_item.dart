@@ -4,17 +4,20 @@ import 'package:echo_frame/models/metadata.dart';
 class MediaItem {
   final int id;
   final bool isFavorite;
+  final String? thumbnailPath;
   final Metadata meta;
 
   const MediaItem({
     required this.id,
     required this.isFavorite,
     required this.meta,
+    this.thumbnailPath,
   });
 
   factory MediaItem.fromRecord(MediaRecord r) => MediaItem(
         id: r.id,
         isFavorite: r.isFavorite,
+        thumbnailPath: r.thumbnailPath,
         meta: Metadata(
           path: r.filePath,
           capturedAt: r.capturedAt ?? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),

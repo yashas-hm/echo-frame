@@ -12,6 +12,7 @@ import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/services/drive_service.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/services/metadata_service.dart';
+import 'package:echo_frame/services/thumbnail_service.dart';
 
 class ImportProgress {
   final int imported;
@@ -160,6 +161,10 @@ class TakeoutService {
 
         await Directory(destPath).parent.create(recursive: true);
         await File(pair.mediaPath).copy(destPath);
+
+        if (LibraryService.isVideo(destPath)) {
+          await ThumbnailService.generate(destPath);
+        }
 
         dev.log(
           '[import] ${pair.filename} → '

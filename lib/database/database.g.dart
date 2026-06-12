@@ -126,6 +126,12 @@ class $MediaRecordsTable extends MediaRecords
   late final GeneratedColumn<String> cameraModel = GeneratedColumn<String>(
       'camera_model', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _thumbnailPathMeta =
+      const VerificationMeta('thumbnailPath');
+  @override
+  late final GeneratedColumn<String> thumbnailPath = GeneratedColumn<String>(
+      'thumbnail_path', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _isFavoriteMeta =
       const VerificationMeta('isFavorite');
   @override
@@ -177,6 +183,7 @@ class $MediaRecordsTable extends MediaRecords
         altitude,
         cameraMake,
         cameraModel,
+        thumbnailPath,
         isFavorite,
         isTrashed,
         hasJsonIndex
@@ -292,6 +299,12 @@ class $MediaRecordsTable extends MediaRecords
           cameraModel.isAcceptableOrUnknown(
               data['camera_model']!, _cameraModelMeta));
     }
+    if (data.containsKey('thumbnail_path')) {
+      context.handle(
+          _thumbnailPathMeta,
+          thumbnailPath.isAcceptableOrUnknown(
+              data['thumbnail_path']!, _thumbnailPathMeta));
+    }
     if (data.containsKey('is_favorite')) {
       context.handle(
           _isFavoriteMeta,
@@ -355,6 +368,8 @@ class $MediaRecordsTable extends MediaRecords
           .read(DriftSqlType.string, data['${effectivePrefix}camera_make']),
       cameraModel: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}camera_model']),
+      thumbnailPath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}thumbnail_path']),
       isFavorite: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_favorite'])!,
       isTrashed: attachedDatabase.typeMapping
@@ -390,6 +405,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final double? altitude;
   final String? cameraMake;
   final String? cameraModel;
+  final String? thumbnailPath;
   final bool isFavorite;
   final bool isTrashed;
   final bool hasJsonIndex;
@@ -413,6 +429,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       this.altitude,
       this.cameraMake,
       this.cameraModel,
+      this.thumbnailPath,
       required this.isFavorite,
       required this.isTrashed,
       required this.hasJsonIndex});
@@ -461,6 +478,9 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
     }
     if (!nullToAbsent || cameraModel != null) {
       map['camera_model'] = Variable<String>(cameraModel);
+    }
+    if (!nullToAbsent || thumbnailPath != null) {
+      map['thumbnail_path'] = Variable<String>(thumbnailPath);
     }
     map['is_favorite'] = Variable<bool>(isFavorite);
     map['is_trashed'] = Variable<bool>(isTrashed);
@@ -511,6 +531,9 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       cameraModel: cameraModel == null && nullToAbsent
           ? const Value.absent()
           : Value(cameraModel),
+      thumbnailPath: thumbnailPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thumbnailPath),
       isFavorite: Value(isFavorite),
       isTrashed: Value(isTrashed),
       hasJsonIndex: Value(hasJsonIndex),
@@ -540,6 +563,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       altitude: serializer.fromJson<double?>(json['altitude']),
       cameraMake: serializer.fromJson<String?>(json['cameraMake']),
       cameraModel: serializer.fromJson<String?>(json['cameraModel']),
+      thumbnailPath: serializer.fromJson<String?>(json['thumbnailPath']),
       isFavorite: serializer.fromJson<bool>(json['isFavorite']),
       isTrashed: serializer.fromJson<bool>(json['isTrashed']),
       hasJsonIndex: serializer.fromJson<bool>(json['hasJsonIndex']),
@@ -568,6 +592,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       'altitude': serializer.toJson<double?>(altitude),
       'cameraMake': serializer.toJson<String?>(cameraMake),
       'cameraModel': serializer.toJson<String?>(cameraModel),
+      'thumbnailPath': serializer.toJson<String?>(thumbnailPath),
       'isFavorite': serializer.toJson<bool>(isFavorite),
       'isTrashed': serializer.toJson<bool>(isTrashed),
       'hasJsonIndex': serializer.toJson<bool>(hasJsonIndex),
@@ -594,6 +619,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
           Value<double?> altitude = const Value.absent(),
           Value<String?> cameraMake = const Value.absent(),
           Value<String?> cameraModel = const Value.absent(),
+          Value<String?> thumbnailPath = const Value.absent(),
           bool? isFavorite,
           bool? isTrashed,
           bool? hasJsonIndex}) =>
@@ -619,6 +645,8 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         altitude: altitude.present ? altitude.value : this.altitude,
         cameraMake: cameraMake.present ? cameraMake.value : this.cameraMake,
         cameraModel: cameraModel.present ? cameraModel.value : this.cameraModel,
+        thumbnailPath:
+            thumbnailPath.present ? thumbnailPath.value : this.thumbnailPath,
         isFavorite: isFavorite ?? this.isFavorite,
         isTrashed: isTrashed ?? this.isTrashed,
         hasJsonIndex: hasJsonIndex ?? this.hasJsonIndex,
@@ -655,6 +683,9 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
           data.cameraMake.present ? data.cameraMake.value : this.cameraMake,
       cameraModel:
           data.cameraModel.present ? data.cameraModel.value : this.cameraModel,
+      thumbnailPath: data.thumbnailPath.present
+          ? data.thumbnailPath.value
+          : this.thumbnailPath,
       isFavorite:
           data.isFavorite.present ? data.isFavorite.value : this.isFavorite,
       isTrashed: data.isTrashed.present ? data.isTrashed.value : this.isTrashed,
@@ -686,6 +717,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
           ..write('altitude: $altitude, ')
           ..write('cameraMake: $cameraMake, ')
           ..write('cameraModel: $cameraModel, ')
+          ..write('thumbnailPath: $thumbnailPath, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('isTrashed: $isTrashed, ')
           ..write('hasJsonIndex: $hasJsonIndex')
@@ -714,6 +746,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         altitude,
         cameraMake,
         cameraModel,
+        thumbnailPath,
         isFavorite,
         isTrashed,
         hasJsonIndex
@@ -741,6 +774,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
           other.altitude == this.altitude &&
           other.cameraMake == this.cameraMake &&
           other.cameraModel == this.cameraModel &&
+          other.thumbnailPath == this.thumbnailPath &&
           other.isFavorite == this.isFavorite &&
           other.isTrashed == this.isTrashed &&
           other.hasJsonIndex == this.hasJsonIndex);
@@ -766,6 +800,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<double?> altitude;
   final Value<String?> cameraMake;
   final Value<String?> cameraModel;
+  final Value<String?> thumbnailPath;
   final Value<bool> isFavorite;
   final Value<bool> isTrashed;
   final Value<bool> hasJsonIndex;
@@ -789,6 +824,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.altitude = const Value.absent(),
     this.cameraMake = const Value.absent(),
     this.cameraModel = const Value.absent(),
+    this.thumbnailPath = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.isTrashed = const Value.absent(),
     this.hasJsonIndex = const Value.absent(),
@@ -813,6 +849,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.altitude = const Value.absent(),
     this.cameraMake = const Value.absent(),
     this.cameraModel = const Value.absent(),
+    this.thumbnailPath = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.isTrashed = const Value.absent(),
     this.hasJsonIndex = const Value.absent(),
@@ -841,6 +878,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     Expression<double>? altitude,
     Expression<String>? cameraMake,
     Expression<String>? cameraModel,
+    Expression<String>? thumbnailPath,
     Expression<bool>? isFavorite,
     Expression<bool>? isTrashed,
     Expression<bool>? hasJsonIndex,
@@ -865,6 +903,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       if (altitude != null) 'altitude': altitude,
       if (cameraMake != null) 'camera_make': cameraMake,
       if (cameraModel != null) 'camera_model': cameraModel,
+      if (thumbnailPath != null) 'thumbnail_path': thumbnailPath,
       if (isFavorite != null) 'is_favorite': isFavorite,
       if (isTrashed != null) 'is_trashed': isTrashed,
       if (hasJsonIndex != null) 'has_json_index': hasJsonIndex,
@@ -891,6 +930,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       Value<double?>? altitude,
       Value<String?>? cameraMake,
       Value<String?>? cameraModel,
+      Value<String?>? thumbnailPath,
       Value<bool>? isFavorite,
       Value<bool>? isTrashed,
       Value<bool>? hasJsonIndex}) {
@@ -914,6 +954,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       altitude: altitude ?? this.altitude,
       cameraMake: cameraMake ?? this.cameraMake,
       cameraModel: cameraModel ?? this.cameraModel,
+      thumbnailPath: thumbnailPath ?? this.thumbnailPath,
       isFavorite: isFavorite ?? this.isFavorite,
       isTrashed: isTrashed ?? this.isTrashed,
       hasJsonIndex: hasJsonIndex ?? this.hasJsonIndex,
@@ -980,6 +1021,9 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     if (cameraModel.present) {
       map['camera_model'] = Variable<String>(cameraModel.value);
     }
+    if (thumbnailPath.present) {
+      map['thumbnail_path'] = Variable<String>(thumbnailPath.value);
+    }
     if (isFavorite.present) {
       map['is_favorite'] = Variable<bool>(isFavorite.value);
     }
@@ -1014,6 +1058,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
           ..write('altitude: $altitude, ')
           ..write('cameraMake: $cameraMake, ')
           ..write('cameraModel: $cameraModel, ')
+          ..write('thumbnailPath: $thumbnailPath, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('isTrashed: $isTrashed, ')
           ..write('hasJsonIndex: $hasJsonIndex')
@@ -1875,6 +1920,7 @@ typedef $$MediaRecordsTableCreateCompanionBuilder = MediaRecordsCompanion
   Value<double?> altitude,
   Value<String?> cameraMake,
   Value<String?> cameraModel,
+  Value<String?> thumbnailPath,
   Value<bool> isFavorite,
   Value<bool> isTrashed,
   Value<bool> hasJsonIndex,
@@ -1900,6 +1946,7 @@ typedef $$MediaRecordsTableUpdateCompanionBuilder = MediaRecordsCompanion
   Value<double?> altitude,
   Value<String?> cameraMake,
   Value<String?> cameraModel,
+  Value<String?> thumbnailPath,
   Value<bool> isFavorite,
   Value<bool> isTrashed,
   Value<bool> hasJsonIndex,
@@ -1970,6 +2017,9 @@ class $$MediaRecordsTableFilterComposer
 
   ColumnFilters<String> get cameraModel => $composableBuilder(
       column: $table.cameraModel, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get thumbnailPath => $composableBuilder(
+      column: $table.thumbnailPath, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get isFavorite => $composableBuilder(
       column: $table.isFavorite, builder: (column) => ColumnFilters(column));
@@ -2050,6 +2100,10 @@ class $$MediaRecordsTableOrderingComposer
   ColumnOrderings<String> get cameraModel => $composableBuilder(
       column: $table.cameraModel, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get thumbnailPath => $composableBuilder(
+      column: $table.thumbnailPath,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<bool> get isFavorite => $composableBuilder(
       column: $table.isFavorite, builder: (column) => ColumnOrderings(column));
 
@@ -2127,6 +2181,9 @@ class $$MediaRecordsTableAnnotationComposer
   GeneratedColumn<String> get cameraModel => $composableBuilder(
       column: $table.cameraModel, builder: (column) => column);
 
+  GeneratedColumn<String> get thumbnailPath => $composableBuilder(
+      column: $table.thumbnailPath, builder: (column) => column);
+
   GeneratedColumn<bool> get isFavorite => $composableBuilder(
       column: $table.isFavorite, builder: (column) => column);
 
@@ -2182,6 +2239,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             Value<double?> altitude = const Value.absent(),
             Value<String?> cameraMake = const Value.absent(),
             Value<String?> cameraModel = const Value.absent(),
+            Value<String?> thumbnailPath = const Value.absent(),
             Value<bool> isFavorite = const Value.absent(),
             Value<bool> isTrashed = const Value.absent(),
             Value<bool> hasJsonIndex = const Value.absent(),
@@ -2206,6 +2264,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             altitude: altitude,
             cameraMake: cameraMake,
             cameraModel: cameraModel,
+            thumbnailPath: thumbnailPath,
             isFavorite: isFavorite,
             isTrashed: isTrashed,
             hasJsonIndex: hasJsonIndex,
@@ -2230,6 +2289,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             Value<double?> altitude = const Value.absent(),
             Value<String?> cameraMake = const Value.absent(),
             Value<String?> cameraModel = const Value.absent(),
+            Value<String?> thumbnailPath = const Value.absent(),
             Value<bool> isFavorite = const Value.absent(),
             Value<bool> isTrashed = const Value.absent(),
             Value<bool> hasJsonIndex = const Value.absent(),
@@ -2254,6 +2314,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             altitude: altitude,
             cameraMake: cameraMake,
             cameraModel: cameraModel,
+            thumbnailPath: thumbnailPath,
             isFavorite: isFavorite,
             isTrashed: isTrashed,
             hasJsonIndex: hasJsonIndex,
