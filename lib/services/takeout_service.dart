@@ -166,14 +166,6 @@ class TakeoutService {
           await ThumbnailService.generate(destPath);
         }
 
-        dev.log(
-          '[import] ${pair.filename} → '
-          'w=${exifMeta.width} h=${exifMeta.height} '
-          'capturedAt=$capturedAt '
-          'camera=${exifMeta.cameraMake} ${exifMeta.cameraModel}',
-          name: 'TakeoutService.apply',
-        );
-
         // Merge: Takeout GPS + timestamp > EXIF
         final mergedMeta = Metadata(
           path: destPath,
