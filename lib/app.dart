@@ -7,7 +7,7 @@ import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/organizer/organizer_screen.dart';
 import 'package:echo_frame/views/search/search_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
-import 'package:echo_frame/views/shell/shell_screen.dart';
+import 'package:echo_frame/views/shell/nav_bar_shell.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
