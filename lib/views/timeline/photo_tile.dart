@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
-import 'package:echo_frame/views/photo_view/photo_view_screen.dart';
+import 'package:echo_frame/views/gallery/image_screen.dart';
+import 'package:echo_frame/views/gallery/video_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,7 +15,9 @@ class PhotoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(PhotoViewScreen.route(item.id)),
+      onTap: () => context.push(
+        item.isVideo ? VideoScreen.route(item.id) : ImageScreen.route(item.id),
+      ),
       child: SizedBox.expand(
         child: item.isVideo
             ? _videoTile(context.colors)

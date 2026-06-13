@@ -6,16 +6,16 @@ import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PhotoDetailPanel extends ConsumerStatefulWidget {
-  const PhotoDetailPanel({super.key, required this.item});
+class GalleryInfoPanel extends ConsumerStatefulWidget {
+  const GalleryInfoPanel({super.key, required this.item});
 
   final MediaItem item;
 
   @override
-  ConsumerState<PhotoDetailPanel> createState() => _PhotoDetailPanelState();
+  ConsumerState<GalleryInfoPanel> createState() => _PhotoDetailPanelState();
 }
 
-class _PhotoDetailPanelState extends ConsumerState<PhotoDetailPanel> {
+class _PhotoDetailPanelState extends ConsumerState<GalleryInfoPanel> {
   late bool _isFavorite;
   bool _toggling = false;
 
@@ -26,7 +26,7 @@ class _PhotoDetailPanelState extends ConsumerState<PhotoDetailPanel> {
   }
 
   @override
-  void didUpdateWidget(PhotoDetailPanel old) {
+  void didUpdateWidget(GalleryInfoPanel old) {
     super.didUpdateWidget(old);
     if (old.item.id != widget.item.id) {
       _isFavorite = widget.item.isFavorite;

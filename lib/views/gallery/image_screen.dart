@@ -3,31 +3,33 @@ import 'dart:io';
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
-import 'package:echo_frame/views/photo_view/photo_detail_panel.dart';
+import 'package:echo_frame/views/gallery/gallery_info_panel.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-class PhotoViewScreen extends StatefulWidget {
-  const PhotoViewScreen({super.key, required this.mediaId});
+class ImageScreen extends StatefulWidget {
+  const ImageScreen({super.key, required this.mediaId});
 
   final int mediaId;
 
-  static const String path = '/photo';
+  static const String path = '/image';
+
   static String route(int id) => '$path/$id';
+
   static GoRoute get routeDef => GoRoute(
         path: '$path/:id',
-        builder: (_, state) => PhotoViewScreen(
+        builder: (_, state) => ImageScreen(
           mediaId: int.parse(state.pathParameters['id']!),
         ),
       );
 
   @override
-  State<PhotoViewScreen> createState() => _PhotoViewScreenState();
+  State<ImageScreen> createState() => _ImageScreenState();
 }
 
-class _PhotoViewScreenState extends State<PhotoViewScreen> {
+class _ImageScreenState extends State<ImageScreen> {
   List<MediaItem> _siblings = [];
   late PageController _pageController;
   int _currentIndex = 0;
@@ -129,52 +131,57 @@ class _PhotoViewScreenState extends State<PhotoViewScreen> {
     final current = _siblings[_currentIndex];
 
     return Focus(
-        autofocus: true,
-        onKeyEvent: _handleKey,
-        child: Scaffold(
-          backgroundColor: KnownColors.basicBlack,
-          body: Row(
-            children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: (i) => setState(() => _currentIndex = i),
-                      itemCount: _siblings.length,
-                      itemBuilder: (_, i) => InteractiveViewer(
-                        child: Center(
-                          child: Image.file(
-                            File(_siblings[i].filePath),
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.broken_image_outlined,
-                                    size: 64, color: KnownColors.basicWhite.withValues(alpha: 0.38)),
-                                const SizedBox(height: 8),
-                                Text('File not available',
-                                    style: TextStyle(color: KnownColors.basicWhite.withValues(alpha: 0.54))),
-                              ],
-                            ),
+      autofocus: true,
+      onKeyEvent: _handleKey,
+      child: Scaffold(
+        backgroundColor: KnownColors.basicBlack,
+        body: Row(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (i) => setState(() => _currentIndex = i),
+                    itemCount: _siblings.length,
+                    itemBuilder: (_, i) => InteractiveViewer(
+                      child: Center(
+                        child: Image.file(
+                          File(_siblings[i].filePath),
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.broken_image_outlined,
+                                  size: 64,
+                                  color: KnownColors.basicWhite
+                                      .withValues(alpha: 0.38)),
+                              const SizedBox(height: 8),
+                              Text('File not available',
+                                  style: TextStyle(
+                                      color: KnownColors.basicWhite
+                                          .withValues(alpha: 0.54))),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                    Positioned(
-                      top: 16,
-                      left: 16,
-                      child: IconButton.filledTonal(
-                        onPressed: context.pop,
-                        icon: const Icon(Icons.arrow_back_rounded),
-                      ),
+                  ),
+                  Positioned(
+                    top: 16,
+                    left: 16,
+                    child: IconButton.filledTonal(
+                      onPressed: context.pop,
+                      icon: const Icon(Icons.arrow_back_rounded),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              PhotoDetailPanel(item: current),
-            ],
-          ),
-        ));
+            ),
+            GalleryInfoPanel(item: current),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -8,10 +8,12 @@ import 'package:echo_frame/services/config_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
   await windowManager.ensureInitialized();
 
   await Prefs.init();
