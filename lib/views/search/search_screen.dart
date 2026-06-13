@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
-import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:echo_frame/views/search/provider/search_provider.dart';
 import 'package:echo_frame/views/timeline/photo_tile.dart';
 import 'package:flutter/material.dart';

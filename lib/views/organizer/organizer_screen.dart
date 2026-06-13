@@ -1,4 +1,4 @@
-import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:echo_frame/views/organizer/operation_preview_list.dart';
 import 'package:echo_frame/views/organizer/provider/organizer_provider.dart';
 import 'package:file_picker/file_picker.dart';

@@ -6,4 +6,6 @@ extension ContextExtension on BuildContext {
   double get width => MediaQuery.of(this).size.width;
 
   bool get isDark => MediaQuery.of(this).platformBrightness == Brightness.dark;
+
+  AppThemeColors get colors => Theme.of(this).extension<AppThemeColors>()!;
 }

@@ -1,5 +1,5 @@
 import 'package:echo_frame/models/organizer_result.dart';
-import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:flutter/material.dart';
 
 class OperationPreviewList extends StatelessWidget {

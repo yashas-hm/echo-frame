@@ -1,4 +1,4 @@
-import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 

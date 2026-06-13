@@ -159,7 +159,3 @@ final class _LerpedColors extends AppThemeColors {
   @override
   _LerpedColors copyWith() => this;
 }
-
-extension AppThemeColorsX on BuildContext {
-  AppThemeColors get colors => Theme.of(this).extension<AppThemeColors>()!;
-}
