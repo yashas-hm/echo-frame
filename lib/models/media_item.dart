@@ -20,7 +20,8 @@ class MediaItem {
         thumbnailPath: r.thumbnailPath,
         meta: Metadata(
           path: r.filePath,
-          capturedAt: r.capturedAt ?? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+          capturedAt: r.capturedAt ??
+              DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
           width: r.width,
           height: r.height,
           durationMs: r.durationMs,
@@ -38,15 +39,26 @@ class MediaItem {
 
   // Convenience accessors — delegates to meta so UI call sites are unchanged.
   String get filePath => meta.path;
+
   DateTime get capturedAt => meta.capturedAt;
+
   int? get width => meta.width;
+
   int? get height => meta.height;
+
   int? get durationMs => meta.durationMs;
+
   String? get cameraMake => meta.cameraMake;
+
   String? get cameraModel => meta.cameraModel;
+
   double? get latitude => meta.latitude;
+
   double? get longitude => meta.longitude;
+
   double? get altitude => meta.altitude;
+
   MediaType get mediaType => meta.mediaType;
+
   bool get isVideo => meta.mediaType == MediaType.video;
 }

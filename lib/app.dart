@@ -1,10 +1,10 @@
 import 'package:echo_frame/theme/provider/theme_provider.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/views/favorites/favorites_screen.dart';
-import 'package:echo_frame/views/import/import_screen.dart';
-import 'package:echo_frame/views/organizer/organizer_screen.dart';
 import 'package:echo_frame/views/gallery/image_screen.dart';
 import 'package:echo_frame/views/gallery/video_screen.dart';
+import 'package:echo_frame/views/import/import_screen.dart';
+import 'package:echo_frame/views/organizer/organizer_screen.dart';
 import 'package:echo_frame/views/search/search_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/shell/shell_screen.dart';

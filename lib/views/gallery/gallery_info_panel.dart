@@ -1,8 +1,8 @@
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
-import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -70,7 +70,9 @@ class _PhotoDetailPanelState extends ConsumerState<GalleryInfoPanel> {
               ),
               label: Text(_isFavorite ? 'Favourited' : 'Add to favourites'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: _isFavorite ? context.colors.errorPrimary : context.colors.textPrimary,
+                foregroundColor: _isFavorite
+                    ? context.colors.errorPrimary
+                    : context.colors.textPrimary,
               ),
             ),
           ),

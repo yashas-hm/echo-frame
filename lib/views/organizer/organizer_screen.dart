@@ -10,7 +10,11 @@ class OrganizerScreen extends ConsumerStatefulWidget {
   const OrganizerScreen({super.key});
 
   static const String path = '/organize';
-  static GoRoute get route => GoRoute(path: path, builder: (_, __) => const OrganizerScreen());
+
+  static GoRoute get route => GoRoute(
+        path: path,
+        builder: (_, __) => const OrganizerScreen(),
+      );
 
   @override
   ConsumerState<OrganizerScreen> createState() => _OrganizerScreenState();
@@ -51,7 +55,8 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
 
     if (destRoot == null) {
       return _buildCentered(
-        Icon(Icons.folder_off_outlined, size: 56, color: context.colors.borderPrimary),
+        Icon(Icons.folder_off_outlined,
+            size: 56, color: context.colors.borderPrimary),
         'No library selected — set up a library first',
       );
     }
@@ -70,8 +75,8 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
               const SizedBox(height: 4),
               Text(
                 'Sort a folder of unsorted photos into your library by date.',
-                style:
-                    theme.textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(color: context.colors.textSecondary),
               ),
               const SizedBox(height: 32),
               _SectionLabel('Source folder'),
@@ -197,8 +202,8 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
               const SizedBox(height: 8),
               Text(
                 '${state.rolledBack} file${state.rolledBack == 1 ? '' : 's'} rolled back',
-                style:
-                    theme.textTheme.bodySmall?.copyWith(color: context.colors.textSecondary),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: context.colors.textSecondary),
               ),
             ],
             const SizedBox(height: 32),
@@ -234,7 +239,8 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline_rounded, size: 56, color: context.colors.errorPrimary),
+            Icon(Icons.error_outline_rounded,
+                size: 56, color: context.colors.errorPrimary),
             const SizedBox(height: 16),
             Text('Something went wrong', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
@@ -243,8 +249,8 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
               child: Text(
                 state.error ?? 'Unknown error',
                 textAlign: TextAlign.center,
-                style:
-                    theme.textTheme.bodySmall?.copyWith(color: context.colors.textSecondary),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: context.colors.textSecondary),
               ),
             ),
             const SizedBox(height: 24),
@@ -328,14 +334,18 @@ class _PathRow extends StatelessWidget {
                     ? Icons.folder_open_rounded
                     : Icons.folder_outlined),
             size: 18,
-            color: path != null ? context.colors.primaryColor : context.colors.borderPrimary,
+            color: path != null
+                ? context.colors.primaryColor
+                : context.colors.borderPrimary,
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               path ?? placeholder ?? '',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: path != null ? context.colors.textPrimary : context.colors.borderPrimary,
+                color: path != null
+                    ? context.colors.textPrimary
+                    : context.colors.borderPrimary,
                 fontFamily: 'monospace',
               ),
               overflow: TextOverflow.ellipsis,

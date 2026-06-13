@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/models/metadata.dart';
+import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 
 // ── Timeline queries ──────────────────────────────────────────────────────────

@@ -10,7 +10,11 @@ class ImportScreen extends ConsumerStatefulWidget {
   const ImportScreen({super.key});
 
   static const String path = '/import';
-  static GoRoute get route => GoRoute(path: path, builder: (_, __) => const ImportScreen());
+
+  static GoRoute get route => GoRoute(
+        path: path,
+        builder: (_, __) => const ImportScreen(),
+      );
 
   @override
   ConsumerState<ImportScreen> createState() => _ImportScreenState();
@@ -67,8 +71,8 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                 'Point to your Google Takeout export folder. EchoFrame will '
                 'match metadata sidecars, fix timestamps, and copy photos into '
                 'your library.',
-                style:
-                    theme.textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(color: context.colors.textSecondary),
               ),
               const SizedBox(height: 32),
               _Label('Takeout folder'),
@@ -269,7 +273,8 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline_rounded, size: 56, color: context.colors.errorPrimary),
+            Icon(Icons.error_outline_rounded,
+                size: 56, color: context.colors.errorPrimary),
             const SizedBox(height: 16),
             Text('Import failed', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
@@ -278,8 +283,8 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
               child: Text(
                 state.error ?? 'Unknown error',
                 textAlign: TextAlign.center,
-                style:
-                    theme.textTheme.bodySmall?.copyWith(color: context.colors.textSecondary),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: context.colors.textSecondary),
               ),
             ),
             const SizedBox(height: 24),
@@ -361,14 +366,18 @@ class _PathRow extends StatelessWidget {
                     ? Icons.folder_open_rounded
                     : Icons.folder_outlined),
             size: 18,
-            color: path != null ? context.colors.primaryColor : context.colors.borderPrimary,
+            color: path != null
+                ? context.colors.primaryColor
+                : context.colors.borderPrimary,
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               path ?? placeholder ?? '',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: path != null ? context.colors.textPrimary : context.colors.borderPrimary,
+                color: path != null
+                    ? context.colors.textPrimary
+                    : context.colors.borderPrimary,
                 fontFamily: 'monospace',
               ),
               overflow: TextOverflow.ellipsis,

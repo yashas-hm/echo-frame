@@ -14,7 +14,11 @@ class ShellScreen extends StatelessWidget {
   final Widget child;
 
   static const _destinations = [
-    (route: TimelineScreen.path, icon: Icons.grid_view_rounded, label: 'Library'),
+    (
+      route: TimelineScreen.path,
+      icon: Icons.grid_view_rounded,
+      label: 'Library'
+    ),
     (route: SearchScreen.path, icon: Icons.search_rounded, label: 'Search'),
     (
       route: FavoritesScreen.path,
@@ -27,7 +31,11 @@ class ShellScreen extends StatelessWidget {
       label: 'Organize'
     ),
     (route: ImportScreen.path, icon: Icons.download_rounded, label: 'Import'),
-    (route: SettingsScreen.path, icon: Icons.settings_outlined, label: 'Settings'),
+    (
+      route: SettingsScreen.path,
+      icon: Icons.settings_outlined,
+      label: 'Settings'
+    ),
   ];
 
   @override

@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/services/metadata_service.dart';
+import 'package:flutter/foundation.dart';
 
 class IndexService {
   static const _fileName = '.echo_index.json';

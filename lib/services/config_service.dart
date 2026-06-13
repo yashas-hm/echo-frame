@@ -38,8 +38,7 @@ class ConfigService {
   }
 
   /// Merges [themeMode] into the existing config file without clobbering other fields.
-  static Future<void> writeThemeMode(
-      String libraryRoot, ThemeMode mode) async {
+  static Future<void> writeThemeMode(String libraryRoot, ThemeMode mode) async {
     final file = File(_configPath(libraryRoot));
     final existing = await _readRaw(libraryRoot) ?? {};
     existing['themeMode'] = mode.name;

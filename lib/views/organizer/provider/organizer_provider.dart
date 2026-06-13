@@ -1,5 +1,5 @@
-import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/models/organizer_result.dart';
+import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/services/indexing_pipeline.dart';
 import 'package:echo_frame/services/organizer_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;

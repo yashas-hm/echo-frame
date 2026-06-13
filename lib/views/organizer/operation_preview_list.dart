@@ -56,7 +56,9 @@ class OperationPreviewList extends StatelessWidget {
                     ? Icons.drive_file_rename_outline_rounded
                     : Icons.subdirectory_arrow_right_rounded,
                 size: 16,
-                color: op.hasConflict ? context.colors.tertiaryColor : context.colors.primaryColor,
+                color: op.hasConflict
+                    ? context.colors.tertiaryColor
+                    : context.colors.primaryColor,
               ),
               title: Text(
                 op.filename,

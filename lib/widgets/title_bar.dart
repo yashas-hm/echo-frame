@@ -21,7 +21,8 @@ class TitleBar extends StatelessWidget {
                 child: Text(
                   'Echo Frame',
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: context.colors.textPrimary.withValues(alpha: 0.4),
+                        color:
+                            context.colors.textPrimary.withValues(alpha: 0.4),
                         letterSpacing: 0.3,
                       ),
                 ),

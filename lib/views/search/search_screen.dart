@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/views/search/provider/search_provider.dart';
 import 'package:echo_frame/views/timeline/photo_tile.dart';
-import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +13,11 @@ class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
   static const String path = '/search';
-  static GoRoute get route => GoRoute(path: path, builder: (_, __) => const SearchScreen());
+
+  static GoRoute get route => GoRoute(
+        path: path,
+        builder: (_, __) => const SearchScreen(),
+      );
 
   @override
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
@@ -137,7 +141,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.search_rounded, size: 56, color: context.colors.borderPrimary),
+          Icon(Icons.search_rounded,
+              size: 56, color: context.colors.borderPrimary),
           const SizedBox(height: 16),
           Text(
             'Search your library',

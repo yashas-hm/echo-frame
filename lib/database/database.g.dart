@@ -8,7 +8,9 @@ class $MediaRecordsTable extends MediaRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $MediaRecordsTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -162,6 +164,7 @@ class $MediaRecordsTable extends MediaRecords
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("has_json_index" IN (0, 1))'),
       defaultValue: const Constant(false));
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -188,11 +191,14 @@ class $MediaRecordsTable extends MediaRecords
         isTrashed,
         hasJsonIndex
       ];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'media_records';
+
   @override
   VerificationContext validateIntegrity(Insertable<MediaRecord> instance,
       {bool isInserting = false}) {
@@ -326,6 +332,7 @@ class $MediaRecordsTable extends MediaRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+
   @override
   MediaRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -409,6 +416,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final bool isFavorite;
   final bool isTrashed;
   final bool hasJsonIndex;
+
   const MediaRecord(
       {required this.id,
       required this.filePath,
@@ -433,6 +441,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       required this.isFavorite,
       required this.isTrashed,
       required this.hasJsonIndex});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -569,6 +578,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       hasJsonIndex: serializer.fromJson<bool>(json['hasJsonIndex']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -651,6 +661,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         isTrashed: isTrashed ?? this.isTrashed,
         hasJsonIndex: hasJsonIndex ?? this.hasJsonIndex,
       );
+
   MediaRecord copyWithCompanion(MediaRecordsCompanion data) {
     return MediaRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -751,6 +762,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         isTrashed,
         hasJsonIndex
       ]);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -804,6 +816,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<bool> isFavorite;
   final Value<bool> isTrashed;
   final Value<bool> hasJsonIndex;
+
   const MediaRecordsCompanion({
     this.id = const Value.absent(),
     this.filePath = const Value.absent(),
@@ -829,6 +842,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.isTrashed = const Value.absent(),
     this.hasJsonIndex = const Value.absent(),
   });
+
   MediaRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String filePath,
@@ -858,6 +872,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
         relativePath = Value(relativePath),
         filename = Value(filename),
         indexedAt = Value(indexedAt);
+
   static Insertable<MediaRecord> custom({
     Expression<int>? id,
     Expression<String>? filePath,
@@ -1072,7 +1087,9 @@ class $DriveRecordsTable extends DriveRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $DriveRecordsTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1120,14 +1137,18 @@ class $DriveRecordsTable extends DriveRecords
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_online" IN (0, 1))'),
       defaultValue: const Constant(false));
+
   @override
   List<GeneratedColumn> get $columns =>
       [id, uuid, label, lastMountPath, firstIndexedAt, lastScannedAt, isOnline];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'drive_records';
+
   @override
   VerificationContext validateIntegrity(Insertable<DriveRecord> instance,
       {bool isInserting = false}) {
@@ -1177,6 +1198,7 @@ class $DriveRecordsTable extends DriveRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+
   @override
   DriveRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1212,6 +1234,7 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
   final DateTime firstIndexedAt;
   final DateTime? lastScannedAt;
   final bool isOnline;
+
   const DriveRecord(
       {required this.id,
       required this.uuid,
@@ -1220,6 +1243,7 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
       required this.firstIndexedAt,
       this.lastScannedAt,
       required this.isOnline});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1266,6 +1290,7 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
       isOnline: serializer.fromJson<bool>(json['isOnline']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -1299,6 +1324,7 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
             lastScannedAt.present ? lastScannedAt.value : this.lastScannedAt,
         isOnline: isOnline ?? this.isOnline,
       );
+
   DriveRecord copyWithCompanion(DriveRecordsCompanion data) {
     return DriveRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -1334,6 +1360,7 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
   @override
   int get hashCode => Object.hash(
       id, uuid, label, lastMountPath, firstIndexedAt, lastScannedAt, isOnline);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1355,6 +1382,7 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
   final Value<DateTime> firstIndexedAt;
   final Value<DateTime?> lastScannedAt;
   final Value<bool> isOnline;
+
   const DriveRecordsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
@@ -1364,6 +1392,7 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
     this.lastScannedAt = const Value.absent(),
     this.isOnline = const Value.absent(),
   });
+
   DriveRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
@@ -1375,6 +1404,7 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
   })  : uuid = Value(uuid),
         label = Value(label),
         firstIndexedAt = Value(firstIndexedAt);
+
   static Insertable<DriveRecord> custom({
     Expression<int>? id,
     Expression<String>? uuid,
@@ -1461,7 +1491,9 @@ class $OperationRecordsTable extends OperationRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $OperationRecordsTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1516,6 +1548,7 @@ class $OperationRecordsTable extends OperationRecords
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_dry_run" IN (0, 1))'),
       defaultValue: const Constant(false));
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1527,11 +1560,14 @@ class $OperationRecordsTable extends OperationRecords
         rolledBackAt,
         isDryRun
       ];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'operation_records';
+
   @override
   VerificationContext validateIntegrity(Insertable<OperationRecord> instance,
       {bool isInserting = false}) {
@@ -1587,6 +1623,7 @@ class $OperationRecordsTable extends OperationRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+
   @override
   OperationRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1625,6 +1662,7 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
   final DateTime appliedAt;
   final DateTime? rolledBackAt;
   final bool isDryRun;
+
   const OperationRecord(
       {required this.id,
       required this.batchId,
@@ -1634,6 +1672,7 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
       required this.appliedAt,
       this.rolledBackAt,
       required this.isDryRun});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1679,6 +1718,7 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
       isDryRun: serializer.fromJson<bool>(json['isDryRun']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -1714,6 +1754,7 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
             rolledBackAt.present ? rolledBackAt.value : this.rolledBackAt,
         isDryRun: isDryRun ?? this.isDryRun,
       );
+
   OperationRecord copyWithCompanion(OperationRecordsCompanion data) {
     return OperationRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -1748,6 +1789,7 @@ class OperationRecord extends DataClass implements Insertable<OperationRecord> {
   @override
   int get hashCode => Object.hash(id, batchId, opType, sourcePath, destPath,
       appliedAt, rolledBackAt, isDryRun);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1771,6 +1813,7 @@ class OperationRecordsCompanion extends UpdateCompanion<OperationRecord> {
   final Value<DateTime> appliedAt;
   final Value<DateTime?> rolledBackAt;
   final Value<bool> isDryRun;
+
   const OperationRecordsCompanion({
     this.id = const Value.absent(),
     this.batchId = const Value.absent(),
@@ -1781,6 +1824,7 @@ class OperationRecordsCompanion extends UpdateCompanion<OperationRecord> {
     this.rolledBackAt = const Value.absent(),
     this.isDryRun = const Value.absent(),
   });
+
   OperationRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String batchId,
@@ -1795,6 +1839,7 @@ class OperationRecordsCompanion extends UpdateCompanion<OperationRecord> {
         sourcePath = Value(sourcePath),
         destPath = Value(destPath),
         appliedAt = Value(appliedAt);
+
   static Insertable<OperationRecord> custom({
     Expression<int>? id,
     Expression<String>? batchId,
@@ -1886,14 +1931,17 @@ class OperationRecordsCompanion extends UpdateCompanion<OperationRecord> {
 
 abstract class _$EchoDatabase extends GeneratedDatabase {
   _$EchoDatabase(QueryExecutor e) : super(e);
+
   $EchoDatabaseManager get managers => $EchoDatabaseManager(this);
   late final $MediaRecordsTable mediaRecords = $MediaRecordsTable(this);
   late final $DriveRecordsTable driveRecords = $DriveRecordsTable(this);
   late final $OperationRecordsTable operationRecords =
       $OperationRecordsTable(this);
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
       [mediaRecords, driveRecords, operationRecords];
@@ -1961,6 +2009,7 @@ class $$MediaRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -2040,6 +2089,7 @@ class $$MediaRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -2124,6 +2174,7 @@ class $$MediaRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -2371,6 +2422,7 @@ class $$DriveRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -2403,6 +2455,7 @@ class $$DriveRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -2437,6 +2490,7 @@ class $$DriveRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -2574,6 +2628,7 @@ class $$OperationRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -2608,6 +2663,7 @@ class $$OperationRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -2643,6 +2699,7 @@ class $$OperationRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -2759,11 +2816,15 @@ typedef $$OperationRecordsTableProcessedTableManager = ProcessedTableManager<
 
 class $EchoDatabaseManager {
   final _$EchoDatabase _db;
+
   $EchoDatabaseManager(this._db);
+
   $$MediaRecordsTableTableManager get mediaRecords =>
       $$MediaRecordsTableTableManager(_db, _db.mediaRecords);
+
   $$DriveRecordsTableTableManager get driveRecords =>
       $$DriveRecordsTableTableManager(_db, _db.driveRecords);
+
   $$OperationRecordsTableTableManager get operationRecords =>
       $$OperationRecordsTableTableManager(_db, _db.operationRecords);
 }

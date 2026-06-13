@@ -27,8 +27,7 @@ class Metadata {
     this.mediaType = MediaType.image,
   });
 
-  factory Metadata.fallback(
-          {required String path, required DateTime mtime}) =>
+  factory Metadata.fallback({required String path, required DateTime mtime}) =>
       Metadata(path: path, capturedAt: mtime, mediaType: MediaType.unknown);
 
   factory Metadata.fromJson(Map<String, dynamic> json,
