@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/services/indexing_pipeline.dart';
+import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
@@ -107,7 +107,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     if (!mounted) return;
     setState(() => _hasLibrary = true);
 
-    await for (final progress in IndexingPipeline.run(
+    await for (final progress in IndexingService.run(
       libraryRoot: path,
       months: structure.months,
     )) {

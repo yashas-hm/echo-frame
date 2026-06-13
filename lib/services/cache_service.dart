@@ -6,7 +6,7 @@ import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:flutter/foundation.dart';
 
-class IndexService {
+class CacheService {
   static const _fileName = '.echo_index.json';
 
   Future<MonthIndex> getOrBuild(MonthFolder folder) async {

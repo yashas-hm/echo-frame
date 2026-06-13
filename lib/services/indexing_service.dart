@@ -3,7 +3,7 @@ import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/services/drive_service.dart';
-import 'package:echo_frame/services/index_service.dart';
+import 'package:echo_frame/services/cache_service.dart';
 
 class IndexingProgress {
   final int completed;
@@ -24,7 +24,7 @@ class IndexingProgress {
   double get fraction => total == 0 ? 1.0 : completed / total;
 }
 
-class IndexingPipeline {
+class IndexingService {
   static Stream<IndexingProgress> run({
     required String libraryRoot,
     required List<MonthFolder> months,
@@ -44,7 +44,7 @@ class IndexingPipeline {
       mountPath: libraryRoot,
     );
 
-    final indexService = IndexService();
+    final indexService = CacheService();
     final mediaDao = MediaDao(db);
 
     for (int i = 0; i < months.length; i++) {

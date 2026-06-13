@@ -1,6 +1,6 @@
 import 'package:echo_frame/models/organizer_result.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
-import 'package:echo_frame/services/indexing_pipeline.dart';
+import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/services/organizer_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
@@ -102,7 +102,7 @@ class OrganizerNotifier extends Notifier<OrganizerState> {
       final destRoot = state.destRoot!;
       final affectedMonths = _extractAffectedMonths(ops, destRoot);
       if (affectedMonths.isNotEmpty) {
-        await for (final _ in IndexingPipeline.run(
+        await for (final _ in IndexingService.run(
           libraryRoot: destRoot,
           months: affectedMonths,
         )) {}

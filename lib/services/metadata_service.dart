@@ -28,7 +28,10 @@ class MetadataService {
   }
 
   static Metadata _fromPlugin(
-          String path, MediaMetadata meta, DateTime mtime) =>
+    String path,
+    MediaMetadata meta,
+    DateTime mtime,
+  ) =>
       Metadata(
         path: path,
         capturedAt: meta.capturedAt ?? mtime,
