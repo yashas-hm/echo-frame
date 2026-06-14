@@ -4,7 +4,6 @@ import 'dart:developer' as dev;
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
-import 'package:echo_frame/views/gallery/gallery_info_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -62,28 +61,21 @@ class _VideoViewState extends State<VideoView> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Stack(
       children: [
-        Expanded(
-          child: Stack(
-            children: [
-              GestureDetector(
-                onTap: _player.playOrPause,
-                child: Video(
-                  controller: _controller,
-                  controls: NoVideoControls,
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: _Controls(player: _player),
-              ),
-            ],
+        GestureDetector(
+          onTap: _player.playOrPause,
+          child: Video(
+            controller: _controller,
+            controls: NoVideoControls,
           ),
         ),
-        GalleryInfoPanel(item: widget.item),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: _Controls(player: _player),
+        ),
       ],
     );
   }

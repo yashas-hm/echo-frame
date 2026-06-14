@@ -1,4 +1,5 @@
 import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
 import 'package:echo_frame/views/gallery/video_view.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
@@ -8,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
+
+import 'components/gallery_info_panel.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {
   const GalleryScreen({super.key, required this.mediaId});
@@ -29,12 +32,10 @@ class GalleryScreen extends ConsumerStatefulWidget {
 
 class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   late int _currentIndex;
-  bool _pendingNext = false;
-  bool _hoverLeft = false;
-  bool _hoverRight = false;
-  Player? _player;
+  bool _loadingNext = false;
+  bool _showInfo = false;
 
-  static const double _zoneWidth = 80;
+  Player? _player;
 
   @override
   void initState() {
@@ -49,7 +50,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     if (_currentIndex < state.flatItems.length - 1) {
       setState(() => _currentIndex++);
     } else if (state.hasMore) {
-      setState(() => _pendingNext = true);
+      setState(() => _loadingNext = true);
       ref.read(timelineProvider.notifier).loadNextPage();
     }
   }
@@ -63,11 +64,11 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     ref.listen(
       timelineProvider,
       (_, next) {
-        if (!_pendingNext) return;
+        if (!_loadingNext) return;
         final flat = next.value?.flatItems ?? const [];
         if (_currentIndex < flat.length - 1) {
           setState(() {
-            _pendingNext = false;
+            _loadingNext = false;
             _currentIndex++;
           });
         }
@@ -107,15 +108,32 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                   includeRepeats: false): context.pop,
               const SingleActivator(LogicalKeyboardKey.space,
                   includeRepeats: false): () => _player?.playOrPause(),
+              const SingleActivator(LogicalKeyboardKey.keyI,
+                      includeRepeats: false):
+                  () => setState(() => _showInfo = !_showInfo),
             },
             child: Focus(
               autofocus: true,
-              child: item.isVideo
-                  ? VideoView(
-                      item: item,
-                      onPlayerReady: (p) => _player = p,
-                    )
-                  : ImageView(item: item),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: item.isVideo
+                        ? VideoView(
+                            item: item,
+                            onPlayerReady: (p) => _player = p,
+                          )
+                        : ImageView(item: item),
+                  ),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 150),
+                    child: _showInfo
+                        ? GalleryInfoPanel(item: item)
+                        : SizedBox.shrink(),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -137,8 +155,17 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             child: Stack(
               children: [
                 Positioned.fill(child: child),
-                if (canPrev) _edgeZone(left: true),
-                if (canNext) _edgeZone(left: false),
+                if (canPrev)
+                  CaretArrow(
+                    left: true,
+                    onPressed: _goPrev,
+                  ),
+                if (canNext)
+                  CaretArrow(
+                    left: false,
+                    onPressed: _goNext,
+                    loadingNext: _loadingNext,
+                  ),
                 Positioned(
                   top: 12,
                   left: 12,
@@ -151,68 +178,6 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _edgeZone({required bool left}) {
-    final hovered = left ? _hoverLeft : _hoverRight;
-    return Positioned(
-      left: left ? 0 : null,
-      right: left ? null : 0,
-      top: 0,
-      bottom: 0,
-      width: _zoneWidth,
-      child: MouseRegion(
-        onEnter: (_) =>
-            setState(() => left ? _hoverLeft = true : _hoverRight = true),
-        onExit: (_) =>
-            setState(() => left ? _hoverLeft = false : _hoverRight = false),
-        child: AnimatedOpacity(
-          opacity: hovered ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 150),
-          child: IgnorePointer(
-            ignoring: !hovered,
-            child: Center(
-              child: _pendingNext && !left
-                  ? const _LoadingArrow()
-                  : _GalleryIconButton(
-                      icon: left
-                          ? Icons.arrow_back_ios_rounded
-                          : Icons.arrow_forward_ios_rounded,
-                      onPressed: left ? _goPrev : _goNext,
-                    ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LoadingArrow extends StatelessWidget {
-  const _LoadingArrow();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: KnownColors.basicBlack.withValues(alpha: 0.45),
-        shape: BoxShape.circle,
-      ),
-      child: const SizedBox(
-        width: 48,
-        height: 48,
-        child: Center(
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: KnownColors.basicWhite,
-            ),
-          ),
-        ),
       ),
     );
   }
