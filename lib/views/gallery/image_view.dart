@@ -30,7 +30,8 @@ class ImageView extends StatelessWidget {
                     Text(
                       'File not available',
                       style: TextStyle(
-                          color: KnownColors.basicWhite.withValues(alpha: 0.54)),
+                          color:
+                              KnownColors.basicWhite.withValues(alpha: 0.54)),
                     ),
                   ],
                 ),

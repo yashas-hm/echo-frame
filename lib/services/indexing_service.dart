@@ -2,8 +2,8 @@ import 'package:echo_frame/database/daos/drive_dao.dart';
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
-import 'package:echo_frame/services/drive_service.dart';
 import 'package:echo_frame/services/cache_service.dart';
+import 'package:echo_frame/services/drive_service.dart';
 
 class IndexingProgress {
   final int completed;

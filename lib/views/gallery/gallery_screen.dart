@@ -6,8 +6,8 @@ import 'package:echo_frame/widgets/title_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:media_kit/media_kit.dart';
 import 'package:go_router/go_router.dart';
+import 'package:media_kit/media_kit.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {
   const GalleryScreen({super.key, required this.mediaId});
@@ -103,10 +103,10 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             bindings: {
               const SingleActivator(LogicalKeyboardKey.arrowRight): _goNext,
               const SingleActivator(LogicalKeyboardKey.arrowLeft): _goPrev,
-              const SingleActivator(LogicalKeyboardKey.escape, includeRepeats: false):
-                  context.pop,
-              const SingleActivator(LogicalKeyboardKey.space, includeRepeats: false):
-                  () => _player?.playOrPause(),
+              const SingleActivator(LogicalKeyboardKey.escape,
+                  includeRepeats: false): context.pop,
+              const SingleActivator(LogicalKeyboardKey.space,
+                  includeRepeats: false): () => _player?.playOrPause(),
             },
             child: Focus(
               autofocus: true,
