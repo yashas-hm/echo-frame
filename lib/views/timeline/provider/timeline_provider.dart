@@ -26,6 +26,9 @@ class TimelineState {
     required this.hasMore,
   });
 
+  List<MediaItem> get flatItems =>
+      loaded.expand((m) => m.items).toList(growable: false);
+
   TimelineState copyWith({
     List<({int year, int month, int count})>? allMonths,
     List<MonthData>? loaded,
