@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
 
+import 'components/action_bubble.dart';
 import 'components/gallery_info_panel.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {
@@ -32,6 +33,7 @@ class GalleryScreen extends ConsumerStatefulWidget {
 
 class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   late int _currentIndex;
+
   bool _loadingNext = false;
   bool _showInfo = false;
 
@@ -57,6 +59,30 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
 
   void _goPrev() {
     if (_currentIndex > 0) setState(() => _currentIndex--);
+  }
+
+  void _togglePlayPause() {
+    final player = _player;
+    if (player == null) return;
+    player.playOrPause();
+    ActionBubble.show(
+      context,
+      icon: player.state.playing
+          ? Icons.pause_rounded
+          : Icons.play_arrow_rounded,
+    );
+  }
+
+  void _toggleMute() {
+    final player = _player;
+    if (player == null) return;
+    if (player.state.volume <= 0) {
+      player.setVolume(100);
+      ActionBubble.show(context, icon: Icons.volume_up_rounded);
+    } else {
+      player.setVolume(0);
+      ActionBubble.show(context, icon: Icons.volume_off_rounded);
+    }
   }
 
   @override
@@ -104,13 +130,22 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             bindings: {
               const SingleActivator(LogicalKeyboardKey.arrowRight): _goNext,
               const SingleActivator(LogicalKeyboardKey.arrowLeft): _goPrev,
-              const SingleActivator(LogicalKeyboardKey.escape,
-                  includeRepeats: false): context.pop,
-              const SingleActivator(LogicalKeyboardKey.space,
-                  includeRepeats: false): () => _player?.playOrPause(),
-              const SingleActivator(LogicalKeyboardKey.keyI,
-                      includeRepeats: false):
-                  () => setState(() => _showInfo = !_showInfo),
+              const SingleActivator(
+                LogicalKeyboardKey.escape,
+                includeRepeats: false,
+              ): context.pop,
+              const SingleActivator(
+                LogicalKeyboardKey.space,
+                includeRepeats: false,
+              ): _togglePlayPause,
+              const SingleActivator(
+                LogicalKeyboardKey.keyI,
+                includeRepeats: false,
+              ): () => setState(() => _showInfo = !_showInfo),
+              const SingleActivator(
+                LogicalKeyboardKey.keyM,
+                includeRepeats: false,
+              ): _toggleMute,
             },
             child: Focus(
               autofocus: true,
