@@ -83,20 +83,28 @@ class MediaDao {
       (_db.select(_db.mediaRecords)..where((r) => r.id.equals(id)))
           .getSingleOrNull();
 
-  // ── Search ───────────────────────────────────────────────────────────────
-
-  Future<List<MediaRecord>> search(String query) {
-    final like = '%$query%';
+  Future<List<MediaRecord>> queryPage({
+    int offset = 0,
+    int limit = 100,
+    String? query,
+  }) {
     return (_db.select(_db.mediaRecords)
-          ..where((r) =>
-              r.isTrashed.equals(false) &
-              (r.filename.like(like) |
-                  r.cameraMake.like(like) |
-                  r.cameraModel.like(like)))
+          ..where((r) {
+            var cond = r.isTrashed.equals(false);
+            if (query != null && query.isNotEmpty) {
+              final like = '%$query%';
+              cond = cond &
+                  (r.filename.like(like) |
+                      r.cameraMake.like(like) |
+                      r.cameraModel.like(like));
+            }
+            return cond;
+          })
           ..orderBy([
             (r) =>
                 OrderingTerm(expression: r.capturedAt, mode: OrderingMode.desc),
-          ]))
+          ])
+          ..limit(limit, offset: offset))
         .get();
   }
 
