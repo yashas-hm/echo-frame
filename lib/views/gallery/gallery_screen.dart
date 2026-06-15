@@ -1,6 +1,5 @@
 import 'dart:math' show min;
 
-import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
@@ -164,10 +163,10 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                   Expanded(
                     child: Center(
                       child: AnimatedSize(
-                        duration: AppDurations.medium3,
+                        duration: Durations.medium1,
                         curve: Curves.easeInOut,
                         child: AnimatedSwitcher(
-                          duration: AppDurations.medium4,
+                          duration: Durations.medium2,
                           child: SizedBox(
                             key: ValueKey(_currentIndex),
                             width: fitted.width,
@@ -184,7 +183,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                     ),
                   ),
                   AnimatedSize(
-                    duration: AppDurations.medium1,
+                    duration: Durations.short4,
                     child: _showInfo
                         ? GalleryInfoPanel(item: item)
                         : SizedBox.shrink(),

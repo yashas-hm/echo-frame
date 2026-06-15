@@ -94,22 +94,19 @@ All constants live in `lib/constants/constants.dart` as a barrel using `part` fi
 - `Keys` — `SharedPreferences` key strings
 - `Sizes` — window constraints (`kMinWindowSize`, `kInitWindowWidth/Height`, `kWindowAspectRatio`)
 - `Spacings`, `Styles`, `Routes` — currently empty part files, ready to populate
-- `AppDurations` — all animation/delay durations used across the app
 
-**Duration rule:** Never write a raw `Duration(milliseconds: …)` in view code. Always use a `AppDurations` constant. Current set:
+**Duration rule:** Never write a raw `Duration(milliseconds: …)` in view code. Always use a constant from Flutter's built-in `Durations` class (available via `flutter/material.dart`, no extra import needed). Common values used in this app:
 
 | Constant | Value | Use |
 |---|---|---|
-| `AppDurations.short1` | 100 ms | micro-interactions, hover feedback |
-| `AppDurations.short2` | 150 ms | quick animations |
-| `AppDurations.medium1` | 200 ms | fast transitions |
-| `AppDurations.medium2` | 220 ms | nav bar expand/collapse |
-| `AppDurations.medium3` | 250 ms | standard animations |
-| `AppDurations.medium4` | 300 ms | content switcher transitions |
-| `AppDurations.long1` | 350 ms | debounce timers |
-| `AppDurations.long2` | 500 ms | delayed effects, slow debounce |
+| `Durations.short3` | 150 ms | quick hover animations |
+| `Durations.short4` | 200 ms | fast transitions, nav bar expand |
+| `Durations.medium1` | 250 ms | standard animations |
+| `Durations.medium2` | 300 ms | content switcher transitions |
+| `Durations.medium3` | 350 ms | debounce timers |
+| `Durations.long2` | 500 ms | delayed effects, slow debounce |
 
-If a new duration is needed, add it to `lib/constants/durations.dart` first, then use the constant.
+Full range: `short1` (50 ms) → `short4` (200 ms) → `medium4` (400 ms) → `long4` (600 ms) → `extralong4` (1000 ms).
 
 ## Models
 

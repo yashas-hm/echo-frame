@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
@@ -39,7 +38,7 @@ class _TimelineSearchBarState extends ConsumerState<TimelineSearchBar> {
 
   void _onChanged(String value) {
     _debounce?.cancel();
-    _debounce = Timer(AppDurations.long1, () {
+    _debounce = Timer(Durations.medium3, () {
       ref.read(timelineProvider.notifier).setQuery(value.trim());
     });
   }

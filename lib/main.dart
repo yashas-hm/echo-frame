@@ -58,7 +58,7 @@ class _EchoWindowListener extends WindowListener {
 
   void _scheduleWrite() {
     _debounce?.cancel();
-    _debounce = Timer(AppDurations.long2, _persist);
+    _debounce = Timer(Durations.long2, _persist);
   }
 
   Future<void> _persist() async {

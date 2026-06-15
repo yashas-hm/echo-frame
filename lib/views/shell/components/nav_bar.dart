@@ -27,7 +27,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
 
   static const double _collapsedWidth = 30;
   static const double _collapsedHeight = 60;
-  static const Duration _duration = AppDurations.medium2;
+  static const Duration _duration = Durations.short4;
   static const Curve _curve = Curves.easeInOut;
 
   static const List<_NavDestination> _destinations = [
