@@ -23,11 +23,11 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  bool _showContent = false;
+  bool _showContent = true;
 
   static const double _collapsedWidth = 30;
   static const double _collapsedHeight = 60;
-  static const Duration _duration = Durations.short4;
+  static const Duration _duration = Durations.medium1;
   static const Curve _curve = Curves.easeInOut;
 
   static const List<_NavDestination> _destinations = [
@@ -54,10 +54,16 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     super.initState();
     _controller = AnimationController(vsync: this, duration: _duration);
     _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
+      if (status == AnimationStatus.dismissed) {
         setState(() => _showContent = true);
       }
     });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => Future.delayed(
+        Durations.extralong1,
+        () => _onExit(null),
+      ),
+    );
   }
 
   @override
@@ -66,11 +72,11 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  void _onEnter(PointerEnterEvent _) => _controller.forward();
+  void _onEnter(PointerEnterEvent _) => _controller.reverse();
 
-  void _onExit(PointerExitEvent _) {
+  void _onExit(PointerExitEvent? _) {
     setState(() => _showContent = false);
-    _controller.reverse();
+    _controller.forward();
   }
 
   @override
@@ -93,8 +99,8 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
             animation: _controller,
             builder: (context, _) {
               final t = _curve.transform(_controller.value);
-              final width = lerpDouble(_collapsedWidth, Sizes.navBarWidth, t)!;
-              final height = lerpDouble(_collapsedHeight, expandedHeight, t)!;
+              final width = lerpDouble(Sizes.navBarWidth, _collapsedWidth, t)!;
+              final height = lerpDouble(expandedHeight, _collapsedHeight, t)!;
 
               return Container(
                 width: width,
@@ -120,14 +126,18 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                       ),
                       if (!_showContent)
                         Center(
-                          child: Icon(
-                            Icons.chevron_left,
-                            size: 25,
-                            color: colors.onPrimary,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Icon(
+                              Icons.chevron_left,
+                              size: 25,
+                              color: colors.onPrimary,
+                            ),
                           ),
                         ),
                       if (_showContent)
-                        Padding(
+                        Positioned.fill(
+                          child: Padding(
                           padding: EdgeInsets.all(Sizes.spacingSmall),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -160,6 +170,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                               ),
                             ],
                           ),
+                        ),
                         ),
                     ],
                   ),
