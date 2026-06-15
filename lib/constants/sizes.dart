@@ -10,4 +10,14 @@ final class Sizes {
   static const double kInitWindowWidth = 1200.0;
 
   static const double kInitWindowHeight = 800.0;
+
+  static const double navBarWidth = 100;
+
+  static const double spacingRegular = 20;
+
+  static const double spacingSmall = 10;
+
+  static const double spacingLarge = 30;
+
+  static const double spacingXL = 40;
 }
