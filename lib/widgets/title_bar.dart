@@ -10,7 +10,14 @@ class TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DragToMoveArea(
-      child: SizedBox(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: context.colors.borderPrimary,
+            ),
+          ),
+        ),
         height: height,
         child: Row(
           children: [

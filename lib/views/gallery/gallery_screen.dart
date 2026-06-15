@@ -1,4 +1,4 @@
-import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
@@ -210,39 +210,29 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                     loadingNext: _loadingNext,
                   ),
                 Positioned(
-                  top: 12,
-                  left: 12,
-                  child: _GalleryIconButton(
-                    icon: Icons.arrow_back_rounded,
-                    onPressed: context.pop,
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                    margin: EdgeInsets.all(Sizes.spacingRegular),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      hoverColor: context.colors.borderPrimary,
+                      onTap: context.pop,
+                      child: Padding(
+                        padding: EdgeInsets.all(Sizes.spacingSmall),
+                        child: Icon(
+                          Icons.arrow_back_rounded,
+                          color: context.colors.textPrimary,
+                          size: 25,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _GalleryIconButton extends StatelessWidget {
-  const _GalleryIconButton({required this.icon, required this.onPressed});
-
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: KnownColors.basicBlack.withValues(alpha: 0.45),
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        onPressed: onPressed,
-        icon: Icon(icon, color: KnownColors.basicWhite),
-        iconSize: 22,
       ),
     );
   }
