@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:echo_frame/models/media_item.dart';
-import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:flutter/material.dart';
 
 class ImageView extends StatelessWidget {
@@ -22,13 +22,13 @@ class ImageView extends StatelessWidget {
               Icon(
                 Icons.broken_image_outlined,
                 size: 64,
-                color: KnownColors.basicWhite.withValues(alpha: 0.38),
+                color: context.colors.textPrimary.withValues(alpha: 0.38),
               ),
               const SizedBox(height: 8),
               Text(
                 'File not available',
                 style: TextStyle(
-                  color: KnownColors.basicWhite.withValues(alpha: 0.54),
+                  color: context.colors.textPrimary.withValues(alpha: 0.54),
                 ),
               ),
             ],

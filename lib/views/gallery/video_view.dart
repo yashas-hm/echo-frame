@@ -71,7 +71,7 @@ class _VideoViewState extends State<VideoView> {
           child: Video(
             controller: _controller,
             controls: NoVideoControls,
-            fill: Colors.transparent,
+            fill: KnownColors.transparent,
           ),
         ),
         Positioned(
@@ -136,16 +136,16 @@ class _ControlsState extends State<_Controls> {
         : 0.0;
 
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
-          colors: [
-            KnownColors.basicBlack.withValues(alpha: 0.87),
-            KnownColors.transparent,
-          ],
-        ),
-      ),
+      // decoration: BoxDecoration(
+      //   gradient: LinearGradient(
+      //     begin: Alignment.bottomCenter,
+      //     end: Alignment.topCenter,
+      //     colors: [
+      //       context.colors.background,
+      //       KnownColors.transparent,
+      //     ],
+      //   ),
+      // ),
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -154,11 +154,12 @@ class _ControlsState extends State<_Controls> {
             data: SliderThemeData(
               trackHeight: 2,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 10),
               activeTrackColor: context.colors.primaryColor,
-              inactiveTrackColor: KnownColors.basicWhite.withValues(alpha: 0.4),
-              thumbColor: KnownColors.basicWhite,
-              overlayColor: KnownColors.basicWhite.withValues(alpha: 0.2),
+              inactiveTrackColor: context.colors.borderPrimary,
+              thumbColor: context.colors.onPrimary,
+              overlayColor: context.colors.borderPrimary,
+
             ),
             child: Slider(
               value: progress,
@@ -173,14 +174,14 @@ class _ControlsState extends State<_Controls> {
                 onPressed: widget.player.playOrPause,
                 icon: Icon(
                   _playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                  color: KnownColors.basicWhite,
+                  color: context.colors.textPrimary,
                 ),
               ),
               const SizedBox(width: 4),
               Text(
                 '${_fmt(_position)} / ${_fmt(_duration)}',
                 style: TextStyle(
-                  color: KnownColors.basicWhite.withValues(alpha: 0.87),
+                  color: context.colors.textSecondary,
                   fontSize: 12,
                 ),
               ),

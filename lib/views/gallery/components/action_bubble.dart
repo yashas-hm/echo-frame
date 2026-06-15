@@ -67,12 +67,16 @@ class _ActionBubbleToastState extends State<_ActionBubbleToast>
           opacity: _controller,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: context.colors.surfacePrimary.withValues(alpha: 0.4),
+              color: context.colors.hoverColor,
               shape: BoxShape.circle,
             ),
             child: Padding(
               padding: const EdgeInsets.all(24),
-              child: Icon(widget.icon, size: 32),
+              child: Icon(
+                widget.icon,
+                size: 32,
+                color: context.colors.onPrimary,
+              ),
             ),
           ),
         ),

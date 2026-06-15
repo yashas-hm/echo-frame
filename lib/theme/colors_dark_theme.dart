@@ -50,7 +50,7 @@ class DarkColors extends AppThemeColors {
   Color get navigationColor => KnownColors.slate800;
 
   @override
-  Color get borderPrimary => KnownColors.slate800;
+  Color get borderPrimary => KnownColors.slate700;
 
   @override
   DarkColors copyWith() => DarkColors();

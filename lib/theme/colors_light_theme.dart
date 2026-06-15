@@ -50,7 +50,7 @@ class LightColors extends AppThemeColors {
   Color get navigationColor => KnownColors.slate200;
 
   @override
-  Color get borderPrimary => KnownColors.slate200;
+  Color get borderPrimary => KnownColors.slate300;
 
   @override
   LightColors copyWith() => LightColors();

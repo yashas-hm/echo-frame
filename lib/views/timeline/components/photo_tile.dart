@@ -43,21 +43,24 @@ class PhotoTile extends StatelessWidget {
         if (thumb != null)
           Image.file(File(thumb), fit: BoxFit.cover)
         else
-          _placeholder(colors, icon: Icons.videocam_outlined),
-        const Align(
+          _placeholder(
+            colors,
+            icon: Icons.videocam_outlined,
+          ),
+        Align(
           alignment: Alignment.bottomRight,
           child: Padding(
             padding: EdgeInsets.all(4),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.black54,
+                color: KnownColors.slate800.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.all(Radius.circular(4)),
               ),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 child: Icon(
                   Icons.play_arrow_rounded,
-                  color: Colors.white,
+                  color: colors.onPrimary,
                   size: 14,
                 ),
               ),
