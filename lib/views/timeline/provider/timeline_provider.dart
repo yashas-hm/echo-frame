@@ -4,89 +4,85 @@ import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MonthData {
-  final int year;
-  final int month;
-  final List<MediaItem> items;
-
-  const MonthData(
-      {required this.year, required this.month, required this.items});
-
-  String get monthName => MonthFolder.monthNames[month - 1];
-}
-
 class TimelineState {
-  final List<({int year, int month, int count})> allMonths;
-  final List<MonthData> loaded;
+  final List<MediaItem> loaded;
   final bool hasMore;
+  final String query;
 
   const TimelineState({
-    required this.allMonths,
     required this.loaded,
     required this.hasMore,
+    this.query = '',
   });
 
-  List<MediaItem> get flatItems =>
-      loaded.expand((m) => m.items).toList(growable: false);
+  List<MediaItem> get flatItems => loaded;
+
+  List<MonthData> get byMonth {
+    final map = <(int, int), List<MediaItem>>{};
+    for (final item in loaded) {
+      final key = (item.capturedAt.year, item.capturedAt.month);
+      (map[key] ??= []).add(item);
+    }
+    return map.entries
+        .map((e) => MonthData(year: e.key.$1, month: e.key.$2, items: e.value))
+        .toList();
+  }
 
   TimelineState copyWith({
-    List<({int year, int month, int count})>? allMonths,
-    List<MonthData>? loaded,
+    List<MediaItem>? loaded,
     bool? hasMore,
+    String? query,
   }) =>
       TimelineState(
-        allMonths: allMonths ?? this.allMonths,
         loaded: loaded ?? this.loaded,
         hasMore: hasMore ?? this.hasMore,
+        query: query ?? this.query,
       );
 }
 
 class TimelineNotifier extends AsyncNotifier<TimelineState> {
-  static const _pageSize = 3;
+  static const _pageSize = 100;
 
   @override
-  Future<TimelineState> build() async {
-    if (!EchoDatabase.isOpen) {
-      return const TimelineState(allMonths: [], loaded: [], hasMore: false);
-    }
-    final allMonths = await MediaDao(EchoDatabase.instance).listMonths();
-    if (allMonths.isEmpty) {
-      return const TimelineState(allMonths: [], loaded: [], hasMore: false);
-    }
-    final firstPage = await _loadPage(allMonths.take(_pageSize).toList());
-    return TimelineState(
-      allMonths: allMonths,
-      loaded: firstPage,
-      hasMore: allMonths.length > _pageSize,
-    );
-  }
+  Future<TimelineState> build() => _fetch(offset: 0, query: '');
 
   Future<void> loadNextPage() async {
     final current = state.value;
     if (current == null || !current.hasMore) return;
-
-    final nextMonths =
-        current.allMonths.skip(current.loaded.length).take(_pageSize).toList();
-    if (nextMonths.isEmpty) return;
-
-    final loaded = await _loadPage(nextMonths);
+    final records = await MediaDao(EchoDatabase.instance).queryPage(
+      offset: current.loaded.length,
+      limit: _pageSize,
+      query: current.query.isEmpty ? null : current.query,
+    );
     state = AsyncData(current.copyWith(
-      loaded: [...current.loaded, ...loaded],
-      hasMore: current.loaded.length + loaded.length < current.allMonths.length,
+      loaded: [...current.loaded, ...records.map(MediaItem.fromRecord)],
+      hasMore: records.length == _pageSize,
     ));
   }
 
-  Future<List<MonthData>> _loadPage(
-          List<({int year, int month, int count})> months) =>
-      Future.wait(months.map((s) async {
-        final records =
-            await MediaDao(EchoDatabase.instance).queryByMonth(s.year, s.month);
-        return MonthData(
-          year: s.year,
-          month: s.month,
-          items: records.map(MediaItem.fromRecord).toList(),
-        );
-      }));
+  Future<void> setQuery(String query) async {
+    state = const AsyncLoading();
+    state = AsyncData(await _fetch(offset: 0, query: query));
+  }
+
+  Future<TimelineState> _fetch({
+    required int offset,
+    required String query,
+  }) async {
+    if (!EchoDatabase.isOpen) {
+      return const TimelineState(loaded: [], hasMore: false);
+    }
+    final records = await MediaDao(EchoDatabase.instance).queryPage(
+      offset: offset,
+      limit: _pageSize,
+      query: query.isEmpty ? null : query,
+    );
+    return TimelineState(
+      loaded: records.map(MediaItem.fromRecord).toList(),
+      hasMore: records.length == _pageSize,
+      query: query,
+    );
+  }
 }
 
 final timelineProvider = AsyncNotifierProvider<TimelineNotifier, TimelineState>(
