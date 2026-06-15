@@ -6,7 +6,6 @@ import 'package:echo_frame/utilities/utilities.dart';
 import 'package:echo_frame/views/favorites/favorites_screen.dart';
 import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/organizer/organizer_screen.dart';
-import 'package:echo_frame/views/search/search_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
 import 'package:flutter/gestures.dart';
@@ -38,7 +37,6 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
       icon: Icons.grid_view_rounded,
       label: 'Library'
     ),
-    (route: SearchScreen.path, icon: Icons.search_rounded, label: 'Search'),
     (
       route: FavoritesScreen.path,
       icon: Icons.favorite_outline_rounded,

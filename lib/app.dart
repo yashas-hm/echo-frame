@@ -4,7 +4,6 @@ import 'package:echo_frame/views/favorites/favorites_screen.dart';
 import 'package:echo_frame/views/gallery/gallery_screen.dart';
 import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/organizer/organizer_screen.dart';
-import 'package:echo_frame/views/search/search_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/shell/nav_bar_shell.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
@@ -22,7 +21,6 @@ final _router = GoRouter(
       },
       routes: [
         TimelineScreen.route,
-        SearchScreen.route,
         FavoritesScreen.route,
         OrganizerScreen.route,
         ImportScreen.route,
@@ -49,7 +47,7 @@ class EchoFrameApp extends ConsumerWidget {
         actions: {
           _SearchIntent: CallbackAction<_SearchIntent>(
             onInvoke: (_) {
-              _router.go(SearchScreen.path);
+              _router.go(TimelineScreen.path);
               return null;
             },
           ),

@@ -6,6 +6,8 @@ import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtension, Prefs;
+import 'package:echo_frame/models/timeline/timeline_models.dart';
+import 'package:echo_frame/views/timeline/components/timeline_search_bar.dart';
 import 'package:echo_frame/views/timeline/photo_tile.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -115,7 +117,6 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
       setState(() => _progress = progress.isDone ? null : progress);
     }
 
-    // Trigger the timeline provider to load from the newly populated DB.
     ref.invalidate(timelineProvider);
   }
 
@@ -127,48 +128,59 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   }
 
   Widget _buildTimeline(BuildContext context) {
-    final state = ref.watch(timelineProvider);
-    return state.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) =>
-          Scaffold(body: Center(child: Text('Error loading library: $e'))),
-      data: (timeline) {
-        if (timeline.loaded.isEmpty) {
-          return const Scaffold(
-            body: Center(child: Text('No photos indexed yet.')),
-          );
-        }
-        return Scaffold(
-          body: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              for (final month in timeline.loaded) ...[
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _MonthHeaderDelegate(month),
-                ),
-                SliverGrid.builder(
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 180,
-                    crossAxisSpacing: 2,
-                    mainAxisSpacing: 2,
-                  ),
-                  itemCount: month.items.length,
-                  itemBuilder: (_, i) => PhotoTile(item: month.items[i]),
-                ),
-              ],
-              if (timeline.hasMore)
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                ),
-            ],
+    final timelineAsync = ref.watch(timelineProvider);
+    return Scaffold(
+      body: Column(
+        children: [
+          const TimelineSearchBar(),
+          Expanded(
+            child: timelineAsync.when(
+              loading: () =>
+                  const Center(child: CircularProgressIndicator()),
+              error: (e, _) =>
+                  Center(child: Text('Error loading library: $e')),
+              data: (timeline) {
+                if (timeline.loaded.isEmpty) {
+                  return Center(
+                    child: Text(timeline.query.isEmpty
+                        ? 'No photos indexed yet.'
+                        : 'No results for "${timeline.query}".'),
+                  );
+                }
+                return CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    for (final month in timeline.byMonth) ...[
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: _MonthHeaderDelegate(month),
+                      ),
+                      SliverGrid.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 180,
+                          crossAxisSpacing: 2,
+                          mainAxisSpacing: 2,
+                        ),
+                        itemCount: month.items.length,
+                        itemBuilder: (_, i) =>
+                            PhotoTile(item: month.items[i]),
+                      ),
+                    ],
+                    if (timeline.hasMore)
+                      const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
