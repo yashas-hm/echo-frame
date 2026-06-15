@@ -8,7 +8,7 @@ import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtension, Prefs;
 import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/views/timeline/components/timeline_search_bar.dart';
-import 'package:echo_frame/views/timeline/photo_tile.dart';
+import 'package:echo_frame/views/timeline/components/photo_tile.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
