@@ -321,7 +321,7 @@ class _PathRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: context.colors.tertiaryColor,
+        color: context.colors.surfacePrimary,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: context.colors.borderPrimary),
       ),

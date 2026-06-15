@@ -33,14 +33,14 @@ class _ImportReportState extends State<ImportReport> {
                 Icon(
                   Icons.warning_amber_rounded,
                   size: 16,
-                  color: context.colors.tertiaryColor,
+                  color: context.colors.surfacePrimary,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   '${widget.unmatched.length} sidecar${widget.unmatched.length == 1 ? '' : 's'} '
                   'with no matching file',
                   style: theme.textTheme.bodySmall
-                      ?.copyWith(color: context.colors.tertiaryColor),
+                      ?.copyWith(color: context.colors.surfacePrimary),
                 ),
                 const Spacer(),
                 Icon(
@@ -59,7 +59,7 @@ class _ImportReportState extends State<ImportReport> {
           Container(
             constraints: const BoxConstraints(maxHeight: 200),
             decoration: BoxDecoration(
-              color: context.colors.tertiaryColor,
+              color: context.colors.surfacePrimary,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: context.colors.borderPrimary),
             ),

@@ -57,7 +57,7 @@ class OperationPreviewList extends StatelessWidget {
                     : Icons.subdirectory_arrow_right_rounded,
                 size: 16,
                 color: op.hasConflict
-                    ? context.colors.tertiaryColor
+                    ? context.colors.surfacePrimary
                     : context.colors.primaryColor,
               ),
               title: Text(
@@ -69,7 +69,7 @@ class OperationPreviewList extends StatelessWidget {
                   ? Text(
                       'Renamed → ${op.destFilename}',
                       style: theme.textTheme.bodySmall
-                          ?.copyWith(color: context.colors.tertiaryColor),
+                          ?.copyWith(color: context.colors.surfacePrimary),
                     )
                   : null,
             ),

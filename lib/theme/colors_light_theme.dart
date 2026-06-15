@@ -5,43 +5,52 @@ class LightColors extends AppThemeColors {
   Brightness get brightness => Brightness.light;
 
   @override
-  Color get primaryColor => KnownColors.sky200;
+  Color get primaryColor => KnownColors.sky400;
 
   @override
-  Color get secondaryColor => KnownColors.sky300;
+  Color get secondaryColor => KnownColors.sky500;
 
   @override
-  Color get tertiaryColor => KnownColors.neutral200;
+  Color get surfacePrimary => KnownColors.slate200;
 
   @override
-  Color get background => KnownColors.neutral100;
+  Color get background => KnownColors.slate50;
 
   @override
-  Color get textPrimary => KnownColors.neutral950;
+  Color get textPrimary => KnownColors.slate950;
 
   @override
   Color get textSecondary => KnownColors.slate500;
 
   @override
-  Color get shadowColor => KnownColors.neutral950;
+  Color get shadowColor => KnownColors.slate950;
 
   @override
-  Color get errorPrimary => KnownColors.red700;
+  Color get errorPrimary => KnownColors.strawberry500;
+
+  @override
+  Color get errorSurface => KnownColors.strawberry100;
+
+  @override
+  Color get success => KnownColors.mint400;
+
+  @override
+  Color get successSurface => KnownColors.mint100;
 
   @override
   Color get cursorColor => KnownColors.sky200;
 
   @override
-  Color get selectionColor => KnownColors.blue500.withValues(alpha: 0.3);
+  Color get selectionColor => KnownColors.sky600.withValues(alpha: 0.3);
 
   @override
-  Color get selectionHandleColor => KnownColors.blue500;
+  Color get selectionHandleColor => KnownColors.sky600;
 
   @override
-  Color get navigationColor => KnownColors.neutral200;
+  Color get navigationColor => KnownColors.slate200;
 
   @override
-  Color get borderPrimary => KnownColors.neutral200;
+  Color get borderPrimary => KnownColors.slate200;
 
   @override
   LightColors copyWith() => LightColors();

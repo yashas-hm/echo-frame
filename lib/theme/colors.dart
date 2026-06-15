@@ -7,34 +7,44 @@ class KnownColors {
   static const Color basicBlack = Color(0xFF000000);
   static const Color transparent = Color(0x00000000);
 
-  // Sky palette – EchoFrame brand (light-theme primary → secondary)
-  static const Color sky200 =
-      Color(0xFF6BB5F2); // soft sky (light-theme primary)
-  static const Color sky300 =
-      Color(0xFF5E9FF2); // medium sky (light-theme secondary)
-  static const Color sky400 =
-      Color(0xFF36A0F7); // bright sky (dark-theme primary)
-  static const Color sky500 =
-      Color(0xFF3187F5); // deep sky (dark-theme secondary)
+  // Sky palette
+  static const Color sky50  = Color(0xFFEEF6FF);
+  static const Color sky100 = Color(0xFFCFE5FF);
+  static const Color sky200 = Color(0xFF9ACBFD);
+  static const Color sky300 = Color(0xFF6BB5F2);
+  static const Color sky400 = Color(0xFF3E9EF5);
+  static const Color sky500 = Color(0xFF1A7FE8);
+  static const Color sky600 = Color(0xFF1464C8);
+  static const Color sky700 = Color(0xFF0F4EA6);
+  static const Color sky800 = Color(0xFF0A3880);
+  static const Color sky900 = Color(0xFF062356);
 
-  // Neutral palette – app backgrounds / text
-  static const Color neutral100 = Color(0xFFFAFAFA); // near-white bg (light)
-  static const Color neutral200 = Color(0xFFE0DEDE); // light surface
-  static const Color neutral800 = Color(0xFF2A2A2A); // dark surface
-  static const Color neutral950 = Color(0xFF1C1C1C); // near-black bg (dark)
+  // Strawberry – error / destructive (light, pastel-forward)
+  static const Color strawberry100 = Color(0xFFFFE4E4);
+  static const Color strawberry200 = Color(0xFFFFBDBD);
+  static const Color strawberry300 = Color(0xFFFF8FA3);
+  static const Color strawberry400 = Color(0xFFFF6B6B);
+  static const Color strawberry500 = Color(0xFFFA5252);
 
-  // Blue – text-selection handles
-  static const Color blue500 = Color(0xFF2196F3);
+  // Mint – success / positive (light, pastel-forward)
+  static const Color mint100 = Color(0xFFDDFBF0);
+  static const Color mint200 = Color(0xFFB2F2E0);
+  static const Color mint300 = Color(0xFF69DFB8);
+  static const Color mint400 = Color(0xFF38C99A);
+  static const Color mint500 = Color(0xFF20B586);
 
-  // Error palette
-  static const Color red200 = Color(0xFFFD9999);
-  static const Color red300 = Color(0xFFFC6666);
-  static const Color red600 = Color(0xFFC80000);
-  static const Color red700 = Color(0xFF960000);
-
-  // Slate – secondary text tones
+  // Slate – full grey ramp (backgrounds, surfaces, text, borders)
+  static const Color slate50  = Color(0xFFFAFAFA); // near-white bg (light)
+  static const Color slate100 = Color(0xFFECEEF0);
+  static const Color slate200 = Color(0xFFE0DEDE); // light surface
   static const Color slate300 = Color(0xFFA7ACB1);
+  static const Color slate400 = Color(0xFF868E96);
   static const Color slate500 = Color(0xFF6C757D);
+  static const Color slate600 = Color(0xFF545B62);
+  static const Color slate700 = Color(0xFF3D4349);
+  static const Color slate800 = Color(0xFF2A2A2A); // dark surface
+  static const Color slate900 = Color(0xFF131619);
+  static const Color slate950 = Color(0xFF1C1C1C); // near-black bg (dark)
 }
 
 abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
@@ -48,15 +58,13 @@ abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
   // Secondary brand color
   Color get secondaryColor;
 
-  Color get onSecondary => textPrimary;
+  Color get onSecondary => onPrimary;
 
   // Tertiary surface (element/card backgrounds)
-  Color get tertiaryColor;
+  Color get surfacePrimary;
 
   // Backgrounds
   Color get background;
-
-  Color get surfacePrimary => background;
 
   // Text
   Color get textPrimary;
@@ -70,6 +78,15 @@ abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
   Color get errorPrimary;
 
   Color get onErrorPrimary => onPrimary;
+
+  Color get errorSurface;
+
+  // Success
+  Color get success;
+
+  Color get successSurface;
+
+  Color get onSuccess => onPrimary;
 
   // Cursor / selection
   Color get cursorColor;
@@ -86,20 +103,29 @@ abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
 
   Color get dividerColor => borderPrimary;
 
-  // Hover (defaults to primary)
-  Color get hoverColor => primaryColor;
+  // Interaction
+  Color get splashColor => primaryColor.withValues(alpha: 0.12);
+
+  Color get hoverColor => onPrimary.withValues(alpha: 0.2);
+
+  // Frosted glass background (blur filter overlay)
+  Color get frostColor =>  textPrimary.withValues(alpha: 0.1);
 
   @override
   AppThemeColors lerp(AppThemeColors b, double t) => _LerpedColors(
         brightness: t < 0.5 ? brightness : b.brightness,
         primaryColor: Color.lerp(primaryColor, b.primaryColor, t)!,
         secondaryColor: Color.lerp(secondaryColor, b.secondaryColor, t)!,
-        tertiaryColor: Color.lerp(tertiaryColor, b.tertiaryColor, t)!,
+        surfacePrimary: Color.lerp(surfacePrimary, b.surfacePrimary, t)!,
         background: Color.lerp(background, b.background, t)!,
         textPrimary: Color.lerp(textPrimary, b.textPrimary, t)!,
         textSecondary: Color.lerp(textSecondary, b.textSecondary, t)!,
         shadowColor: Color.lerp(shadowColor, b.shadowColor, t)!,
         errorPrimary: Color.lerp(errorPrimary, b.errorPrimary, t)!,
+        errorSurface: Color.lerp(errorSurface, b.errorSurface, t)!,
+        success: Color.lerp(success, b.success, t)!,
+        successSurface: Color.lerp(successSurface, b.successSurface, t)!,
+        frostColor: Color.lerp(frostColor, b.frostColor, t)!,
         cursorColor: Color.lerp(cursorColor, b.cursorColor, t)!,
         selectionColor: Color.lerp(selectionColor, b.selectionColor, t)!,
         selectionHandleColor:
@@ -114,12 +140,16 @@ final class _LerpedColors extends AppThemeColors {
     required this.brightness,
     required this.primaryColor,
     required this.secondaryColor,
-    required this.tertiaryColor,
+    required this.surfacePrimary,
     required this.background,
     required this.textPrimary,
     required this.textSecondary,
     required this.shadowColor,
     required this.errorPrimary,
+    required this.errorSurface,
+    required this.success,
+    required this.successSurface,
+    required this.frostColor,
     required this.cursorColor,
     required this.selectionColor,
     required this.selectionHandleColor,
@@ -134,7 +164,7 @@ final class _LerpedColors extends AppThemeColors {
   @override
   final Color secondaryColor;
   @override
-  final Color tertiaryColor;
+  final Color surfacePrimary;
   @override
   final Color background;
   @override
@@ -145,6 +175,14 @@ final class _LerpedColors extends AppThemeColors {
   final Color shadowColor;
   @override
   final Color errorPrimary;
+  @override
+  final Color errorSurface;
+  @override
+  final Color success;
+  @override
+  final Color successSurface;
+  @override
+  final Color frostColor;
   @override
   final Color cursorColor;
   @override

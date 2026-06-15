@@ -73,7 +73,7 @@ class PhotoTile extends StatelessWidget {
     IconData icon = Icons.hide_image_outlined,
   }) =>
       ColoredBox(
-        color: colors.tertiaryColor,
+        color: colors.surfacePrimary,
         child: Icon(icon, color: colors.borderPrimary),
       );
 }

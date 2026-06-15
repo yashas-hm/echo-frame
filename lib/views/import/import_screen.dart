@@ -158,7 +158,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                   const SizedBox(height: 10),
                   _SummaryRow(
                     icon: Icons.warning_amber_rounded,
-                    color: context.colors.tertiaryColor,
+                    color: context.colors.surfacePrimary,
                     text:
                         '${d.unmatched.length} sidecar${d.unmatched.length == 1 ? '' : 's'} '
                         'with no matching file — will be skipped',
@@ -353,7 +353,7 @@ class _PathRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: context.colors.tertiaryColor,
+        color: context.colors.surfacePrimary,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: context.colors.borderPrimary),
       ),

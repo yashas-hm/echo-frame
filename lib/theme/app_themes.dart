@@ -28,18 +28,18 @@ class EchoFrameThemes {
       appBarTheme: AppBarTheme(
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarBrightness: brightness,
-          statusBarColor: colors.tertiaryColor,
+          statusBarColor: colors.surfacePrimary,
           statusBarIconBrightness: isLight ? Brightness.dark : Brightness.light,
         ),
         elevation: 5,
         iconTheme: IconThemeData(color: colors.textPrimary),
-        backgroundColor: colors.tertiaryColor,
+        backgroundColor: colors.surfacePrimary,
       ),
       colorScheme: ColorScheme.fromSeed(
         seedColor: colors.secondaryColor,
         primary: colors.primaryColor,
         secondary: colors.secondaryColor,
-        tertiary: colors.tertiaryColor,
+        tertiary: colors.surfacePrimary,
         shadow: colors.shadowColor,
         error: colors.errorPrimary,
         brightness: brightness,
