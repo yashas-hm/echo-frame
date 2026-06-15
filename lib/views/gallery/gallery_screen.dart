@@ -1,4 +1,8 @@
+import 'dart:math' show min;
+
+import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
 import 'package:echo_frame/views/gallery/video_view.dart';
@@ -32,7 +36,7 @@ class GalleryScreen extends ConsumerStatefulWidget {
 }
 
 class _GalleryScreenState extends ConsumerState<GalleryScreen> {
-  late int _currentIndex;
+  int _currentIndex = 0;
 
   bool _loadingNext = false;
   bool _showInfo = false;
@@ -49,6 +53,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   void _goNext() {
     final state = ref.read(timelineProvider).value;
     if (state == null) return;
+    _player?.stop();
     if (_currentIndex < state.flatItems.length - 1) {
       setState(() => _currentIndex++);
     } else if (state.hasMore) {
@@ -58,6 +63,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   }
 
   void _goPrev() {
+    _player?.stop();
     if (_currentIndex > 0) setState(() => _currentIndex--);
   }
 
@@ -67,9 +73,8 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     player.playOrPause();
     ActionBubble.show(
       context,
-      icon: player.state.playing
-          ? Icons.pause_rounded
-          : Icons.play_arrow_rounded,
+      icon:
+          player.state.playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
     );
   }
 
@@ -123,6 +128,8 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
         final canPrev = _currentIndex > 0;
         final canNext = _currentIndex < flat.length - 1 || state.hasMore;
 
+        final fitted = _fittedSize(item, context);
+
         return _scaffold(
           canPrev: canPrev,
           canNext: canNext,
@@ -154,15 +161,29 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: item.isVideo
-                        ? VideoView(
-                            item: item,
-                            onPlayerReady: (p) => _player = p,
-                          )
-                        : ImageView(item: item),
+                    child: Center(
+                      child: AnimatedSize(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: SizedBox(
+                            key: ValueKey(_currentIndex),
+                            width: fitted.width,
+                            height: fitted.height,
+                            child: item.isVideo
+                                ? VideoView(
+                                    item: item,
+                                    onPlayerReady: (p) => _player = p,
+                                  )
+                                : ImageView(item: item),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   AnimatedSize(
-                    duration: const Duration(milliseconds: 150),
+                    duration: const Duration(milliseconds: 200),
                     child: _showInfo
                         ? GalleryInfoPanel(item: item)
                         : SizedBox.shrink(),
@@ -174,6 +195,18 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
         );
       },
     );
+  }
+
+  Size _fittedSize(MediaItem item, BuildContext context) {
+    final w = item.width?.toDouble();
+    final h = item.height?.toDouble();
+    final availableWidth = context.width;
+    final availableHeight = context.height - TitleBar.height;
+    if (w != null && h != null && w > 0 && h > 0) {
+      final scale = min(availableWidth / w, availableHeight / h);
+      return Size(w * scale, h * scale);
+    }
+    return Size(availableWidth, availableHeight);
   }
 
   Widget _scaffold({
