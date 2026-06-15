@@ -24,7 +24,6 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   bool _showContent = false;
-  String _selectedPath = TimelineScreen.path;
 
   static const double _collapsedWidth = 30;
   static const double _collapsedHeight = 60;
@@ -79,6 +78,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     final colors = context.colors;
     final showLabel = Prefs.showNavLabel;
     final expandedHeight = context.height * 0.8;
+    final currentRoute = GoRouterState.of(context).uri.path;
 
     return Align(
       alignment: Alignment.centerRight,
@@ -102,11 +102,11 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                 margin: EdgeInsets.all(Sizes.spacingRegular),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: colors.onPrimary.withValues(alpha: 0.2),
+                    color: colors.textPrimary.withValues(alpha: 0.2),
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(Sizes.navBarWidth),
-                  color: colors.onPrimary.withValues(alpha: 0.1),
+                  color: colors.textPrimary.withValues(alpha: 0.1),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(Sizes.navBarWidth),
@@ -138,8 +138,12 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                                     spacing: Sizes.spacingSmall,
                                     children: [
                                       for (final dest in _destinations)
-                                        _tappableIcon(dest, colors,
-                                            showLabel: showLabel),
+                                        _tappableIcon(
+                                          dest,
+                                          colors,
+                                          showLabel: showLabel,
+                                          currentRoute: currentRoute,
+                                        ),
                                     ],
                                   ),
                                 ),
@@ -152,6 +156,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                                 ),
                                 colors,
                                 showLabel: showLabel,
+                                currentRoute: currentRoute,
                               ),
                             ],
                           ),
@@ -171,18 +176,16 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     _NavDestination destination,
     AppThemeColors colors, {
     bool showLabel = false,
+    required String currentRoute,
   }) {
     return Material(
-      color: _selectedPath == destination.route
+      color: currentRoute == destination.route
           ? colors.primaryColor.withValues(alpha: 0.6)
           : KnownColors.transparent,
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          setState(() => _selectedPath = destination.route);
-          context.go(destination.route);
-        },
+        onTap: () => context.go(destination.route),
         hoverColor: colors.onPrimary.withValues(alpha: 0.2),
         child: Container(
           margin: EdgeInsets.all(Sizes.spacingMedium),
