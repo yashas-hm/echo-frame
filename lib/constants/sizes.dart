@@ -15,7 +15,11 @@ final class Sizes {
 
   static const double spacingRegular = 20;
 
+  static const double spacingMedium = 15;
+
   static const double spacingSmall = 10;
+
+  static const double spacingXS = 5;
 
   static const double spacingLarge = 30;
 

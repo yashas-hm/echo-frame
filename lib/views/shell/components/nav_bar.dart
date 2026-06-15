@@ -9,6 +9,7 @@ import 'package:echo_frame/views/organizer/organizer_screen.dart';
 import 'package:echo_frame/views/search/search_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,10 +22,13 @@ class NavBar extends StatefulWidget {
   State<NavBar> createState() => _NavBarState();
 }
 
-class _NavBarState extends State<NavBar> {
-  bool _hovered = false;
+class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  bool _showContent = false;
   String _selectedPath = TimelineScreen.path;
 
+  static const double _collapsedWidth = 30;
+  static const double _collapsedHeight = 60;
   static const Duration _duration = Duration(milliseconds: 220);
   static const Curve _curve = Curves.easeInOut;
 
@@ -49,93 +53,116 @@ class _NavBarState extends State<NavBar> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: _duration);
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() => _showContent = true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onEnter(PointerEnterEvent _) => _controller.forward();
+
+  void _onExit(PointerExitEvent _) {
+    setState(() => _showContent = false);
+    _controller.reverse();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final showLabel = Prefs.showNavLabel;
-    final double width = _hovered ? Sizes.navBarWidth : 40;
-    final double height = _hovered ? context.height * 0.8 : 80;
+    final expandedHeight = context.height * 0.8;
 
     return Align(
       alignment: Alignment.centerRight,
       child: MouseRegion(
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
+        onEnter: _onEnter,
+        onExit: _onExit,
         child: Container(
           alignment: Alignment.centerRight,
-          height: context.height * 0.8,
+          height: expandedHeight,
           width: Sizes.navBarWidth * 1.5,
-          child: AnimatedContainer(
-            duration: _duration,
-            curve: _curve,
-            height: height,
-            width: width,
-            margin: EdgeInsets.all(Sizes.spacingRegular),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: colors.onPrimary.withValues(alpha: 0.2),
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(Sizes.navBarWidth),
-              color: colors.onPrimary.withValues(alpha: 0.1),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(Sizes.navBarWidth),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                      child: const SizedBox.expand(),
-                    ),
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) {
+              final t = _curve.transform(_controller.value);
+              final width = lerpDouble(_collapsedWidth, Sizes.navBarWidth, t)!;
+              final height = lerpDouble(_collapsedHeight, expandedHeight, t)!;
+
+              return Container(
+                width: width,
+                height: height,
+                margin: EdgeInsets.all(Sizes.spacingRegular),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: colors.onPrimary.withValues(alpha: 0.2),
+                    width: 1,
                   ),
-                  Center(
-                    child: AnimatedOpacity(
-                      opacity: !_hovered ? 1.0 : 0.0,
-                      duration: !_hovered
-                          ? _duration
-                          : const Duration(milliseconds: 80),
-                      child: Icon(
-                        Icons.chevron_left,
-                        size: 25,
-                        color: colors.onPrimary,
-                      ),
-                    ),
-                  ),
-                  AnimatedOpacity(
-                    opacity: _hovered ? 1.0 : 0.0,
-                    duration:
-                        _hovered ? _duration : const Duration(milliseconds: 80),
-                    child: IgnorePointer(
-                      ignoring: !_hovered,
-                      child: Padding(
-                        padding: EdgeInsets.all(Sizes.spacingSmall),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                for (final dest in _destinations)
-                                  _tappableIcon(dest, colors,
-                                      showLabel: showLabel),
-                              ],
-                            ),
-                            _tappableIcon(
-                              (
-                                route: SettingsScreen.path,
-                                icon: Icons.settings_outlined,
-                                label: 'Settings',
-                              ),
-                              colors,
-                              showLabel: showLabel,
-                            ),
-                          ],
+                  borderRadius: BorderRadius.circular(Sizes.navBarWidth),
+                  color: colors.onPrimary.withValues(alpha: 0.1),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(Sizes.navBarWidth),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                          child: const SizedBox.expand(),
                         ),
                       ),
-                    ),
+                      if (!_showContent)
+                        Center(
+                          child: Icon(
+                            Icons.chevron_left,
+                            size: 25,
+                            color: colors.onPrimary,
+                          ),
+                        ),
+                      if (_showContent)
+                        Padding(
+                          padding: EdgeInsets.all(Sizes.spacingSmall),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    spacing: Sizes.spacingSmall,
+                                    children: [
+                                      for (final dest in _destinations)
+                                        _tappableIcon(dest, colors,
+                                            showLabel: showLabel),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              _tappableIcon(
+                                (
+                                  route: SettingsScreen.path,
+                                  icon: Icons.settings_outlined,
+                                  label: 'Settings',
+                                ),
+                                colors,
+                                showLabel: showLabel,
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -160,12 +187,12 @@ class _NavBarState extends State<NavBar> {
         },
         hoverColor: colors.onPrimary.withValues(alpha: 0.2),
         child: Container(
-          margin: EdgeInsets.all(Sizes.spacingRegular),
+          margin: EdgeInsets.all(Sizes.spacingMedium),
           alignment: Alignment.center,
           child: Column(
-            spacing: Sizes.spacingSmall,
+            spacing: Sizes.spacingXS,
             children: [
-              Icon(destination.icon, size: 30, color: colors.onPrimary),
+              Icon(destination.icon, size: 20, color: colors.onPrimary),
               if (showLabel)
                 FittedBox(
                   fit: BoxFit.scaleDown,
