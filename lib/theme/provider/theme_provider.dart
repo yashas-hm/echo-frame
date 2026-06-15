@@ -22,11 +22,9 @@ class AppThemeState {
 
 class AppThemeNotifier extends Notifier<AppThemeState> {
   @override
-  AppThemeState build() =>
-      _resolve(ConfigService.driveThemeMode ?? Prefs.themeMode);
+  AppThemeState build() => _resolve(Prefs.themeMode);
 
-  void init() =>
-      state = _resolve(ConfigService.driveThemeMode ?? Prefs.themeMode);
+  void init() => state = _resolve(Prefs.themeMode);
 
   void toggle() => _set(state.isDark ? ThemeMode.light : ThemeMode.dark);
 

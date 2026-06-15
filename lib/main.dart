@@ -14,14 +14,14 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  await windowManager.ensureInitialized();
 
+  await windowManager.ensureInitialized();
   await Prefs.init();
 
   final root = Prefs.libraryRootPath;
   if (root != null) {
     await EchoDatabase.open(root);
-    await ConfigService.initialize(root);
+    await ConfigService.seedPrefsIfNeeded(root);
   }
 
   final savedW = Prefs.windowWidth;
