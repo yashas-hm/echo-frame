@@ -6,9 +6,8 @@ import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtension, Prefs;
-import 'package:echo_frame/models/timeline/timeline_models.dart';
-import 'package:echo_frame/views/timeline/components/timeline_search_bar.dart';
 import 'package:echo_frame/views/timeline/components/photo_tile.dart';
+import 'package:echo_frame/views/timeline/components/timeline_search_bar.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -130,54 +129,66 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   Widget _buildTimeline(BuildContext context) {
     final timelineAsync = ref.watch(timelineProvider);
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          const TimelineSearchBar(),
-          Expanded(
-            child: timelineAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (e, _) =>
-                  Center(child: Text('Error loading library: $e')),
-              data: (timeline) {
-                if (timeline.loaded.isEmpty) {
-                  return Center(
-                    child: Text(timeline.query.isEmpty
-                        ? 'No photos indexed yet.'
-                        : 'No results for "${timeline.query}".'),
-                  );
-                }
-                return CustomScrollView(
-                  controller: _scrollController,
-                  slivers: [
-                    for (final month in timeline.byMonth) ...[
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: _MonthHeaderDelegate(month),
-                      ),
-                      SliverGrid.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 180,
-                          crossAxisSpacing: 2,
-                          mainAxisSpacing: 2,
-                        ),
-                        itemCount: month.items.length,
-                        itemBuilder: (_, i) =>
-                            PhotoTile(item: month.items[i]),
-                      ),
-                    ],
-                    if (timeline.hasMore)
-                      const SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.all(24),
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                      ),
-                  ],
+          timelineAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text('Error loading library: $e')),
+            data: (timeline) {
+              if (timeline.loaded.isEmpty) {
+                return Center(
+                  child: Text(timeline.query.isEmpty
+                      ? 'No photos indexed yet.'
+                      : 'No results for "${timeline.query}".'),
                 );
-              },
-            ),
+              }
+              return CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: TimelineSearchBar.height),
+                  ),
+                  for (final month in timeline.byMonth) ...[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 17),
+                        child: Text(
+                          '${month.monthName} ${month.year}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                    SliverGrid.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 180,
+                        crossAxisSpacing: 2,
+                        mainAxisSpacing: 2,
+                      ),
+                      itemCount: month.items.length,
+                      itemBuilder: (_, i) => PhotoTile(item: month.items[i]),
+                    ),
+                  ],
+                  if (timeline.hasMore)
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: TimelineSearchBar(),
           ),
         ],
       ),
@@ -235,38 +246,4 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
       ),
     );
   }
-}
-
-class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _MonthHeaderDelegate(this.month);
-
-  final MonthData month;
-
-  @override
-  double get minExtent => 52;
-
-  @override
-  double get maxExtent => 52;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return ColoredBox(
-      color: context.colors.background,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 17),
-        child: Text(
-          '${month.monthName} ${month.year}',
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(_MonthHeaderDelegate old) =>
-      month.year != old.month.year || month.month != old.month.month;
 }
