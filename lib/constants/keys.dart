@@ -9,4 +9,6 @@ final class Keys {
   static const String windowHeight = 'windowHeight';
   static const String windowX = 'windowX';
   static const String windowY = 'windowY';
+  static const String sharedPrefExists = 'sharedPrefExists';
+  static const String showNavLabel = 'showNavLabel';
 }

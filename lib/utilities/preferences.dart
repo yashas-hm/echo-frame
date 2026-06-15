@@ -27,6 +27,17 @@ class Prefs {
     }
   }
 
+  static bool get sharedPrefExists =>
+      _prefs.getBool(Keys.sharedPrefExists) ?? false;
+
+  static set sharedPrefExists(bool value) =>
+      _prefs.setBool(Keys.sharedPrefExists, value);
+
+  static bool get showNavLabel => _prefs.getBool(Keys.showNavLabel) ?? true;
+
+  static set showNavLabel(bool value) =>
+      _prefs.setBool(Keys.showNavLabel, value);
+
   // ── Window geometry ───────────────────────────────────────────────────────
 
   static double? get windowWidth => _prefs.getDouble(Keys.windowWidth);
