@@ -1,6 +1,3 @@
-import 'dart:math' show min;
-
-import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
@@ -128,8 +125,6 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
         final canPrev = _currentIndex > 0;
         final canNext = _currentIndex < flat.length - 1 || state.hasMore;
 
-        final fitted = _fittedSize(item, context);
-
         return _scaffold(
           canPrev: canPrev,
           canNext: canNext,
@@ -161,24 +156,16 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: Center(
-                      child: AnimatedSize(
-                        duration: Durations.medium1,
-                        curve: Curves.easeInOut,
-                        child: AnimatedSwitcher(
-                          duration: Durations.medium2,
-                          child: SizedBox(
-                            key: ValueKey(_currentIndex),
-                            width: fitted.width,
-                            height: fitted.height,
-                            child: item.isVideo
-                                ? VideoView(
-                                    item: item,
-                                    onPlayerReady: (p) => _player = p,
-                                  )
-                                : ImageView(item: item),
-                          ),
-                        ),
+                    child: AnimatedSwitcher(
+                      duration: Durations.medium2,
+                      child: KeyedSubtree(
+                        key: ValueKey(_currentIndex),
+                        child: item.isVideo
+                            ? VideoView(
+                                item: item,
+                                onPlayerReady: (p) => _player = p,
+                              )
+                            : ImageView(item: item),
                       ),
                     ),
                   ),
@@ -197,25 +184,13 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     );
   }
 
-  Size _fittedSize(MediaItem item, BuildContext context) {
-    final w = item.width?.toDouble();
-    final h = item.height?.toDouble();
-    final availableWidth = context.width;
-    final availableHeight = context.height - TitleBar.height;
-    if (w != null && h != null && w > 0 && h > 0) {
-      final scale = min(availableWidth / w, availableHeight / h);
-      return Size(w * scale, h * scale);
-    }
-    return Size(availableWidth, availableHeight);
-  }
-
   Widget _scaffold({
     required Widget child,
     bool canPrev = false,
     bool canNext = false,
   }) {
     return Scaffold(
-      backgroundColor: KnownColors.basicBlack,
+      backgroundColor: context.colors.background,
       body: Column(
         children: [
           const TitleBar(),

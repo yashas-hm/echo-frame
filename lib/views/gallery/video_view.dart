@@ -54,8 +54,11 @@ class _VideoViewState extends State<VideoView> {
     try {
       await _player.open(Media(path));
     } catch (e, st) {
-      dev.log('Failed to open video: $e',
-          stackTrace: st, name: 'VideoView._openFile');
+      dev.log(
+        'Failed to open video: $e',
+        stackTrace: st,
+        name: 'VideoView._openFile',
+      );
     }
   }
 
@@ -68,6 +71,7 @@ class _VideoViewState extends State<VideoView> {
           child: Video(
             controller: _controller,
             controls: NoVideoControls,
+            fill: Colors.transparent,
           ),
         ),
         Positioned(
