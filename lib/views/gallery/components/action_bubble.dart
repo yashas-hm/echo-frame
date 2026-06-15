@@ -1,3 +1,4 @@
+import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:flutter/material.dart';
 
@@ -39,14 +40,14 @@ class _ActionBubbleToastState extends State<_ActionBubbleToast>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: AppDurations.medium3,
     );
     _run();
   }
 
   Future<void> _run() async {
     await _controller.forward();
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(AppDurations.long2);
     if (!mounted) return;
     await _controller.reverse();
     if (!mounted) return;

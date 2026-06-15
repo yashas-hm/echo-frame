@@ -9,3 +9,7 @@ extension ContextExtension on BuildContext {
 
   AppThemeColors get colors => Theme.of(this).extension<AppThemeColors>()!;
 }
+
+extension DurationExtension on int {
+  Duration get milliseconds => Duration(milliseconds: this);
+}

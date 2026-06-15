@@ -93,7 +93,23 @@ All constants live in `lib/constants/constants.dart` as a barrel using `part` fi
 
 - `Keys` — `SharedPreferences` key strings
 - `Sizes` — window constraints (`kMinWindowSize`, `kInitWindowWidth/Height`, `kWindowAspectRatio`)
-- `Spacings`, `Styles`, `Durations`, `Routes` — currently empty part files, ready to populate
+- `Spacings`, `Styles`, `Routes` — currently empty part files, ready to populate
+- `AppDurations` — all animation/delay durations used across the app
+
+**Duration rule:** Never write a raw `Duration(milliseconds: …)` in view code. Always use a `AppDurations` constant. Current set:
+
+| Constant | Value | Use |
+|---|---|---|
+| `AppDurations.short1` | 100 ms | micro-interactions, hover feedback |
+| `AppDurations.short2` | 150 ms | quick animations |
+| `AppDurations.medium1` | 200 ms | fast transitions |
+| `AppDurations.medium2` | 220 ms | nav bar expand/collapse |
+| `AppDurations.medium3` | 250 ms | standard animations |
+| `AppDurations.medium4` | 300 ms | content switcher transitions |
+| `AppDurations.long1` | 350 ms | debounce timers |
+| `AppDurations.long2` | 500 ms | delayed effects, slow debounce |
+
+If a new duration is needed, add it to `lib/constants/durations.dart` first, then use the constant.
 
 ## Models
 

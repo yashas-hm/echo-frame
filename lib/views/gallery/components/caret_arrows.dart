@@ -1,3 +1,4 @@
+import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ class _CaretArrowState extends State<CaretArrow> {
         onExit: (_) => setState(() => _hovering = false),
         child: AnimatedOpacity(
           opacity: _hovering ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 150),
+          duration: AppDurations.short2,
           child: IgnorePointer(
             ignoring: !_hovering,
             child: Material(
