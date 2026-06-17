@@ -6,6 +6,7 @@ import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/organizer/organizer_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/shell/nav_bar_shell.dart';
+import 'package:echo_frame/test/test_organizer_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final _router = GoRouter(
-  initialLocation: TimelineScreen.path,
+  initialLocation: TestOrganizerScreen.path,
   routes: [
     ShellRoute(
       builder: (_, __, child) {
@@ -25,6 +26,7 @@ final _router = GoRouter(
         OrganizerScreen.route,
         ImportScreen.route,
         SettingsScreen.route,
+        TestOrganizerScreen.route,
       ],
     ),
     GalleryScreen.routeDef,

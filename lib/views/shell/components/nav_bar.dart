@@ -105,7 +105,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
               return Container(
                 width: width,
                 height: height,
-                margin: EdgeInsets.all(Sizes.spacingRegular),
+                margin: EdgeInsets.all(Sizes.spacingMedium),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: colors.textPrimary.withValues(alpha: 0.2),
@@ -138,7 +138,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                       if (_showContent)
                         Positioned.fill(
                           child: Padding(
-                          padding: EdgeInsets.all(Sizes.spacingSmall),
+                          padding: EdgeInsets.all(Sizes.spacingRegular),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -199,10 +199,10 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
         onTap: () => context.go(destination.route),
         hoverColor: colors.onPrimary.withValues(alpha: 0.2),
         child: Container(
-          margin: EdgeInsets.all(Sizes.spacingMedium),
+          margin: EdgeInsets.all(Sizes.iconWLabelPadding),
           alignment: Alignment.center,
           child: Column(
-            spacing: Sizes.spacingXS,
+            spacing: Sizes.spacingExtraSmall,
             children: [
               Icon(destination.icon, size: 20, color: colors.onPrimary),
               if (showLabel)

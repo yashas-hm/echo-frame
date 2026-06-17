@@ -219,7 +219,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                       hoverColor: context.colors.borderPrimary,
                       onTap: context.pop,
                       child: Padding(
-                        padding: EdgeInsets.all(Sizes.spacingSmall),
+                        padding: EdgeInsets.all(Sizes.iconPadding),
                         child: Icon(
                           Icons.arrow_back_rounded,
                           color: context.colors.textPrimary,

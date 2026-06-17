@@ -1,6 +1,8 @@
 import 'dart:ui' show Size;
 
+import 'package:echo_frame/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 part 'durations.dart';
 part 'keys.dart';
