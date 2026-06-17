@@ -9,6 +9,7 @@ import 'package:echo_frame/database/daos/operation_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/folder_tree.dart';
 import 'package:echo_frame/models/google_takeout/discover_event.dart';
+import 'package:echo_frame/models/google_takeout/discovery_error.dart';
 import 'package:echo_frame/models/google_takeout/import_plan.dart';
 import 'package:echo_frame/models/google_takeout/planned_import.dart';
 import 'package:echo_frame/models/google_takeout/takeout_models.dart';
@@ -20,17 +21,20 @@ import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 
 class ImportProgress {
-  final int imported;
-  final int total;
-  final String? currentFile;
-
   const ImportProgress({
     required this.imported,
     required this.total,
     this.currentFile,
+    this.errors = const [],
   });
 
-  double get fraction => total == 0 ? 1.0 : imported / total;
+  final int imported;
+  final int total;
+  final String? currentFile;
+  final List<DiscoveryError> errors;
+
+  int get processed => imported + errors.length;
+  double get fraction => total == 0 ? 1.0 : processed / total;
 }
 
 class TakeoutService {
@@ -108,15 +112,26 @@ class TakeoutService {
     }
 
     // Build PlannedImports and FolderTree.
+    // Files MMP couldn't read are recorded as discovery errors and excluded.
     final planned = <PlannedImport>[];
+    final discoveryErrors = <DiscoveryError>[];
     final treeData = <int, Map<String, int>>{};
 
     for (final mediaPath in allMediaPaths) {
       final sidecar = sidecarMap[mediaPath];
       final mmp = mmpByPath[mediaPath];
 
-      final fileMtime = File(mediaPath).lastModifiedSync().toUtc();
-      final capturedAt = sidecar?.photoTakenTime ?? mmp?.capturedAt ?? fileMtime;
+      if (mmp == null) {
+        dev.log('Skipping $mediaPath — MMP returned null (possibly corrupted)',
+            name: 'TakeoutService.discover');
+        discoveryErrors.add(DiscoveryError(
+          sourcePath: mediaPath,
+          reason: 'File Possibly Corrupted (No Metadata)',
+        ));
+        continue;
+      }
+
+      final capturedAt = sidecar?.photoTakenTime ?? mmp.capturedAt;
 
       final year = capturedAt.year;
       final monthName = MonthFolder.monthNames[capturedAt.month - 1];
@@ -127,15 +142,15 @@ class TakeoutService {
       final mergedMeta = Metadata(
         path: destPath,
         capturedAt: capturedAt,
-        width: mmp?.width,
-        height: mmp?.height,
-        durationMs: mmp?.durationMs,
-        cameraMake: mmp?.cameraMake,
-        cameraModel: mmp?.cameraModel,
-        latitude: sidecar?.latitude ?? mmp?.latitude,
-        longitude: sidecar?.longitude ?? mmp?.longitude,
-        altitude: sidecar?.altitude ?? mmp?.altitude,
-        mediaType: mmp?.mediaType ?? MediaType.image,
+        width: mmp.width,
+        height: mmp.height,
+        durationMs: mmp.durationMs,
+        cameraMake: mmp.cameraMake,
+        cameraModel: mmp.cameraModel,
+        latitude: sidecar?.latitude ?? mmp.latitude,
+        longitude: sidecar?.longitude ?? mmp.longitude,
+        altitude: sidecar?.altitude ?? mmp.altitude,
+        mediaType: mmp.mediaType,
       );
 
       planned.add(PlannedImport(
@@ -152,6 +167,7 @@ class TakeoutService {
       plan: ImportPlan(
         items: planned,
         tree: FolderTree.fromMap(treeData),
+        errors: discoveryErrors,
       ),
     );
   }
@@ -168,9 +184,33 @@ class TakeoutService {
     final opDao = OperationDao(db);
     final driveId = await DriveService.volumeUuid(libraryRoot);
 
-    for (int i = 0; i < plan.items.length; i++) {
-      final item = plan.items[i];
+    int imported = 0;
+    final applyErrors = <DiscoveryError>[];
 
+    for (final item in plan.items) {
+      // Copy is the only fatal operation — skip the file if it fails.
+      try {
+        await Directory(item.destPath).parent.create(recursive: true);
+        await File(item.mediaPath).copy(item.destPath);
+      } catch (e, st) {
+        dev.log('Copy failed for ${item.mediaPath}: $e',
+            stackTrace: st, name: 'TakeoutService.apply');
+        applyErrors.add(DiscoveryError(
+          sourcePath: item.mediaPath,
+          reason: 'File Copy Error',
+        ));
+        yield ImportProgress(
+          imported: imported,
+          total: plan.items.length,
+          currentFile: item.filename,
+          errors: List.unmodifiable(applyErrors),
+        );
+        continue;
+      }
+
+      imported++;
+
+      // Best-effort: DB write and thumbnail after successful copy.
       try {
         await opDao.insert(OperationRecordsCompanion(
           batchId: Value(batchId),
@@ -179,24 +219,20 @@ class TakeoutService {
           destPath: Value(item.destPath),
           appliedAt: Value(DateTime.now().toUtc()),
         ));
-
-        await Directory(item.destPath).parent.create(recursive: true);
-        await File(item.mediaPath).copy(item.destPath);
-
         if (LibraryService.isVideo(item.destPath)) {
           await ThumbnailService.generate(item.destPath);
         }
-
         await mediaDao.upsertMeta(item.meta, driveId, libraryRoot);
       } catch (e, st) {
-        dev.log('Import failed for ${item.mediaPath}: $e',
+        dev.log('Post-copy operations failed for ${item.destPath}: $e',
             stackTrace: st, name: 'TakeoutService.apply');
       }
 
       yield ImportProgress(
-        imported: i + 1,
+        imported: imported,
         total: plan.items.length,
         currentFile: item.filename,
+        errors: List.unmodifiable(applyErrors),
       );
     }
   }

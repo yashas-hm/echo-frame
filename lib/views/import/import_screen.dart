@@ -1,3 +1,4 @@
+import 'package:echo_frame/models/google_takeout/discovery_error.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:echo_frame/views/import/provider/import_provider.dart';
 import 'package:echo_frame/widgets/folder_tree_preview.dart';
@@ -147,10 +148,18 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
     return Scaffold(
       body: Column(
         children: [
-          _PreviewHeader(
-            count: total,
-            verb: 'imported',
-          ),
+          _PreviewHeader(count: total, verb: 'imported'),
+          if (plan.errors.isNotEmpty) ...[
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: _ErrorList(
+                errors: plan.errors,
+                title:
+                    '${plan.errors.length} file${plan.errors.length == 1 ? '' : 's'} skipped during scan',
+              ),
+            ),
+          ],
           const Divider(height: 1),
           Expanded(child: FolderTreePreview(tree: plan.tree)),
           const Divider(height: 1),
@@ -183,7 +192,9 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
   Widget _buildImporting(BuildContext context, ImportState state) {
     final theme = Theme.of(context);
-    final fraction = state.total == 0 ? null : state.imported / state.total;
+    final errorCount = state.applyErrors.length;
+    final processed = state.imported + errorCount;
+    final fraction = state.total == 0 ? null : processed / state.total;
 
     return Scaffold(
       body: Center(
@@ -197,7 +208,19 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
               const SizedBox(height: 16),
               LinearProgressIndicator(value: fraction),
               const SizedBox(height: 8),
-              Text('${state.imported} of ${state.total}'),
+              Row(
+                children: [
+                  Text('${state.imported} of ${state.total}'),
+                  if (errorCount > 0) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '($errorCount skipped)',
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: context.colors.errorPrimary),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
         ),
@@ -210,6 +233,10 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
   Widget _buildDone(BuildContext context, ImportState state) {
     final theme = Theme.of(context);
     final notifier = ref.read(importProvider.notifier);
+    final allErrors = [
+      ...?state.plan?.errors,
+      ...state.applyErrors,
+    ];
 
     return Scaffold(
       body: Center(
@@ -225,12 +252,20 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                       color: context.colors.primaryColor, size: 28),
                   const SizedBox(width: 10),
                   Text(
-                    '${state.total} photo${state.total == 1 ? '' : 's'} imported',
+                    '${state.imported} photo${state.imported == 1 ? '' : 's'} imported',
                     style: theme.textTheme.headlineSmall
                         ?.copyWith(fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
+              if (allErrors.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                _ErrorList(
+                  errors: allErrors,
+                  title:
+                      '${allErrors.length} file${allErrors.length == 1 ? '' : 's'} had errors',
+                ),
+              ],
               const SizedBox(height: 32),
               Align(
                 alignment: Alignment.centerRight,
@@ -415,6 +450,99 @@ class _PreviewHeader extends StatelessWidget {
                     ),
                   ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorList extends StatefulWidget {
+  const _ErrorList({required this.errors, required this.title});
+
+  final List<DiscoveryError> errors;
+  final String title;
+
+  @override
+  State<_ErrorList> createState() => _ErrorListState();
+}
+
+class _ErrorListState extends State<_ErrorList> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.colors.errorSurface,
+        borderRadius: BorderRadius.circular(8),
+        border:
+            Border.all(color: context.colors.errorPrimary.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Row(
+              children: [
+                Icon(Icons.warning_amber_rounded,
+                    size: 16, color: context.colors.errorPrimary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.title,
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: context.colors.errorPrimary),
+                  ),
+                ),
+                Icon(
+                  _expanded ? Icons.expand_less : Icons.expand_more,
+                  size: 16,
+                  color: context.colors.errorPrimary,
+                ),
+              ],
+            ),
+          ),
+          if (_expanded) ...[
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 160),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: widget.errors.length,
+                itemBuilder: (_, i) {
+                  final err = widget.errors[i];
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            err.filename,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: context.colors.textPrimary,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          err.reason,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: context.colors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:echo_frame/models/google_takeout/discover_event.dart';
+import 'package:echo_frame/models/google_takeout/discovery_error.dart';
 import 'package:echo_frame/models/google_takeout/import_plan.dart';
 import 'package:echo_frame/services/takeout_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
@@ -17,6 +18,7 @@ class ImportState {
     this.total = 0,
     this.scanningDir,
     this.filesFound = 0,
+    this.applyErrors = const [],
     this.error,
   });
 
@@ -28,6 +30,7 @@ class ImportState {
   final int total;
   final String? scanningDir;
   final int filesFound;
+  final List<DiscoveryError> applyErrors;
   final String? error;
 
   ImportState copyWith({
@@ -39,6 +42,7 @@ class ImportState {
     int? total,
     String? scanningDir,
     int? filesFound,
+    List<DiscoveryError>? applyErrors,
     String? error,
   }) =>
       ImportState(
@@ -50,6 +54,7 @@ class ImportState {
         total: total ?? this.total,
         scanningDir: scanningDir ?? this.scanningDir,
         filesFound: filesFound ?? this.filesFound,
+        applyErrors: applyErrors ?? this.applyErrors,
         error: error ?? this.error,
       );
 }
@@ -97,6 +102,7 @@ class ImportNotifier extends Notifier<ImportState> {
       phase: ImportPhase.importing,
       imported: 0,
       total: plan.total,
+      applyErrors: const [],
     );
 
     try {
@@ -105,7 +111,10 @@ class ImportNotifier extends Notifier<ImportState> {
         libraryRoot: libraryRoot,
         batchId: batchId,
       )) {
-        state = state.copyWith(imported: progress.imported);
+        state = state.copyWith(
+          imported: progress.imported,
+          applyErrors: progress.errors,
+        );
       }
 
       ref.invalidate(timelineProvider);
