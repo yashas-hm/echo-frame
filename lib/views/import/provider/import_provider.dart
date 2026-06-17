@@ -58,6 +58,8 @@ class ImportState {
 }
 
 class ImportNotifier extends Notifier<ImportState> {
+  final _service = TakeoutService();
+
   @override
   ImportState build() => ImportState(libraryRoot: Prefs.libraryRootPath);
 
@@ -73,9 +75,9 @@ class ImportNotifier extends Notifier<ImportState> {
     );
 
     try {
-      await for (final event in TakeoutService.discover(
-        takeoutDir: takeoutDir,
-        libraryRoot: libraryRoot,
+      await for (final event in _service.discover(
+        sourceDir: takeoutDir,
+        destRoot: libraryRoot,
       )) {
         switch (event) {
           case DiscoverScanning(:final dirName, :final filesFound):
@@ -104,7 +106,7 @@ class ImportNotifier extends Notifier<ImportState> {
     );
 
     try {
-      await for (final progress in TakeoutService.apply(
+      await for (final progress in _service.apply(
         plan: plan,
         libraryRoot: libraryRoot,
         batchId: batchId,

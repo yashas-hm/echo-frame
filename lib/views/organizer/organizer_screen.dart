@@ -1,6 +1,7 @@
+import 'package:echo_frame/models/discovery/discovery.dart' show DiscoveryError;
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
-import 'package:echo_frame/views/organizer/operation_preview_list.dart';
 import 'package:echo_frame/views/organizer/provider/organizer_provider.dart';
+import 'package:echo_frame/widgets/folder_tree_preview.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,9 +37,8 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
 
     return switch (state.phase) {
       OrganizerPhase.idle => _buildIdle(context, state),
-      OrganizerPhase.previewing =>
-        _buildCentered(const CircularProgressIndicator(), 'Scanning files…'),
-      OrganizerPhase.preview => _buildPreview(context, state),
+      OrganizerPhase.discovering => _buildDiscovering(context, state),
+      OrganizerPhase.review => _buildReview(context, state),
       OrganizerPhase.applying => _buildApplying(context, state),
       OrganizerPhase.done => _buildDone(context, state),
       OrganizerPhase.error => _buildError(context, state),
@@ -50,7 +50,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
   Widget _buildIdle(BuildContext context, OrganizerState state) {
     final theme = Theme.of(context);
     final destRoot = state.destRoot;
-    final canPreview =
+    final canDiscover =
         _sourceDir != null && destRoot != null && _sourceDir != destRoot;
 
     if (destRoot == null) {
@@ -97,13 +97,13 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: FilledButton.icon(
-                  onPressed: canPreview
+                  onPressed: canDiscover
                       ? () => ref
                           .read(organizerProvider.notifier)
-                          .preview(_sourceDir!)
+                          .discover(_sourceDir!)
                       : null,
-                  icon: const Icon(Icons.preview_rounded),
-                  label: const Text('Preview'),
+                  icon: const Icon(Icons.search_rounded),
+                  label: const Text('Scan'),
                 ),
               ),
             ],
@@ -113,21 +113,58 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
     );
   }
 
-  // ── Preview ───────────────────────────────────────────────────────────────
+  // ── Discovering ───────────────────────────────────────────────────────────
 
-  Widget _buildPreview(BuildContext context, OrganizerState state) {
-    final ops = state.operations;
+  Widget _buildDiscovering(BuildContext context, OrganizerState state) {
+    final theme = Theme.of(context);
+    final dir = state.scanningDir;
+    final label = dir != null ? 'Scanning $dir…' : 'Scanning folder…';
+
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(label, style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 4),
+            if (state.filesFound > 0)
+              Text(
+                '${state.filesFound} file${state.filesFound == 1 ? '' : 's'} found',
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: context.colors.textSecondary),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Review ────────────────────────────────────────────────────────────────
+
+  Widget _buildReview(BuildContext context, OrganizerState state) {
+    final plan = state.plan!;
     final notifier = ref.read(organizerProvider.notifier);
+    final total = plan.total;
 
     return Scaffold(
       body: Column(
         children: [
-          _PreviewHeader(
-            count: ops.length,
-            destRoot: state.destRoot ?? '',
-          ),
+          _PreviewHeader(count: total, verb: 'sorted'),
+          if (plan.errors.isNotEmpty) ...[
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: _ErrorList(
+                errors: plan.errors,
+                title:
+                    '${plan.errors.length} file${plan.errors.length == 1 ? '' : 's'} skipped during scan',
+              ),
+            ),
+          ],
           const Divider(height: 1),
-          Expanded(child: OperationPreviewList(operations: ops)),
+          Expanded(child: FolderTreePreview(tree: plan.tree)),
           const Divider(height: 1),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -140,11 +177,11 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
                 ),
                 const SizedBox(width: 12),
                 FilledButton.icon(
-                  onPressed: ops.isEmpty ? null : notifier.apply,
+                  onPressed: total == 0 ? null : notifier.apply,
                   icon: const Icon(Icons.drive_folder_upload_outlined),
-                  label: Text(ops.isEmpty
+                  label: Text(total == 0
                       ? 'No files to sort'
-                      : 'Sort ${ops.length} Photo${ops.length == 1 ? '' : 's'}'),
+                      : 'Sort $total Photo${total == 1 ? '' : 's'}'),
                 ),
               ],
             ),
@@ -158,7 +195,9 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
 
   Widget _buildApplying(BuildContext context, OrganizerState state) {
     final theme = Theme.of(context);
-    final fraction = state.total == 0 ? null : state.applied / state.total;
+    final errorCount = state.applyErrors.length;
+    final processed = state.applied + errorCount;
+    final fraction = state.total == 0 ? null : processed / state.total;
 
     return Scaffold(
       body: Center(
@@ -172,7 +211,19 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
               const SizedBox(height: 16),
               LinearProgressIndicator(value: fraction),
               const SizedBox(height: 8),
-              Text('${state.applied} of ${state.total}'),
+              Row(
+                children: [
+                  Text('${state.applied} of ${state.total}'),
+                  if (errorCount > 0) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '($errorCount skipped)',
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: context.colors.errorPrimary),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
         ),
@@ -185,44 +236,49 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
   Widget _buildDone(BuildContext context, OrganizerState state) {
     final theme = Theme.of(context);
     final notifier = ref.read(organizerProvider.notifier);
+    final allErrors = [
+      ...?state.plan?.errors,
+      ...state.applyErrors,
+    ];
 
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.check_circle_outline_rounded,
-                size: 64, color: context.colors.primaryColor),
-            const SizedBox(height: 16),
-            Text(
-              '${state.total} photo${state.total == 1 ? '' : 's'} sorted',
-              style: theme.textTheme.titleMedium,
-            ),
-            if (state.rolledBack != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                '${state.rolledBack} file${state.rolledBack == 1 ? '' : 's'} rolled back',
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: context.colors.textSecondary),
+        child: SizedBox(
+          width: 480,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.check_circle_outline_rounded,
+                      size: 28, color: context.colors.primaryColor),
+                  const SizedBox(width: 10),
+                  Text(
+                    '${state.applied} photo${state.applied == 1 ? '' : 's'} sorted',
+                    style: theme.textTheme.headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
-            ],
-            const SizedBox(height: 32),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: notifier.rollback,
-                  icon: const Icon(Icons.undo_rounded),
-                  label: const Text('Rollback'),
+              if (allErrors.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                _ErrorList(
+                  errors: allErrors,
+                  title:
+                      '${allErrors.length} file${allErrors.length == 1 ? '' : 's'} had errors',
                 ),
-                const SizedBox(width: 16),
-                FilledButton(
+              ],
+              const SizedBox(height: 32),
+              Align(
+                alignment: Alignment.centerRight,
+                child: FilledButton(
                   onPressed: notifier.reset,
                   child: const Text('Done'),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -271,11 +327,7 @@ class _OrganizerScreenState extends ConsumerState<OrganizerScreen> {
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            icon,
-            const SizedBox(height: 16),
-            Text(label),
-          ],
+          children: [icon, const SizedBox(height: 16), Text(label)],
         ),
       ),
     );
@@ -290,15 +342,13 @@ class _SectionLabel extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: Theme.of(context)
-          .textTheme
-          .labelMedium
-          ?.copyWith(color: context.colors.textSecondary),
-    );
-  }
+  Widget build(BuildContext context) => Text(
+        text,
+        style: Theme.of(context)
+            .textTheme
+            .labelMedium
+            ?.copyWith(color: context.colors.textSecondary),
+      );
 }
 
 class _PathRow extends StatelessWidget {
@@ -362,13 +412,10 @@ class _PathRow extends StatelessWidget {
 }
 
 class _PreviewHeader extends StatelessWidget {
-  const _PreviewHeader({
-    required this.count,
-    required this.destRoot,
-  });
+  const _PreviewHeader({required this.count, required this.verb});
 
   final int count;
-  final String destRoot;
+  final String verb;
 
   @override
   Widget build(BuildContext context) {
@@ -391,7 +438,7 @@ class _PreviewHeader extends StatelessWidget {
                           ?.copyWith(fontWeight: FontWeight.w600),
                       children: [
                         TextSpan(
-                          text: ' will be sorted into your library',
+                          text: ' will be $verb into your library',
                           style: theme.textTheme.titleSmall
                               ?.copyWith(fontWeight: FontWeight.normal),
                         ),
@@ -399,6 +446,99 @@ class _PreviewHeader extends StatelessWidget {
                     ),
                   ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorList extends StatefulWidget {
+  const _ErrorList({required this.errors, required this.title});
+
+  final List<DiscoveryError> errors;
+  final String title;
+
+  @override
+  State<_ErrorList> createState() => _ErrorListState();
+}
+
+class _ErrorListState extends State<_ErrorList> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.colors.errorSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+            color: context.colors.errorPrimary.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Row(
+              children: [
+                Icon(Icons.warning_amber_rounded,
+                    size: 16, color: context.colors.errorPrimary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.title,
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: context.colors.errorPrimary),
+                  ),
+                ),
+                Icon(
+                  _expanded ? Icons.expand_less : Icons.expand_more,
+                  size: 16,
+                  color: context.colors.errorPrimary,
+                ),
+              ],
+            ),
+          ),
+          if (_expanded) ...[
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 160),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: widget.errors.length,
+                itemBuilder: (_, i) {
+                  final err = widget.errors[i];
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            err.filename,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: context.colors.textPrimary,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          err.reason,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: context.colors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );

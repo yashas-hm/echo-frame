@@ -1,111 +1,123 @@
-import 'package:echo_frame/models/organizer_result.dart';
-import 'package:echo_frame/models/timeline/timeline_models.dart';
-import 'package:echo_frame/services/indexing_service.dart';
+import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/services/organizer_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum OrganizerPhase { idle, previewing, preview, applying, done, error }
+export 'package:echo_frame/services/import_service.dart' show ImportProgress;
+
+enum OrganizerPhase { idle, discovering, review, applying, done, error }
 
 class OrganizerState {
-  final OrganizerPhase phase;
-  final String? sourceDir;
-  final String? destRoot;
-  final List<OperationResult> operations;
-  final int applied;
-  final int total;
-  final String? error;
-  final String? lastBatchId;
-  final int? rolledBack;
-
   const OrganizerState({
     this.phase = OrganizerPhase.idle,
     this.sourceDir,
     this.destRoot,
-    this.operations = const [],
+    this.plan,
     this.applied = 0,
     this.total = 0,
+    this.scanningDir,
+    this.filesFound = 0,
+    this.applyErrors = const [],
     this.error,
-    this.lastBatchId,
-    this.rolledBack,
   });
+
+  final OrganizerPhase phase;
+  final String? sourceDir;
+  final String? destRoot;
+  final DiscoveryResult? plan;
+  final int applied;
+  final int total;
+  final String? scanningDir;
+  final int filesFound;
+  final List<DiscoveryError> applyErrors;
+  final String? error;
 
   OrganizerState copyWith({
     OrganizerPhase? phase,
     String? sourceDir,
     String? destRoot,
-    List<OperationResult>? operations,
+    DiscoveryResult? plan,
     int? applied,
     int? total,
+    String? scanningDir,
+    int? filesFound,
+    List<DiscoveryError>? applyErrors,
     String? error,
-    String? lastBatchId,
-    int? rolledBack,
   }) =>
       OrganizerState(
         phase: phase ?? this.phase,
         sourceDir: sourceDir ?? this.sourceDir,
         destRoot: destRoot ?? this.destRoot,
-        operations: operations ?? this.operations,
+        plan: plan ?? this.plan,
         applied: applied ?? this.applied,
         total: total ?? this.total,
+        scanningDir: scanningDir ?? this.scanningDir,
+        filesFound: filesFound ?? this.filesFound,
+        applyErrors: applyErrors ?? this.applyErrors,
         error: error ?? this.error,
-        lastBatchId: lastBatchId ?? this.lastBatchId,
-        rolledBack: rolledBack ?? this.rolledBack,
       );
 }
 
 class OrganizerNotifier extends Notifier<OrganizerState> {
+  final _service = OrganizerService();
+
   @override
   OrganizerState build() => OrganizerState(destRoot: Prefs.libraryRootPath);
 
-  Future<void> preview(String sourceDir) async {
+  Future<void> discover(String sourceDir) async {
     final destRoot = state.destRoot;
     if (destRoot == null) return;
 
     state = state.copyWith(
-      phase: OrganizerPhase.previewing,
+      phase: OrganizerPhase.discovering,
       sourceDir: sourceDir,
+      filesFound: 0,
+      scanningDir: null,
     );
 
     try {
-      final ops = await OrganizerService.preview(
+      await for (final event in _service.discover(
         sourceDir: sourceDir,
         destRoot: destRoot,
-      );
-      state = state.copyWith(phase: OrganizerPhase.preview, operations: ops);
+      )) {
+        switch (event) {
+          case DiscoverScanning(:final dirName, :final filesFound):
+            state =
+                state.copyWith(scanningDir: dirName, filesFound: filesFound);
+          case DiscoverDone(:final plan):
+            state = state.copyWith(phase: OrganizerPhase.review, plan: plan);
+        }
+      }
     } catch (e) {
       state = state.copyWith(phase: OrganizerPhase.error, error: e.toString());
     }
   }
 
   Future<void> apply() async {
-    final ops = state.operations;
-    if (ops.isEmpty) return;
+    final plan = state.plan;
+    final destRoot = state.destRoot;
+    if (plan == null || destRoot == null) return;
 
     final batchId = DateTime.now().millisecondsSinceEpoch.toString();
+
     state = state.copyWith(
       phase: OrganizerPhase.applying,
       applied: 0,
-      total: ops.length,
-      lastBatchId: batchId,
+      total: plan.total,
+      applyErrors: const [],
     );
 
     try {
-      await for (final progress in OrganizerService.apply(
-        operations: ops,
+      await for (final progress in _service.apply(
+        plan: plan,
+        libraryRoot: destRoot,
         batchId: batchId,
       )) {
-        state = state.copyWith(applied: progress.applied);
-      }
-
-      final destRoot = state.destRoot!;
-      final affectedMonths = _extractAffectedMonths(ops, destRoot);
-      if (affectedMonths.isNotEmpty) {
-        await for (final _ in IndexingService.run(
-          libraryRoot: destRoot,
-          months: affectedMonths,
-        )) {}
+        state = state.copyWith(
+          applied: progress.imported,
+          applyErrors: progress.errors,
+        );
       }
 
       ref.invalidate(timelineProvider);
@@ -115,50 +127,7 @@ class OrganizerNotifier extends Notifier<OrganizerState> {
     }
   }
 
-  Future<void> rollback() async {
-    final batchId = state.lastBatchId;
-    if (batchId == null) return;
-
-    try {
-      final count = await OrganizerService.rollback(batchId);
-      ref.invalidate(timelineProvider);
-      state = OrganizerState(
-        destRoot: state.destRoot,
-        rolledBack: count,
-      );
-    } catch (e) {
-      state = state.copyWith(phase: OrganizerPhase.error, error: e.toString());
-    }
-  }
-
   void reset() => state = OrganizerState(destRoot: state.destRoot);
-
-  List<MonthFolder> _extractAffectedMonths(
-    List<OperationResult> ops,
-    String destRoot,
-  ) {
-    final seen = <String>{};
-    final months = <MonthFolder>[];
-
-    for (final op in ops) {
-      final parts = op.destRelative.split('/');
-      if (parts.length < 2) continue;
-      final key = '${parts[0]}/${parts[1]}';
-      if (!seen.add(key)) continue;
-
-      final year = int.tryParse(parts[0]);
-      final monthIdx = MonthFolder.monthNames.indexOf(parts[1]);
-      if (year == null || monthIdx < 0) continue;
-
-      months.add(MonthFolder(
-        year: year,
-        month: monthIdx + 1,
-        path: '$destRoot/${parts[0]}/${parts[1]}',
-      ));
-    }
-
-    return months;
-  }
 }
 
 final organizerProvider =

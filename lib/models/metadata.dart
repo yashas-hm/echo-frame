@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart' show ValueGetter;
+
 enum MediaType { image, video, unknown }
 
 class Metadata {
@@ -48,6 +50,33 @@ class Metadata {
       mediaType: durationMs != null ? MediaType.video : MediaType.image,
     );
   }
+
+  Metadata copyWith({
+    String? path,
+    DateTime? capturedAt,
+    ValueGetter<int?>? width,
+    ValueGetter<int?>? height,
+    ValueGetter<int?>? durationMs,
+    ValueGetter<String?>? cameraMake,
+    ValueGetter<String?>? cameraModel,
+    ValueGetter<double?>? latitude,
+    ValueGetter<double?>? longitude,
+    ValueGetter<double?>? altitude,
+    MediaType? mediaType,
+  }) =>
+      Metadata(
+        path: path ?? this.path,
+        capturedAt: capturedAt ?? this.capturedAt,
+        width: width != null ? width() : this.width,
+        height: height != null ? height() : this.height,
+        durationMs: durationMs != null ? durationMs() : this.durationMs,
+        cameraMake: cameraMake != null ? cameraMake() : this.cameraMake,
+        cameraModel: cameraModel != null ? cameraModel() : this.cameraModel,
+        latitude: latitude != null ? latitude() : this.latitude,
+        longitude: longitude != null ? longitude() : this.longitude,
+        altitude: altitude != null ? altitude() : this.altitude,
+        mediaType: mediaType ?? this.mediaType,
+      );
 
   Map<String, dynamic> toJson() => {
         'filename': path.split('/').last,
