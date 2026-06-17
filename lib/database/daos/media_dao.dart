@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/metadata.dart';
-import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 
 // ── Timeline queries ──────────────────────────────────────────────────────────
@@ -21,20 +20,12 @@ class MediaDao {
     });
   }
 
-  Future<void> upsertFromIndex({
-    required MonthIndex index,
-    required MonthFolder folder,
-    required String driveId,
-    required String libraryRoot,
-  }) async {
-    final companions = index.items
-        .map((item) => _toCompanion(
-              Metadata.fromJson(item, folderPath: folder.path),
-              driveId,
-              libraryRoot,
-            ))
-        .toList();
-    await upsertBatch(companions);
+  Future<Set<String>> listFilePaths(String driveId) async {
+    final rows = await (_db.selectOnly(_db.mediaRecords)
+          ..addColumns([_db.mediaRecords.filePath])
+          ..where(_db.mediaRecords.driveId.equals(driveId)))
+        .get();
+    return rows.map((r) => r.read(_db.mediaRecords.filePath)!).toSet();
   }
 
   Future<List<({int year, int month, int count})>> listMonths() async {

@@ -6,9 +6,11 @@ import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/discovery/takeout_sidecar.dart';
 import 'package:echo_frame/models/folder_tree.dart';
 import 'package:echo_frame/services/importing/import_service.dart';
+import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 import 'package:intl/intl.dart';
 
-export 'package:echo_frame/services/importing/import_service.dart' show ImportProgress;
+export 'package:echo_frame/services/importing/import_service.dart'
+    show ImportProgress;
 
 class TakeoutService extends ImportService {
   @override
@@ -19,11 +21,13 @@ class TakeoutService extends ImportService {
     final allMediaPaths = <String>[];
     final sidecarMap = <String, TakeoutSidecar>{};
 
-    await for (final scan in walkDirectories(sourceDir)) {
-      yield DiscoverScanning(
-          dirName: scan.dirName, filesFound: scan.totalFound);
-
+    await for (final scan in DirUtils.walk(sourceDir)) {
       allMediaPaths.addAll(scan.mediaPaths);
+
+      yield DiscoverScanning(
+        dirName: scan.dirName,
+        filesFound: allMediaPaths.length,
+      );
 
       for (final mediaPath in scan.mediaPaths) {
         final filename = mediaPath.split('/').last;
@@ -41,8 +45,11 @@ class TakeoutService extends ImportService {
               sidecarMap[mediaPath] = TakeoutSidecar.fromJson(json);
             }
           } catch (e, st) {
-            dev.log('Failed to parse sidecar ${sidecarEntry.value}: $e',
-                stackTrace: st, name: 'TakeoutService.discover');
+            dev.log(
+              'Failed to parse sidecar ${sidecarEntry.value}: $e',
+              stackTrace: st,
+              name: 'TakeoutService.discover',
+            );
           }
         }
       }
@@ -60,8 +67,10 @@ class TakeoutService extends ImportService {
       final mmp = mmpByPath[mediaPath];
 
       if (mmp == null) {
-        dev.log('Skipping $mediaPath — MMP null',
-            name: 'TakeoutService.discover');
+        dev.log(
+          'Skipping $mediaPath -> MMP null',
+          name: 'TakeoutService.discover',
+        );
         discoveryErrors.add(DiscoveryError(
           sourcePath: mediaPath,
           reason: 'File Possibly Corrupted (No Metadata)',

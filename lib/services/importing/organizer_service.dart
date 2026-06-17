@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/folder_tree.dart';
 import 'package:echo_frame/services/importing/import_service.dart';
+import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 import 'package:intl/intl.dart';
 
 class OrganizerService extends ImportService {
@@ -13,10 +14,12 @@ class OrganizerService extends ImportService {
   }) async* {
     final allMediaPaths = <String>[];
 
-    await for (final scan in walkDirectories(sourceDir)) {
-      yield DiscoverScanning(
-          dirName: scan.dirName, filesFound: scan.totalFound);
+    await for (final scan in DirUtils.walk(sourceDir)) {
       allMediaPaths.addAll(scan.mediaPaths);
+      yield DiscoverScanning(
+        dirName: scan.dirName,
+        filesFound: allMediaPaths.length,
+      );
     }
 
     final mmpByPath = await fetchMetadata(allMediaPaths);

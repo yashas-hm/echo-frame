@@ -1,70 +1,121 @@
+import 'dart:developer' as dev;
+
 import 'package:echo_frame/database/daos/drive_dao.dart';
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/timeline/timeline_models.dart';
-import 'package:echo_frame/services/cache_service.dart';
+import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/drive_service.dart';
-import 'package:intl/intl.dart';
+import 'package:echo_frame/services/metadata_service.dart';
+import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 
-class IndexingProgress {
-  final int completed;
-  final int total;
-  final String? currentFolder;
-  final bool isDone;
-
-  const IndexingProgress({
-    required this.completed,
-    required this.total,
-    this.currentFolder,
-    this.isDone = false,
-  });
-
-  factory IndexingProgress.done(int total) =>
-      IndexingProgress(completed: total, total: total, isDone: true);
-
-  double get fraction => total == 0 ? 1.0 : completed / total;
-}
+enum IndexingPhase { scanning, reading, done }
 
 class IndexingService {
-  static Stream<IndexingProgress> run({
+  /// Runs on every library open. Walks disk, diffs against DB, indexes only new files.
+  static Stream<IndexingProgress> autoIndex({
     required String libraryRoot,
-    required List<MonthFolder> months,
   }) async* {
-    if (months.isEmpty) {
-      yield IndexingProgress.done(0);
-      return;
-    }
-
-    final uuid = await DriveService.volumeUuid(libraryRoot);
-    final label = await DriveService.volumeLabel(libraryRoot);
     final db = EchoDatabase.instance;
-
+    final driveId = await DriveService.volumeUuid(libraryRoot);
+    final label = await DriveService.volumeLabel(libraryRoot);
     await DriveDao(db).upsertDrive(
-      uuid: uuid,
+      uuid: driveId,
       label: label,
       mountPath: libraryRoot,
     );
 
-    final indexService = CacheService();
-    final mediaDao = MediaDao(db);
-
-    for (int i = 0; i < months.length; i++) {
-      final folder = months[i];
+    final allPaths = <String>[];
+    await for (final scan in DirUtils.walk(libraryRoot)) {
+      allPaths.addAll(scan.mediaPaths);
       yield IndexingProgress(
-        completed: i,
-        total: months.length,
-        currentFolder: '${folder.year}/${DateFormat('MMMM').format(DateTime(folder.year, folder.month))}',
-      );
-
-      final index = await indexService.getOrBuild(folder);
-      await mediaDao.upsertFromIndex(
-        index: index,
-        folder: folder,
-        driveId: uuid,
-        libraryRoot: libraryRoot,
+        phase: IndexingPhase.scanning,
+        currentDir: scan.dirName,
+        filesFound: allPaths.length,
       );
     }
 
-    yield IndexingProgress.done(months.length);
+    final existingPaths = await MediaDao(db).listFilePaths(driveId);
+    final newPaths = allPaths.where((p) => !existingPaths.contains(p)).toList();
+
+    if (newPaths.isEmpty) {
+      yield const IndexingProgress(phase: IndexingPhase.done);
+      return;
+    }
+
+    yield IndexingProgress(
+      phase: IndexingPhase.reading,
+      newFiles: newPaths.length,
+    );
+
+    await _fetchAndUpsert(newPaths, db, driveId, libraryRoot);
+
+    yield IndexingProgress(
+      phase: IndexingPhase.done,
+      newFiles: newPaths.length,
+    );
+  }
+
+  /// Runs only on first connect (no echo.db found). Indexes all files.
+  static Stream<IndexingProgress> fullIndex({
+    required String libraryRoot,
+  }) async* {
+    final db = EchoDatabase.instance;
+    final driveId = await DriveService.volumeUuid(libraryRoot);
+    final label = await DriveService.volumeLabel(libraryRoot);
+    await DriveDao(db)
+        .upsertDrive(uuid: driveId, label: label, mountPath: libraryRoot);
+
+    final allPaths = <String>[];
+    await for (final scan in DirUtils.walk(libraryRoot)) {
+      allPaths.addAll(scan.mediaPaths);
+      yield IndexingProgress(
+        phase: IndexingPhase.scanning,
+        currentDir: scan.dirName,
+        filesFound: allPaths.length,
+      );
+    }
+
+    if (allPaths.isEmpty) {
+      yield const IndexingProgress(phase: IndexingPhase.done);
+      return;
+    }
+
+    yield IndexingProgress(
+      phase: IndexingPhase.reading,
+      newFiles: allPaths.length,
+    );
+
+    await _fetchAndUpsert(allPaths, db, driveId, libraryRoot);
+
+    yield IndexingProgress(
+      phase: IndexingPhase.done,
+      newFiles: allPaths.length,
+    );
+  }
+
+  static Future<void> _fetchAndUpsert(
+    List<String> paths,
+    EchoDatabase db,
+    String driveId,
+    String libraryRoot,
+  ) async {
+    final metas = await MetadataService.readAll(paths);
+    final mediaDao = MediaDao(db);
+    for (int i = 0; i < paths.length; i++) {
+      final m = metas[i];
+      if (m == null) {
+        dev.log('No metadata for ${paths[i]}', name: 'IndexingService');
+        continue;
+      }
+      try {
+        await mediaDao.upsertMeta(m, driveId, libraryRoot);
+      } catch (e, st) {
+        dev.log(
+          'upsertMeta failed for ${paths[i]}: $e',
+          stackTrace: st,
+          name: 'IndexingService',
+        );
+      }
+    }
   }
 }

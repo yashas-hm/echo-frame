@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:developer' as dev;
 import 'dart:io';
 
@@ -7,7 +6,7 @@ import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/services/drive_service.dart';
-import 'package:echo_frame/services/library_service.dart';
+import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 
@@ -28,73 +27,7 @@ class ImportProgress {
   double get fraction => total == 0 ? 1.0 : processed / total;
 }
 
-/// Per-directory result yielded by [ImportService.walkDirectories].
-class DirectoryScan {
-  const DirectoryScan({
-    required this.dirName,
-    required this.totalFound,
-    required this.mediaPaths,
-    required this.jsonByName,
-  });
-
-  /// Display name of this directory (last path segment).
-  final String dirName;
-
-  /// Running total of media files found across all directories so far.
-  final int totalFound;
-
-  /// Media files found in this directory.
-  final List<String> mediaPaths;
-
-  /// JSON files in this directory keyed by filename — for sidecar lookup.
-  final Map<String, String> jsonByName;
-}
-
 abstract class ImportService {
-  /// BFS walk of [sourceDir]. Yields one [DirectoryScan] per directory,
-  /// including media paths and JSON filenames for that directory.
-  Stream<DirectoryScan> walkDirectories(String sourceDir) async* {
-    int totalFound = 0;
-    final queue = Queue<Directory>()..add(Directory(sourceDir));
-
-    while (queue.isNotEmpty) {
-      final dir = queue.removeFirst();
-
-      List<FileSystemEntity> entries;
-      try {
-        entries = dir.listSync();
-      } catch (e, st) {
-        dev.log('Failed to list ${dir.path}: $e',
-            stackTrace: st, name: '$runtimeType.walkDirectories');
-        continue;
-      }
-
-      final mediaPaths = <String>[];
-      final jsonByName = <String, String>{};
-
-      for (final e in entries) {
-        if (e is! File) continue;
-        if (e.path.endsWith('.json')) {
-          jsonByName[e.path.split('/').last] = e.path;
-        } else if (LibraryService.isMedia(e.path)) {
-          mediaPaths.add(e.path);
-        }
-      }
-
-      totalFound += mediaPaths.length;
-      yield DirectoryScan(
-        dirName: dir.path.split('/').last,
-        totalFound: totalFound,
-        mediaPaths: mediaPaths,
-        jsonByName: jsonByName,
-      );
-
-      for (final e in entries) {
-        if (e is Directory) queue.add(e);
-      }
-    }
-  }
-
   /// Batch MMP call. Returns a map of path → Metadata (null results excluded).
   Future<Map<String, Metadata>> fetchMetadata(List<String> paths) async {
     final results = await MetadataService.readAll(paths);
@@ -162,7 +95,7 @@ abstract class ImportService {
       imported++;
 
       try {
-        if (LibraryService.isVideo(item.destPath)) {
+        if (DirUtils.isVideo(item.destPath)) {
           await ThumbnailService.generate(item.destPath);
         }
         await mediaDao.upsertMeta(item.meta, driveId, libraryRoot);

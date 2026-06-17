@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:echo_frame/database/database.dart';
+import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/indexing_service.dart';
-import 'package:echo_frame/services/library_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtension, Prefs;
 import 'package:echo_frame/views/timeline/components/photo_tile.dart';
@@ -91,28 +90,24 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     );
     if (path == null || !mounted) return;
 
-    final echoDir = Directory(EchoDatabase.echoframeDir(path));
-    await echoDir.create(recursive: true);
-    await File('${echoDir.path}/echo_config.json').writeAsString(
-      jsonEncode({
-        'version': 1,
-        'createdAt': DateTime.now().toUtc().toIso8601String(),
-        'themeMode': Prefs.themeMode.name,
-      }),
-    );
+    final echoframeDir = EchoDatabase.echoframeDir(path);
+    final isExisting = File('$echoframeDir/echo.db').existsSync();
+
+    if (!isExisting) {
+      await Directory(echoframeDir).create(recursive: true);
+    }
 
     await EchoDatabase.open(path);
     Prefs.libraryRootPath = path;
 
-    final structure = await LibraryService.discover(path);
-
     if (!mounted) return;
     setState(() => _hasLibrary = true);
 
-    await for (final progress in IndexingService.run(
-      libraryRoot: path,
-      months: structure.months,
-    )) {
+    final stream = isExisting
+        ? IndexingService.autoIndex(libraryRoot: path)
+        : IndexingService.fullIndex(libraryRoot: path);
+
+    await for (final progress in stream) {
       if (!mounted) return;
       setState(() => _progress = progress.isDone ? null : progress);
     }
@@ -209,12 +204,14 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
               Text('Indexing library…',
                   style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 16),
-              LinearProgressIndicator(value: p.fraction),
+              LinearProgressIndicator(),
               const SizedBox(height: 8),
-              Text('${p.completed} of ${p.total} months'),
-              if (p.currentFolder != null) ...[
+              Text(p.phase == IndexingPhase.reading
+                  ? 'Reading metadata for ${p.newFiles} files…'
+                  : '${p.filesFound} files found'),
+              if (p.currentDir != null) ...[
                 const SizedBox(height: 4),
-                Text(p.currentFolder!,
+                Text(p.currentDir!,
                     style: TextStyle(
                         color: context.colors.textSecondary, fontSize: 12)),
               ],
