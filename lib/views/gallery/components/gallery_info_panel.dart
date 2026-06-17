@@ -5,6 +5,7 @@ import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class GalleryInfoPanel extends ConsumerStatefulWidget {
   const GalleryInfoPanel({super.key, required this.item});
@@ -106,23 +107,7 @@ class _PhotoDetailPanelState extends ConsumerState<GalleryInfoPanel> {
 
   static String _formatDate(DateTime? dt) {
     if (dt == null) return 'Unknown date';
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final h = dt.hour.toString().padLeft(2, '0');
-    final m = dt.minute.toString().padLeft(2, '0');
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}  $h:$m';
+    return DateFormat('d MMM yyyy  HH:mm').format(dt);
   }
 }
 

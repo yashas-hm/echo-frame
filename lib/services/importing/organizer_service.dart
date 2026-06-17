@@ -2,8 +2,8 @@ import 'dart:developer' as dev;
 
 import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/folder_tree.dart';
-import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/services/importing/import_service.dart';
+import 'package:intl/intl.dart';
 
 class OrganizerService extends ImportService {
   @override
@@ -23,7 +23,8 @@ class OrganizerService extends ImportService {
 
     final planned = <DiscoveryData>[];
     final discoveryErrors = <DiscoveryError>[];
-    final treeData = <int, Map<String, int>>{};
+    final treeData = <int, Map<int, int>>{};
+    final monthFmt = DateFormat('MMMM');
 
     for (final mediaPath in allMediaPaths) {
       final mmp = mmpByPath[mediaPath];
@@ -39,7 +40,8 @@ class OrganizerService extends ImportService {
       }
 
       final year = mmp.capturedAt.year;
-      final monthName = MonthFolder.monthNames[mmp.capturedAt.month - 1];
+      final month = mmp.capturedAt.month;
+      final monthName = monthFmt.format(mmp.capturedAt);
       final filename = mediaPath.split('/').last;
       final destPath =
           ImportService.resolveConflict('$destRoot/$year/$monthName/$filename');
@@ -50,8 +52,7 @@ class OrganizerService extends ImportService {
         meta: mmp.copyWith(path: destPath),
       ));
 
-      (treeData[year] ??= {})[monthName] =
-          (treeData[year]![monthName] ?? 0) + 1;
+      (treeData[year] ??= {})[month] = (treeData[year]![month] ?? 0) + 1;
     }
 
     yield DiscoverDone(

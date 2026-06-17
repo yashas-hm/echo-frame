@@ -7,5 +7,4 @@ class MonthData {
 
   const MonthData({required this.year, required this.month, required this.items});
 
-  String get monthName => MonthFolder.monthNames[month - 1];
 }

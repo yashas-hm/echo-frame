@@ -4,6 +4,7 @@ import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/services/cache_service.dart';
 import 'package:echo_frame/services/drive_service.dart';
+import 'package:intl/intl.dart';
 
 class IndexingProgress {
   final int completed;
@@ -52,7 +53,7 @@ class IndexingService {
       yield IndexingProgress(
         completed: i,
         total: months.length,
-        currentFolder: '${folder.year}/${folder.monthName}',
+        currentFolder: '${folder.year}/${DateFormat('MMMM').format(DateTime(folder.year, folder.month))}',
       );
 
       final index = await indexService.getOrBuild(folder);

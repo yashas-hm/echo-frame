@@ -13,6 +13,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class TimelineScreen extends ConsumerStatefulWidget {
   const TimelineScreen({super.key});
@@ -154,7 +155,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 17),
                         child: Text(
-                          '${month.monthName} ${month.year}',
+                          DateFormat('MMMM yyyy').format(DateTime(month.year, month.month)),
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall

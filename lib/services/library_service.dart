@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:echo_frame/models/timeline/timeline_models.dart';
+import 'package:intl/intl.dart';
 
 class LibraryStructure {
   final List<MonthFolder> months;
@@ -45,12 +46,15 @@ class LibraryService {
         if (year != null && year > 1900 && year < 2100) {
           await for (final sub in entry.list()) {
             if (sub is Directory) {
-              final monthIdx =
-                  MonthFolder.monthNames.indexOf(sub.path.split('/').last);
-              if (monthIdx >= 0) {
+              final folderName = sub.path.split('/').last;
+              int? month;
+              try {
+                month = DateFormat('MMMM').parseStrict(folderName).month;
+              } catch (_) {}
+              if (month != null) {
                 organized.add(MonthFolder(
                   year: year,
-                  month: monthIdx + 1,
+                  month: month,
                   path: sub.path,
                 ));
               }
