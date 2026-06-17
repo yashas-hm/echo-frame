@@ -99,8 +99,6 @@ class OrganizerNotifier extends Notifier<OrganizerState> {
     final destRoot = state.destRoot;
     if (plan == null || destRoot == null) return;
 
-    final batchId = DateTime.now().millisecondsSinceEpoch.toString();
-
     state = state.copyWith(
       phase: OrganizerPhase.applying,
       applied: 0,
@@ -112,7 +110,6 @@ class OrganizerNotifier extends Notifier<OrganizerState> {
       await for (final progress in _service.apply(
         plan: plan,
         libraryRoot: destRoot,
-        batchId: batchId,
       )) {
         state = state.copyWith(
           applied: progress.imported,

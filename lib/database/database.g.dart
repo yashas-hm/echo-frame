@@ -8,9 +8,7 @@ class $MediaRecordsTable extends MediaRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-
   $MediaRecordsTable(this.attachedDatabase, [this._alias]);
-
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -164,7 +162,6 @@ class $MediaRecordsTable extends MediaRecords
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("has_json_index" IN (0, 1))'),
       defaultValue: const Constant(false));
-
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -191,14 +188,11 @@ class $MediaRecordsTable extends MediaRecords
         isTrashed,
         hasJsonIndex
       ];
-
   @override
   String get aliasedName => _alias ?? actualTableName;
-
   @override
   String get actualTableName => $name;
   static const String $name = 'media_records';
-
   @override
   VerificationContext validateIntegrity(Insertable<MediaRecord> instance,
       {bool isInserting = false}) {
@@ -332,7 +326,6 @@ class $MediaRecordsTable extends MediaRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
-
   @override
   MediaRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -416,7 +409,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final bool isFavorite;
   final bool isTrashed;
   final bool hasJsonIndex;
-
   const MediaRecord(
       {required this.id,
       required this.filePath,
@@ -441,7 +433,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       required this.isFavorite,
       required this.isTrashed,
       required this.hasJsonIndex});
-
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -578,7 +569,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       hasJsonIndex: serializer.fromJson<bool>(json['hasJsonIndex']),
     );
   }
-
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -661,7 +651,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         isTrashed: isTrashed ?? this.isTrashed,
         hasJsonIndex: hasJsonIndex ?? this.hasJsonIndex,
       );
-
   MediaRecord copyWithCompanion(MediaRecordsCompanion data) {
     return MediaRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -762,7 +751,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         isTrashed,
         hasJsonIndex
       ]);
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -816,7 +804,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<bool> isFavorite;
   final Value<bool> isTrashed;
   final Value<bool> hasJsonIndex;
-
   const MediaRecordsCompanion({
     this.id = const Value.absent(),
     this.filePath = const Value.absent(),
@@ -842,7 +829,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.isTrashed = const Value.absent(),
     this.hasJsonIndex = const Value.absent(),
   });
-
   MediaRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String filePath,
@@ -872,7 +858,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
         relativePath = Value(relativePath),
         filename = Value(filename),
         indexedAt = Value(indexedAt);
-
   static Insertable<MediaRecord> custom({
     Expression<int>? id,
     Expression<String>? filePath,
@@ -1087,9 +1072,7 @@ class $DriveRecordsTable extends DriveRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-
   $DriveRecordsTable(this.attachedDatabase, [this._alias]);
-
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1137,18 +1120,14 @@ class $DriveRecordsTable extends DriveRecords
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_online" IN (0, 1))'),
       defaultValue: const Constant(false));
-
   @override
   List<GeneratedColumn> get $columns =>
       [id, uuid, label, lastMountPath, firstIndexedAt, lastScannedAt, isOnline];
-
   @override
   String get aliasedName => _alias ?? actualTableName;
-
   @override
   String get actualTableName => $name;
   static const String $name = 'drive_records';
-
   @override
   VerificationContext validateIntegrity(Insertable<DriveRecord> instance,
       {bool isInserting = false}) {
@@ -1198,7 +1177,6 @@ class $DriveRecordsTable extends DriveRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
-
   @override
   DriveRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1234,7 +1212,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
   final DateTime firstIndexedAt;
   final DateTime? lastScannedAt;
   final bool isOnline;
-
   const DriveRecord(
       {required this.id,
       required this.uuid,
@@ -1243,7 +1220,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
       required this.firstIndexedAt,
       this.lastScannedAt,
       required this.isOnline});
-
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1290,7 +1266,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
       isOnline: serializer.fromJson<bool>(json['isOnline']),
     );
   }
-
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -1324,7 +1299,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
             lastScannedAt.present ? lastScannedAt.value : this.lastScannedAt,
         isOnline: isOnline ?? this.isOnline,
       );
-
   DriveRecord copyWithCompanion(DriveRecordsCompanion data) {
     return DriveRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -1360,7 +1334,6 @@ class DriveRecord extends DataClass implements Insertable<DriveRecord> {
   @override
   int get hashCode => Object.hash(
       id, uuid, label, lastMountPath, firstIndexedAt, lastScannedAt, isOnline);
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1382,7 +1355,6 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
   final Value<DateTime> firstIndexedAt;
   final Value<DateTime?> lastScannedAt;
   final Value<bool> isOnline;
-
   const DriveRecordsCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
@@ -1392,7 +1364,6 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
     this.lastScannedAt = const Value.absent(),
     this.isOnline = const Value.absent(),
   });
-
   DriveRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
@@ -1404,7 +1375,6 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
   })  : uuid = Value(uuid),
         label = Value(label),
         firstIndexedAt = Value(firstIndexedAt);
-
   static Insertable<DriveRecord> custom({
     Expression<int>? id,
     Expression<String>? uuid,
@@ -1486,465 +1456,17 @@ class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
   }
 }
 
-class $OperationRecordsTable extends OperationRecords
-    with TableInfo<$OperationRecordsTable, OperationRecord> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-
-  $OperationRecordsTable(this.attachedDatabase, [this._alias]);
-
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _batchIdMeta =
-      const VerificationMeta('batchId');
-  @override
-  late final GeneratedColumn<String> batchId = GeneratedColumn<String>(
-      'batch_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _opTypeMeta = const VerificationMeta('opType');
-  @override
-  late final GeneratedColumn<String> opType = GeneratedColumn<String>(
-      'op_type', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _sourcePathMeta =
-      const VerificationMeta('sourcePath');
-  @override
-  late final GeneratedColumn<String> sourcePath = GeneratedColumn<String>(
-      'source_path', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _destPathMeta =
-      const VerificationMeta('destPath');
-  @override
-  late final GeneratedColumn<String> destPath = GeneratedColumn<String>(
-      'dest_path', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _appliedAtMeta =
-      const VerificationMeta('appliedAt');
-  @override
-  late final GeneratedColumn<DateTime> appliedAt = GeneratedColumn<DateTime>(
-      'applied_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _rolledBackAtMeta =
-      const VerificationMeta('rolledBackAt');
-  @override
-  late final GeneratedColumn<DateTime> rolledBackAt = GeneratedColumn<DateTime>(
-      'rolled_back_at', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _isDryRunMeta =
-      const VerificationMeta('isDryRun');
-  @override
-  late final GeneratedColumn<bool> isDryRun = GeneratedColumn<bool>(
-      'is_dry_run', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("is_dry_run" IN (0, 1))'),
-      defaultValue: const Constant(false));
-
-  @override
-  List<GeneratedColumn> get $columns => [
-        id,
-        batchId,
-        opType,
-        sourcePath,
-        destPath,
-        appliedAt,
-        rolledBackAt,
-        isDryRun
-      ];
-
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'operation_records';
-
-  @override
-  VerificationContext validateIntegrity(Insertable<OperationRecord> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('batch_id')) {
-      context.handle(_batchIdMeta,
-          batchId.isAcceptableOrUnknown(data['batch_id']!, _batchIdMeta));
-    } else if (isInserting) {
-      context.missing(_batchIdMeta);
-    }
-    if (data.containsKey('op_type')) {
-      context.handle(_opTypeMeta,
-          opType.isAcceptableOrUnknown(data['op_type']!, _opTypeMeta));
-    } else if (isInserting) {
-      context.missing(_opTypeMeta);
-    }
-    if (data.containsKey('source_path')) {
-      context.handle(
-          _sourcePathMeta,
-          sourcePath.isAcceptableOrUnknown(
-              data['source_path']!, _sourcePathMeta));
-    } else if (isInserting) {
-      context.missing(_sourcePathMeta);
-    }
-    if (data.containsKey('dest_path')) {
-      context.handle(_destPathMeta,
-          destPath.isAcceptableOrUnknown(data['dest_path']!, _destPathMeta));
-    } else if (isInserting) {
-      context.missing(_destPathMeta);
-    }
-    if (data.containsKey('applied_at')) {
-      context.handle(_appliedAtMeta,
-          appliedAt.isAcceptableOrUnknown(data['applied_at']!, _appliedAtMeta));
-    } else if (isInserting) {
-      context.missing(_appliedAtMeta);
-    }
-    if (data.containsKey('rolled_back_at')) {
-      context.handle(
-          _rolledBackAtMeta,
-          rolledBackAt.isAcceptableOrUnknown(
-              data['rolled_back_at']!, _rolledBackAtMeta));
-    }
-    if (data.containsKey('is_dry_run')) {
-      context.handle(_isDryRunMeta,
-          isDryRun.isAcceptableOrUnknown(data['is_dry_run']!, _isDryRunMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-
-  @override
-  OperationRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return OperationRecord(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      batchId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}batch_id'])!,
-      opType: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}op_type'])!,
-      sourcePath: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source_path'])!,
-      destPath: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}dest_path'])!,
-      appliedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}applied_at'])!,
-      rolledBackAt: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}rolled_back_at']),
-      isDryRun: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}is_dry_run'])!,
-    );
-  }
-
-  @override
-  $OperationRecordsTable createAlias(String alias) {
-    return $OperationRecordsTable(attachedDatabase, alias);
-  }
-}
-
-class OperationRecord extends DataClass implements Insertable<OperationRecord> {
-  final int id;
-  final String batchId;
-  final String opType;
-  final String sourcePath;
-  final String destPath;
-  final DateTime appliedAt;
-  final DateTime? rolledBackAt;
-  final bool isDryRun;
-
-  const OperationRecord(
-      {required this.id,
-      required this.batchId,
-      required this.opType,
-      required this.sourcePath,
-      required this.destPath,
-      required this.appliedAt,
-      this.rolledBackAt,
-      required this.isDryRun});
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['batch_id'] = Variable<String>(batchId);
-    map['op_type'] = Variable<String>(opType);
-    map['source_path'] = Variable<String>(sourcePath);
-    map['dest_path'] = Variable<String>(destPath);
-    map['applied_at'] = Variable<DateTime>(appliedAt);
-    if (!nullToAbsent || rolledBackAt != null) {
-      map['rolled_back_at'] = Variable<DateTime>(rolledBackAt);
-    }
-    map['is_dry_run'] = Variable<bool>(isDryRun);
-    return map;
-  }
-
-  OperationRecordsCompanion toCompanion(bool nullToAbsent) {
-    return OperationRecordsCompanion(
-      id: Value(id),
-      batchId: Value(batchId),
-      opType: Value(opType),
-      sourcePath: Value(sourcePath),
-      destPath: Value(destPath),
-      appliedAt: Value(appliedAt),
-      rolledBackAt: rolledBackAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(rolledBackAt),
-      isDryRun: Value(isDryRun),
-    );
-  }
-
-  factory OperationRecord.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return OperationRecord(
-      id: serializer.fromJson<int>(json['id']),
-      batchId: serializer.fromJson<String>(json['batchId']),
-      opType: serializer.fromJson<String>(json['opType']),
-      sourcePath: serializer.fromJson<String>(json['sourcePath']),
-      destPath: serializer.fromJson<String>(json['destPath']),
-      appliedAt: serializer.fromJson<DateTime>(json['appliedAt']),
-      rolledBackAt: serializer.fromJson<DateTime?>(json['rolledBackAt']),
-      isDryRun: serializer.fromJson<bool>(json['isDryRun']),
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'batchId': serializer.toJson<String>(batchId),
-      'opType': serializer.toJson<String>(opType),
-      'sourcePath': serializer.toJson<String>(sourcePath),
-      'destPath': serializer.toJson<String>(destPath),
-      'appliedAt': serializer.toJson<DateTime>(appliedAt),
-      'rolledBackAt': serializer.toJson<DateTime?>(rolledBackAt),
-      'isDryRun': serializer.toJson<bool>(isDryRun),
-    };
-  }
-
-  OperationRecord copyWith(
-          {int? id,
-          String? batchId,
-          String? opType,
-          String? sourcePath,
-          String? destPath,
-          DateTime? appliedAt,
-          Value<DateTime?> rolledBackAt = const Value.absent(),
-          bool? isDryRun}) =>
-      OperationRecord(
-        id: id ?? this.id,
-        batchId: batchId ?? this.batchId,
-        opType: opType ?? this.opType,
-        sourcePath: sourcePath ?? this.sourcePath,
-        destPath: destPath ?? this.destPath,
-        appliedAt: appliedAt ?? this.appliedAt,
-        rolledBackAt:
-            rolledBackAt.present ? rolledBackAt.value : this.rolledBackAt,
-        isDryRun: isDryRun ?? this.isDryRun,
-      );
-
-  OperationRecord copyWithCompanion(OperationRecordsCompanion data) {
-    return OperationRecord(
-      id: data.id.present ? data.id.value : this.id,
-      batchId: data.batchId.present ? data.batchId.value : this.batchId,
-      opType: data.opType.present ? data.opType.value : this.opType,
-      sourcePath:
-          data.sourcePath.present ? data.sourcePath.value : this.sourcePath,
-      destPath: data.destPath.present ? data.destPath.value : this.destPath,
-      appliedAt: data.appliedAt.present ? data.appliedAt.value : this.appliedAt,
-      rolledBackAt: data.rolledBackAt.present
-          ? data.rolledBackAt.value
-          : this.rolledBackAt,
-      isDryRun: data.isDryRun.present ? data.isDryRun.value : this.isDryRun,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('OperationRecord(')
-          ..write('id: $id, ')
-          ..write('batchId: $batchId, ')
-          ..write('opType: $opType, ')
-          ..write('sourcePath: $sourcePath, ')
-          ..write('destPath: $destPath, ')
-          ..write('appliedAt: $appliedAt, ')
-          ..write('rolledBackAt: $rolledBackAt, ')
-          ..write('isDryRun: $isDryRun')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, batchId, opType, sourcePath, destPath,
-      appliedAt, rolledBackAt, isDryRun);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is OperationRecord &&
-          other.id == this.id &&
-          other.batchId == this.batchId &&
-          other.opType == this.opType &&
-          other.sourcePath == this.sourcePath &&
-          other.destPath == this.destPath &&
-          other.appliedAt == this.appliedAt &&
-          other.rolledBackAt == this.rolledBackAt &&
-          other.isDryRun == this.isDryRun);
-}
-
-class OperationRecordsCompanion extends UpdateCompanion<OperationRecord> {
-  final Value<int> id;
-  final Value<String> batchId;
-  final Value<String> opType;
-  final Value<String> sourcePath;
-  final Value<String> destPath;
-  final Value<DateTime> appliedAt;
-  final Value<DateTime?> rolledBackAt;
-  final Value<bool> isDryRun;
-
-  const OperationRecordsCompanion({
-    this.id = const Value.absent(),
-    this.batchId = const Value.absent(),
-    this.opType = const Value.absent(),
-    this.sourcePath = const Value.absent(),
-    this.destPath = const Value.absent(),
-    this.appliedAt = const Value.absent(),
-    this.rolledBackAt = const Value.absent(),
-    this.isDryRun = const Value.absent(),
-  });
-
-  OperationRecordsCompanion.insert({
-    this.id = const Value.absent(),
-    required String batchId,
-    required String opType,
-    required String sourcePath,
-    required String destPath,
-    required DateTime appliedAt,
-    this.rolledBackAt = const Value.absent(),
-    this.isDryRun = const Value.absent(),
-  })  : batchId = Value(batchId),
-        opType = Value(opType),
-        sourcePath = Value(sourcePath),
-        destPath = Value(destPath),
-        appliedAt = Value(appliedAt);
-
-  static Insertable<OperationRecord> custom({
-    Expression<int>? id,
-    Expression<String>? batchId,
-    Expression<String>? opType,
-    Expression<String>? sourcePath,
-    Expression<String>? destPath,
-    Expression<DateTime>? appliedAt,
-    Expression<DateTime>? rolledBackAt,
-    Expression<bool>? isDryRun,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (batchId != null) 'batch_id': batchId,
-      if (opType != null) 'op_type': opType,
-      if (sourcePath != null) 'source_path': sourcePath,
-      if (destPath != null) 'dest_path': destPath,
-      if (appliedAt != null) 'applied_at': appliedAt,
-      if (rolledBackAt != null) 'rolled_back_at': rolledBackAt,
-      if (isDryRun != null) 'is_dry_run': isDryRun,
-    });
-  }
-
-  OperationRecordsCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? batchId,
-      Value<String>? opType,
-      Value<String>? sourcePath,
-      Value<String>? destPath,
-      Value<DateTime>? appliedAt,
-      Value<DateTime?>? rolledBackAt,
-      Value<bool>? isDryRun}) {
-    return OperationRecordsCompanion(
-      id: id ?? this.id,
-      batchId: batchId ?? this.batchId,
-      opType: opType ?? this.opType,
-      sourcePath: sourcePath ?? this.sourcePath,
-      destPath: destPath ?? this.destPath,
-      appliedAt: appliedAt ?? this.appliedAt,
-      rolledBackAt: rolledBackAt ?? this.rolledBackAt,
-      isDryRun: isDryRun ?? this.isDryRun,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (batchId.present) {
-      map['batch_id'] = Variable<String>(batchId.value);
-    }
-    if (opType.present) {
-      map['op_type'] = Variable<String>(opType.value);
-    }
-    if (sourcePath.present) {
-      map['source_path'] = Variable<String>(sourcePath.value);
-    }
-    if (destPath.present) {
-      map['dest_path'] = Variable<String>(destPath.value);
-    }
-    if (appliedAt.present) {
-      map['applied_at'] = Variable<DateTime>(appliedAt.value);
-    }
-    if (rolledBackAt.present) {
-      map['rolled_back_at'] = Variable<DateTime>(rolledBackAt.value);
-    }
-    if (isDryRun.present) {
-      map['is_dry_run'] = Variable<bool>(isDryRun.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('OperationRecordsCompanion(')
-          ..write('id: $id, ')
-          ..write('batchId: $batchId, ')
-          ..write('opType: $opType, ')
-          ..write('sourcePath: $sourcePath, ')
-          ..write('destPath: $destPath, ')
-          ..write('appliedAt: $appliedAt, ')
-          ..write('rolledBackAt: $rolledBackAt, ')
-          ..write('isDryRun: $isDryRun')
-          ..write(')'))
-        .toString();
-  }
-}
-
 abstract class _$EchoDatabase extends GeneratedDatabase {
   _$EchoDatabase(QueryExecutor e) : super(e);
-
   $EchoDatabaseManager get managers => $EchoDatabaseManager(this);
   late final $MediaRecordsTable mediaRecords = $MediaRecordsTable(this);
   late final $DriveRecordsTable driveRecords = $DriveRecordsTable(this);
-  late final $OperationRecordsTable operationRecords =
-      $OperationRecordsTable(this);
-
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
-
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [mediaRecords, driveRecords, operationRecords];
+      [mediaRecords, driveRecords];
 }
 
 typedef $$MediaRecordsTableCreateCompanionBuilder = MediaRecordsCompanion
@@ -2009,7 +1531,6 @@ class $$MediaRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -2089,7 +1610,6 @@ class $$MediaRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -2174,7 +1694,6 @@ class $$MediaRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -2422,7 +1941,6 @@ class $$DriveRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -2455,7 +1973,6 @@ class $$DriveRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -2490,7 +2007,6 @@ class $$DriveRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -2596,235 +2112,12 @@ typedef $$DriveRecordsTableProcessedTableManager = ProcessedTableManager<
     ),
     DriveRecord,
     PrefetchHooks Function()>;
-typedef $$OperationRecordsTableCreateCompanionBuilder
-    = OperationRecordsCompanion Function({
-  Value<int> id,
-  required String batchId,
-  required String opType,
-  required String sourcePath,
-  required String destPath,
-  required DateTime appliedAt,
-  Value<DateTime?> rolledBackAt,
-  Value<bool> isDryRun,
-});
-typedef $$OperationRecordsTableUpdateCompanionBuilder
-    = OperationRecordsCompanion Function({
-  Value<int> id,
-  Value<String> batchId,
-  Value<String> opType,
-  Value<String> sourcePath,
-  Value<String> destPath,
-  Value<DateTime> appliedAt,
-  Value<DateTime?> rolledBackAt,
-  Value<bool> isDryRun,
-});
-
-class $$OperationRecordsTableFilterComposer
-    extends Composer<_$EchoDatabase, $OperationRecordsTable> {
-  $$OperationRecordsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-
-  ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get batchId => $composableBuilder(
-      column: $table.batchId, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get opType => $composableBuilder(
-      column: $table.opType, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get sourcePath => $composableBuilder(
-      column: $table.sourcePath, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get destPath => $composableBuilder(
-      column: $table.destPath, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get appliedAt => $composableBuilder(
-      column: $table.appliedAt, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get rolledBackAt => $composableBuilder(
-      column: $table.rolledBackAt, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<bool> get isDryRun => $composableBuilder(
-      column: $table.isDryRun, builder: (column) => ColumnFilters(column));
-}
-
-class $$OperationRecordsTableOrderingComposer
-    extends Composer<_$EchoDatabase, $OperationRecordsTable> {
-  $$OperationRecordsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-
-  ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get batchId => $composableBuilder(
-      column: $table.batchId, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get opType => $composableBuilder(
-      column: $table.opType, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get sourcePath => $composableBuilder(
-      column: $table.sourcePath, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get destPath => $composableBuilder(
-      column: $table.destPath, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get appliedAt => $composableBuilder(
-      column: $table.appliedAt, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get rolledBackAt => $composableBuilder(
-      column: $table.rolledBackAt,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<bool> get isDryRun => $composableBuilder(
-      column: $table.isDryRun, builder: (column) => ColumnOrderings(column));
-}
-
-class $$OperationRecordsTableAnnotationComposer
-    extends Composer<_$EchoDatabase, $OperationRecordsTable> {
-  $$OperationRecordsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get batchId =>
-      $composableBuilder(column: $table.batchId, builder: (column) => column);
-
-  GeneratedColumn<String> get opType =>
-      $composableBuilder(column: $table.opType, builder: (column) => column);
-
-  GeneratedColumn<String> get sourcePath => $composableBuilder(
-      column: $table.sourcePath, builder: (column) => column);
-
-  GeneratedColumn<String> get destPath =>
-      $composableBuilder(column: $table.destPath, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get appliedAt =>
-      $composableBuilder(column: $table.appliedAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get rolledBackAt => $composableBuilder(
-      column: $table.rolledBackAt, builder: (column) => column);
-
-  GeneratedColumn<bool> get isDryRun =>
-      $composableBuilder(column: $table.isDryRun, builder: (column) => column);
-}
-
-class $$OperationRecordsTableTableManager extends RootTableManager<
-    _$EchoDatabase,
-    $OperationRecordsTable,
-    OperationRecord,
-    $$OperationRecordsTableFilterComposer,
-    $$OperationRecordsTableOrderingComposer,
-    $$OperationRecordsTableAnnotationComposer,
-    $$OperationRecordsTableCreateCompanionBuilder,
-    $$OperationRecordsTableUpdateCompanionBuilder,
-    (
-      OperationRecord,
-      BaseReferences<_$EchoDatabase, $OperationRecordsTable, OperationRecord>
-    ),
-    OperationRecord,
-    PrefetchHooks Function()> {
-  $$OperationRecordsTableTableManager(
-      _$EchoDatabase db, $OperationRecordsTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$OperationRecordsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$OperationRecordsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$OperationRecordsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> batchId = const Value.absent(),
-            Value<String> opType = const Value.absent(),
-            Value<String> sourcePath = const Value.absent(),
-            Value<String> destPath = const Value.absent(),
-            Value<DateTime> appliedAt = const Value.absent(),
-            Value<DateTime?> rolledBackAt = const Value.absent(),
-            Value<bool> isDryRun = const Value.absent(),
-          }) =>
-              OperationRecordsCompanion(
-            id: id,
-            batchId: batchId,
-            opType: opType,
-            sourcePath: sourcePath,
-            destPath: destPath,
-            appliedAt: appliedAt,
-            rolledBackAt: rolledBackAt,
-            isDryRun: isDryRun,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String batchId,
-            required String opType,
-            required String sourcePath,
-            required String destPath,
-            required DateTime appliedAt,
-            Value<DateTime?> rolledBackAt = const Value.absent(),
-            Value<bool> isDryRun = const Value.absent(),
-          }) =>
-              OperationRecordsCompanion.insert(
-            id: id,
-            batchId: batchId,
-            opType: opType,
-            sourcePath: sourcePath,
-            destPath: destPath,
-            appliedAt: appliedAt,
-            rolledBackAt: rolledBackAt,
-            isDryRun: isDryRun,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ));
-}
-
-typedef $$OperationRecordsTableProcessedTableManager = ProcessedTableManager<
-    _$EchoDatabase,
-    $OperationRecordsTable,
-    OperationRecord,
-    $$OperationRecordsTableFilterComposer,
-    $$OperationRecordsTableOrderingComposer,
-    $$OperationRecordsTableAnnotationComposer,
-    $$OperationRecordsTableCreateCompanionBuilder,
-    $$OperationRecordsTableUpdateCompanionBuilder,
-    (
-      OperationRecord,
-      BaseReferences<_$EchoDatabase, $OperationRecordsTable, OperationRecord>
-    ),
-    OperationRecord,
-    PrefetchHooks Function()>;
 
 class $EchoDatabaseManager {
   final _$EchoDatabase _db;
-
   $EchoDatabaseManager(this._db);
-
   $$MediaRecordsTableTableManager get mediaRecords =>
       $$MediaRecordsTableTableManager(_db, _db.mediaRecords);
-
   $$DriveRecordsTableTableManager get driveRecords =>
       $$DriveRecordsTableTableManager(_db, _db.driveRecords);
-
-  $$OperationRecordsTableTableManager get operationRecords =>
-      $$OperationRecordsTableTableManager(_db, _db.operationRecords);
 }

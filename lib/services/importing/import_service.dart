@@ -2,9 +2,7 @@ import 'dart:collection';
 import 'dart:developer' as dev;
 import 'dart:io';
 
-import 'package:drift/drift.dart';
 import 'package:echo_frame/database/daos/media_dao.dart';
-import 'package:echo_frame/database/daos/operation_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/metadata.dart';
@@ -131,13 +129,11 @@ abstract class ImportService {
   Stream<ImportProgress> apply({
     required DiscoveryResult plan,
     required String libraryRoot,
-    required String batchId,
   }) async* {
     if (plan.items.isEmpty) return;
 
     final db = EchoDatabase.instance;
     final mediaDao = MediaDao(db);
-    final opDao = OperationDao(db);
     final driveId = await DriveService.volumeUuid(libraryRoot);
 
     int imported = 0;
@@ -166,13 +162,6 @@ abstract class ImportService {
       imported++;
 
       try {
-        await opDao.insert(OperationRecordsCompanion(
-          batchId: Value(batchId),
-          opType: const Value('copy'),
-          sourcePath: Value(item.mediaPath),
-          destPath: Value(item.destPath),
-          appliedAt: Value(DateTime.now().toUtc()),
-        ));
         if (LibraryService.isVideo(item.destPath)) {
           await ThumbnailService.generate(item.destPath);
         }

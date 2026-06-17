@@ -4,11 +4,10 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:echo_frame/database/schemas/drive_schema.dart';
 import 'package:echo_frame/database/schemas/media_schema.dart';
-import 'package:echo_frame/database/schemas/operation_schema.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [MediaRecords, DriveRecords, OperationRecords])
+@DriftDatabase(tables: [MediaRecords, DriveRecords])
 class EchoDatabase extends _$EchoDatabase {
   EchoDatabase(super.e);
 
@@ -26,10 +25,6 @@ class EchoDatabase extends _$EchoDatabase {
           await customStatement(
             'CREATE INDEX IF NOT EXISTS idx_media_captured_at '
             'ON media_records (captured_at)',
-          );
-          await customStatement(
-            'CREATE INDEX IF NOT EXISTS idx_op_batch_id '
-            'ON operation_records (batch_id)',
           );
         },
       );

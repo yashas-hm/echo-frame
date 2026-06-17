@@ -96,8 +96,6 @@ class ImportNotifier extends Notifier<ImportState> {
     final libraryRoot = state.libraryRoot;
     if (plan == null || libraryRoot == null) return;
 
-    final batchId = DateTime.now().millisecondsSinceEpoch.toString();
-
     state = state.copyWith(
       phase: ImportPhase.importing,
       imported: 0,
@@ -109,7 +107,6 @@ class ImportNotifier extends Notifier<ImportState> {
       await for (final progress in _service.apply(
         plan: plan,
         libraryRoot: libraryRoot,
-        batchId: batchId,
       )) {
         state = state.copyWith(
           imported: progress.imported,
