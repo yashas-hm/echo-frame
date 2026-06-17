@@ -6,9 +6,9 @@ import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/discovery/takeout_sidecar.dart';
 import 'package:echo_frame/models/folder_tree.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
-import 'package:echo_frame/services/import_service.dart';
+import 'package:echo_frame/services/importing/import_service.dart';
 
-export 'package:echo_frame/services/import_service.dart' show ImportProgress;
+export 'package:echo_frame/services/importing/import_service.dart' show ImportProgress;
 
 class TakeoutService extends ImportService {
   @override

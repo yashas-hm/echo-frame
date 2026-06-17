@@ -1,5 +1,5 @@
 import 'package:echo_frame/models/discovery/discovery.dart';
-import 'package:echo_frame/services/takeout_service.dart';
+import 'package:echo_frame/services/importing/takeout_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

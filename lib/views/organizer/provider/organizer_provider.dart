@@ -1,10 +1,10 @@
 import 'package:echo_frame/models/discovery/discovery.dart';
-import 'package:echo_frame/services/organizer_service.dart';
+import 'package:echo_frame/services/importing/organizer_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-export 'package:echo_frame/services/import_service.dart' show ImportProgress;
+export 'package:echo_frame/services/importing/import_service.dart' show ImportProgress;
 
 enum OrganizerPhase { idle, discovering, review, applying, done, error }
 

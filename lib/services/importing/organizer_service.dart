@@ -3,7 +3,7 @@ import 'dart:developer' as dev;
 import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/folder_tree.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
-import 'package:echo_frame/services/import_service.dart';
+import 'package:echo_frame/services/importing/import_service.dart';
 
 class OrganizerService extends ImportService {
   @override
