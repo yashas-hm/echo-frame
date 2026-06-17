@@ -1,4 +1,4 @@
-import 'package:echo_frame/models/google_takeout/discovery_error.dart';
+import 'package:echo_frame/models/discovery/discovery.dart' show DiscoveryError;
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
 import 'package:echo_frame/views/import/provider/import_provider.dart';
 import 'package:echo_frame/widgets/folder_tree_preview.dart';

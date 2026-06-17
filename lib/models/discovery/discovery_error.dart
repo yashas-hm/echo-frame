@@ -1,3 +1,5 @@
+part of 'discovery.dart';
+
 class DiscoveryError {
   const DiscoveryError({required this.sourcePath, required this.reason});
 

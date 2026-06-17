@@ -1,7 +1,7 @@
-import 'package:echo_frame/models/metadata.dart';
+part of 'discovery.dart';
 
-class PlannedImport {
-  const PlannedImport({
+class DiscoveryData {
+  const DiscoveryData({
     required this.mediaPath,
     required this.destPath,
     required this.meta,

@@ -8,11 +8,8 @@ import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/daos/operation_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/folder_tree.dart';
-import 'package:echo_frame/models/google_takeout/discover_event.dart';
-import 'package:echo_frame/models/google_takeout/discovery_error.dart';
-import 'package:echo_frame/models/google_takeout/import_plan.dart';
-import 'package:echo_frame/models/google_takeout/planned_import.dart';
-import 'package:echo_frame/models/google_takeout/takeout_models.dart';
+import 'package:echo_frame/models/discovery/discovery.dart';
+import 'package:echo_frame/models/discovery/takeout_sidecar.dart';
 import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
 import 'package:echo_frame/services/drive_service.dart';
@@ -113,7 +110,7 @@ class TakeoutService {
 
     // Build PlannedImports and FolderTree.
     // Files MMP couldn't read are recorded as discovery errors and excluded.
-    final planned = <PlannedImport>[];
+    final planned = <DiscoveryData>[];
     final discoveryErrors = <DiscoveryError>[];
     final treeData = <int, Map<String, int>>{};
 
@@ -153,7 +150,7 @@ class TakeoutService {
         mediaType: mmp.mediaType,
       );
 
-      planned.add(PlannedImport(
+      planned.add(DiscoveryData(
         mediaPath: mediaPath,
         destPath: destPath,
         meta: mergedMeta,
@@ -164,7 +161,7 @@ class TakeoutService {
     }
 
     yield DiscoverDone(
-      plan: ImportPlan(
+      plan: DiscoveryResult(
         items: planned,
         tree: FolderTree.fromMap(treeData),
         errors: discoveryErrors,
@@ -173,7 +170,7 @@ class TakeoutService {
   }
 
   static Stream<ImportProgress> apply({
-    required ImportPlan plan,
+    required DiscoveryResult plan,
     required String libraryRoot,
     required String batchId,
   }) async* {

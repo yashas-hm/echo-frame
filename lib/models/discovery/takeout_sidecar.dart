@@ -1,5 +1,3 @@
-part of 'takeout_models.dart';
-
 /// Metadata parsed from a Google Takeout supplemental JSON sidecar.
 /// Internal to the import pipeline — not a domain model.
 class TakeoutSidecar {

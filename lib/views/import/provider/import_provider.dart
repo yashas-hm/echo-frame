@@ -1,6 +1,4 @@
-import 'package:echo_frame/models/google_takeout/discover_event.dart';
-import 'package:echo_frame/models/google_takeout/discovery_error.dart';
-import 'package:echo_frame/models/google_takeout/import_plan.dart';
+import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/services/takeout_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
@@ -25,7 +23,7 @@ class ImportState {
   final ImportPhase phase;
   final String? takeoutDir;
   final String? libraryRoot;
-  final ImportPlan? plan;
+  final DiscoveryResult? plan;
   final int imported;
   final int total;
   final String? scanningDir;
@@ -37,7 +35,7 @@ class ImportState {
     ImportPhase? phase,
     String? takeoutDir,
     String? libraryRoot,
-    ImportPlan? plan,
+    DiscoveryResult? plan,
     int? imported,
     int? total,
     String? scanningDir,

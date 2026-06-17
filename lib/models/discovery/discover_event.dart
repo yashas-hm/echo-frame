@@ -1,4 +1,4 @@
-import 'package:echo_frame/models/google_takeout/import_plan.dart';
+part of 'discovery.dart';
 
 sealed class DiscoverEvent {}
 
@@ -12,5 +12,5 @@ class DiscoverScanning extends DiscoverEvent {
 class DiscoverDone extends DiscoverEvent {
   DiscoverDone({required this.plan});
 
-  final ImportPlan plan;
+  final DiscoveryResult plan;
 }
