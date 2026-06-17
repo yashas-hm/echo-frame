@@ -1,6 +1,6 @@
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
-import 'package:echo_frame/views/import/import_report.dart';
 import 'package:echo_frame/views/import/provider/import_provider.dart';
+import 'package:echo_frame/widgets/folder_tree_preview.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +36,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
 
     return switch (state.phase) {
       ImportPhase.idle => _buildIdle(context, state),
-      ImportPhase.discovering => _buildSpinner('Scanning Takeout folder…'),
+      ImportPhase.discovering => _buildDiscovering(context, state),
       ImportPhase.review => _buildReview(context, state),
       ImportPhase.importing => _buildImporting(context, state),
       ImportPhase.done => _buildDone(context, state),
@@ -109,83 +109,72 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
     );
   }
 
-  // ── Review ────────────────────────────────────────────────────────────────
+  // ── Discovering ───────────────────────────────────────────────────────────
 
-  Widget _buildReview(BuildContext context, ImportState state) {
+  Widget _buildDiscovering(BuildContext context, ImportState state) {
     final theme = Theme.of(context);
-    final d = state.discovered!;
-    final notifier = ref.read(importProvider.notifier);
-    final total = d.pairs.length;
+    final dir = state.scanningDir;
+    final label = dir != null ? 'Scanning $dir…' : 'Scanning Takeout folder…';
 
     return Scaffold(
       body: Center(
-        child: SizedBox(
-          width: 480,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Ready to import',
-                  style: theme.textTheme.headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: 24),
-              if (total == 0)
-                _SummaryRow(
-                  icon: Icons.folder_off_outlined,
-                  color: context.colors.textSecondary,
-                  text: 'No media files found in the selected folder',
-                )
-              else ...[
-                if (d.withSidecar > 0)
-                  _SummaryRow(
-                    icon: Icons.check_circle_outline_rounded,
-                    color: context.colors.primaryColor,
-                    text:
-                        '${d.withSidecar} photo${d.withSidecar == 1 ? '' : 's'} '
-                        'with Takeout metadata',
-                  ),
-                if (d.withoutSidecar > 0) ...[
-                  const SizedBox(height: 10),
-                  _SummaryRow(
-                    icon: Icons.info_outline_rounded,
-                    color: context.colors.secondaryColor,
-                    text:
-                        '${d.withoutSidecar} photo${d.withoutSidecar == 1 ? '' : 's'} '
-                        'without sidecar (will use EXIF)',
-                  ),
-                ],
-                if (d.unmatched.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  _SummaryRow(
-                    icon: Icons.warning_amber_rounded,
-                    color: context.colors.surfacePrimary,
-                    text:
-                        '${d.unmatched.length} sidecar${d.unmatched.length == 1 ? '' : 's'} '
-                        'with no matching file — will be skipped',
-                  ),
-                ],
-              ],
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: notifier.reset,
-                    child: const Text('Cancel'),
-                  ),
-                  const SizedBox(width: 12),
-                  FilledButton.icon(
-                    onPressed: total == 0 ? null : notifier.apply,
-                    icon: const Icon(Icons.download_rounded),
-                    label: Text(total == 0
-                        ? 'Nothing to import'
-                        : 'Import $total Photo${total == 1 ? '' : 's'}'),
-                  ),
-                ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(label, style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 4),
+            if (state.filesFound > 0)
+              Text(
+                '${state.filesFound} file${state.filesFound == 1 ? '' : 's'} found',
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: context.colors.textSecondary),
               ),
-            ],
-          ),
+          ],
         ),
+      ),
+    );
+  }
+
+  // ── Review ────────────────────────────────────────────────────────────────
+
+  Widget _buildReview(BuildContext context, ImportState state) {
+    final plan = state.plan!;
+    final notifier = ref.read(importProvider.notifier);
+    final total = plan.total;
+
+    return Scaffold(
+      body: Column(
+        children: [
+          _PreviewHeader(
+            count: total,
+            verb: 'imported',
+          ),
+          const Divider(height: 1),
+          Expanded(child: FolderTreePreview(tree: plan.tree)),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: notifier.reset,
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 12),
+                FilledButton.icon(
+                  onPressed: total == 0 ? null : notifier.apply,
+                  icon: const Icon(Icons.download_rounded),
+                  label: Text(total == 0
+                      ? 'Nothing to import'
+                      : 'Import $total Photo${total == 1 ? '' : 's'}'),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -221,7 +210,6 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
   Widget _buildDone(BuildContext context, ImportState state) {
     final theme = Theme.of(context);
     final notifier = ref.read(importProvider.notifier);
-    final unmatched = state.discovered?.unmatched ?? [];
 
     return Scaffold(
       body: Center(
@@ -243,10 +231,6 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                   ),
                 ],
               ),
-              if (unmatched.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                ImportReport(unmatched: unmatched),
-              ],
               const SizedBox(height: 32),
               Align(
                 alignment: Alignment.centerRight,
@@ -393,28 +377,46 @@ class _PathRow extends StatelessWidget {
   }
 }
 
-class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({
-    required this.icon,
-    required this.color,
-    required this.text,
+class _PreviewHeader extends StatelessWidget {
+  const _PreviewHeader({
+    required this.count,
+    required this.verb,
   });
 
-  final IconData icon;
-  final Color color;
-  final String text;
+  final int count;
+  final String verb;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 18, color: color),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
-        ),
-      ],
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      child: Row(
+        children: [
+          Icon(Icons.drive_folder_upload_outlined,
+              size: 20, color: context.colors.primaryColor),
+          const SizedBox(width: 10),
+          Expanded(
+            child: count == 0
+                ? Text('No media files found',
+                    style: theme.textTheme.titleSmall)
+                : Text.rich(
+                    TextSpan(
+                      text: '$count photo${count == 1 ? '' : 's'}',
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.w600),
+                      children: [
+                        TextSpan(
+                          text: ' will be $verb into your library',
+                          style: theme.textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.normal),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

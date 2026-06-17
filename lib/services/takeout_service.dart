@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
@@ -6,6 +7,10 @@ import 'package:drift/drift.dart';
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/daos/operation_dao.dart';
 import 'package:echo_frame/database/database.dart';
+import 'package:echo_frame/models/folder_tree.dart';
+import 'package:echo_frame/models/google_takeout/discover_event.dart';
+import 'package:echo_frame/models/google_takeout/import_plan.dart';
+import 'package:echo_frame/models/google_takeout/planned_import.dart';
 import 'package:echo_frame/models/google_takeout/takeout_models.dart';
 import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/models/timeline/timeline_models.dart';
@@ -29,168 +34,169 @@ class ImportProgress {
 }
 
 class TakeoutService {
-  static Future<DiscoverResult> discover(String root) async {
-    final mediaPaths = <String>[];
-    final jsonPaths = <String>[];
+  static Stream<DiscoverEvent> discover({
+    required String takeoutDir,
+    required String libraryRoot,
+  }) async* {
+    final allMediaPaths = <String>[];
+    final sidecarMap = <String, TakeoutSidecar>{};
 
-    await for (final entity in Directory(root).list(recursive: true)) {
-      if (entity is! File) continue;
-      final path = entity.path;
-      if (path.endsWith('.json')) {
-        jsonPaths.add(path);
-      } else if (LibraryService.isMedia(path)) {
-        mediaPaths.add(path);
-      }
-    }
+    // BFS walk: yield scanning events per directory.
+    final queue = Queue<Directory>()..add(Directory(takeoutDir));
 
-    // Build per-directory media index: dir → { filename → absolutePath }
-    final mediaByDir = <String, Map<String, String>>{};
-    for (final path in mediaPaths) {
-      final dir = path.substring(0, path.lastIndexOf('/'));
-      final name = path.split('/').last;
-      (mediaByDir[dir] ??= {})[name] = path;
-    }
+    while (queue.isNotEmpty) {
+      final dir = queue.removeFirst();
+      final dirName = dir.path.split('/').last;
 
-    final matched = <MatchedPair>[];
-    final unmatched = <ImportError>[];
-    final claimedMedia = <String>{};
+      yield DiscoverScanning(dirName: dirName, filesFound: allMediaPaths.length);
 
-    for (final jsonPath in jsonPaths) {
-      // Parse JSON — skip if it doesn't look like a Takeout meta file
-      TakeoutSidecar? meta;
+      List<FileSystemEntity> entries;
       try {
-        final raw = await File(jsonPath).readAsString();
-        final json = jsonDecode(raw) as Map<String, dynamic>;
-        if (json['photoTakenTime'] == null && json['creationTime'] == null) {
-          continue;
-        }
-        meta = TakeoutSidecar.fromJson(json);
+        entries = dir.listSync();
       } catch (e, st) {
-        dev.log('Failed to parse sidecar $jsonPath: $e',
+        dev.log('Failed to list directory ${dir.path}: $e',
             stackTrace: st, name: 'TakeoutService.discover');
         continue;
       }
 
-      final jsonDir = jsonPath.substring(0, jsonPath.lastIndexOf('/'));
-      final jsonFilename = jsonPath.split('/').last;
-      final dirMedia = mediaByDir[jsonDir] ?? {};
-
-      String? foundPath;
-
-      // Strategy 1: strip ".json" suffix from sidecar name → exact match
-      if (jsonFilename.endsWith('.json')) {
-        final mediaName = jsonFilename.substring(0, jsonFilename.length - 5);
-        foundPath = dirMedia[mediaName];
+      // Index JSON files by their filename for O(1) sidecar lookup.
+      final jsonByName = <String, String>{};
+      for (final e in entries) {
+        if (e is File && e.path.endsWith('.json')) {
+          jsonByName[e.path.split('/').last] = e.path;
+        }
       }
 
-      // Strategy 2: title field match (handles 46-char truncation)
-      if (foundPath == null && meta.title.isNotEmpty) {
-        foundPath = dirMedia[meta.title];
+      for (final e in entries) {
+        if (e is! File) continue;
+        final mediaPath = e.path;
+        if (!LibraryService.isMedia(mediaPath)) continue;
 
-        if (foundPath == null) {
-          final dot = meta.title.lastIndexOf('.');
-          final base = dot > 0 ? meta.title.substring(0, dot) : meta.title;
-          if (base.length >= 46) {
-            final prefix = base.substring(0, 46);
-            foundPath = dirMedia.entries
-                .where((e) => e.key.startsWith(prefix))
-                .map((e) => e.value)
-                .firstOrNull;
+        allMediaPaths.add(mediaPath);
+
+        final filename = mediaPath.split('/').last;
+        // Sidecar: any file named `<filename>.<anything>.json` in the same dir.
+        final sidecarEntry = jsonByName.entries
+            .where((j) => j.key.startsWith('$filename.') && j.key.endsWith('.json'))
+            .firstOrNull;
+
+        if (sidecarEntry != null) {
+          try {
+            final raw = File(sidecarEntry.value).readAsStringSync();
+            final json = jsonDecode(raw) as Map<String, dynamic>;
+            if (json['photoTakenTime'] != null || json['creationTime'] != null) {
+              sidecarMap[mediaPath] = TakeoutSidecar.fromJson(json);
+            }
+          } catch (e, st) {
+            dev.log('Failed to parse sidecar ${sidecarEntry.value}: $e',
+                stackTrace: st, name: 'TakeoutService.discover');
           }
         }
       }
 
-      if (foundPath != null) {
-        claimedMedia.add(foundPath);
-        matched.add(MatchedPair(
-          mediaPath: foundPath,
-          sidecarPath: jsonPath,
-          meta: meta,
-        ));
-      } else {
-        unmatched.add(ImportError(
-          path: jsonPath,
-          reason: 'No media file found for sidecar',
-        ));
+      for (final e in entries) {
+        if (e is Directory) queue.add(e);
       }
     }
 
-    // Media files with no sidecar are still importable
-    for (final path in mediaPaths) {
-      if (!claimedMedia.contains(path)) {
-        matched.add(MatchedPair(mediaPath: path));
-      }
+    // Single batched FFI call for all media — MMP provides dimensions, duration,
+    // camera make/model, and media type regardless of whether a sidecar exists.
+    final mmpResults = await MetadataService.readAll(allMediaPaths);
+    final mmpByPath = <String, Metadata>{};
+    for (int i = 0; i < allMediaPaths.length; i++) {
+      if (mmpResults[i] != null) mmpByPath[allMediaPaths[i]] = mmpResults[i]!;
     }
 
-    return DiscoverResult(pairs: matched, unmatched: unmatched);
+    // Build PlannedImports and FolderTree.
+    final planned = <PlannedImport>[];
+    final treeData = <int, Map<String, int>>{};
+
+    for (final mediaPath in allMediaPaths) {
+      final sidecar = sidecarMap[mediaPath];
+      final mmp = mmpByPath[mediaPath];
+
+      final fileMtime = File(mediaPath).lastModifiedSync().toUtc();
+      final capturedAt = sidecar?.photoTakenTime ?? mmp?.capturedAt ?? fileMtime;
+
+      final year = capturedAt.year;
+      final monthName = MonthFolder.monthNames[capturedAt.month - 1];
+      final filename = mediaPath.split('/').last;
+      final rawDest = '$libraryRoot/$year/$monthName/$filename';
+      final destPath = _resolveConflict(rawDest);
+
+      final mergedMeta = Metadata(
+        path: destPath,
+        capturedAt: capturedAt,
+        width: mmp?.width,
+        height: mmp?.height,
+        durationMs: mmp?.durationMs,
+        cameraMake: mmp?.cameraMake,
+        cameraModel: mmp?.cameraModel,
+        latitude: sidecar?.latitude ?? mmp?.latitude,
+        longitude: sidecar?.longitude ?? mmp?.longitude,
+        altitude: sidecar?.altitude ?? mmp?.altitude,
+        mediaType: mmp?.mediaType ?? MediaType.image,
+      );
+
+      planned.add(PlannedImport(
+        mediaPath: mediaPath,
+        destPath: destPath,
+        meta: mergedMeta,
+      ));
+
+      (treeData[year] ??= {})[monthName] =
+          (treeData[year]![monthName] ?? 0) + 1;
+    }
+
+    yield DiscoverDone(
+      plan: ImportPlan(
+        items: planned,
+        tree: FolderTree.fromMap(treeData),
+      ),
+    );
   }
 
   static Stream<ImportProgress> apply({
-    required List<MatchedPair> pairs,
+    required ImportPlan plan,
     required String libraryRoot,
     required String batchId,
   }) async* {
-    if (pairs.isEmpty) return;
+    if (plan.items.isEmpty) return;
 
     final db = EchoDatabase.instance;
     final mediaDao = MediaDao(db);
     final opDao = OperationDao(db);
     final driveId = await DriveService.volumeUuid(libraryRoot);
 
-    for (int i = 0; i < pairs.length; i++) {
-      final pair = pairs[i];
+    for (int i = 0; i < plan.items.length; i++) {
+      final item = plan.items[i];
 
       try {
-        // Resolve capturedAt: Takeout timestamp > EXIF > mtime
-        final exifMeta = await MetadataService.read(pair.mediaPath);
-        final capturedAt = pair.meta?.photoTakenTime ?? exifMeta.capturedAt;
-
-        final year = capturedAt.year;
-        final monthName = MonthFolder.monthNames[capturedAt.month - 1];
-        final rawDest = '$libraryRoot/$year/$monthName/${pair.filename}';
-        final destPath = _resolveConflict(rawDest);
-
-        // Audit log before touching files
         await opDao.insert(OperationRecordsCompanion(
           batchId: Value(batchId),
           opType: const Value('copy'),
-          sourcePath: Value(pair.mediaPath),
-          destPath: Value(destPath),
+          sourcePath: Value(item.mediaPath),
+          destPath: Value(item.destPath),
           appliedAt: Value(DateTime.now().toUtc()),
         ));
 
-        await Directory(destPath).parent.create(recursive: true);
-        await File(pair.mediaPath).copy(destPath);
+        await Directory(item.destPath).parent.create(recursive: true);
+        await File(item.mediaPath).copy(item.destPath);
 
-        if (LibraryService.isVideo(destPath)) {
-          await ThumbnailService.generate(destPath);
+        if (LibraryService.isVideo(item.destPath)) {
+          await ThumbnailService.generate(item.destPath);
         }
 
-        // Merge: Takeout GPS + timestamp > EXIF
-        final mergedMeta = Metadata(
-          path: destPath,
-          capturedAt: capturedAt,
-          width: exifMeta.width,
-          height: exifMeta.height,
-          durationMs: exifMeta.durationMs,
-          cameraMake: exifMeta.cameraMake,
-          cameraModel: exifMeta.cameraModel,
-          latitude: pair.meta?.latitude ?? exifMeta.latitude,
-          longitude: pair.meta?.longitude ?? exifMeta.longitude,
-          altitude: pair.meta?.altitude ?? exifMeta.altitude,
-          mediaType: exifMeta.mediaType,
-        );
-
-        await mediaDao.upsertMeta(mergedMeta, driveId, libraryRoot);
+        await mediaDao.upsertMeta(item.meta, driveId, libraryRoot);
       } catch (e, st) {
-        dev.log('Import failed for ${pair.mediaPath}: $e',
+        dev.log('Import failed for ${item.mediaPath}: $e',
             stackTrace: st, name: 'TakeoutService.apply');
       }
 
       yield ImportProgress(
         imported: i + 1,
-        total: pairs.length,
-        currentFile: pair.filename,
+        total: plan.items.length,
+        currentFile: item.filename,
       );
     }
   }
