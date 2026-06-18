@@ -1,77 +1,27 @@
 part of 'constants.dart';
 
-class Spacing {
-  Spacing._();
+class AutoSpacer extends StatelessWidget {
+  const AutoSpacer(this.size, {super.key});
 
-  static Widget extraSmallV() => const SizedBox(
-        height: Sizes.spacingExtraSmall,
-      );
+  final double size;
 
-  static Widget smallV() => const SizedBox(
-        height: Sizes.spacingSmall,
-      );
-
-  static Widget regularV() => const SizedBox(
-        height: Sizes.spacingRegular,
-      );
-
-  static Widget mediumV() => const SizedBox(
-        height: Sizes.spacingMedium,
-      );
-
-  static Widget mediumLargeV() => const SizedBox(
-        height: Sizes.spacingMediumLarge,
-      );
-
-  static Widget largeV() => const SizedBox(
-        height: Sizes.spacingLarge,
-      );
-
-  static Widget extraLargeV() => const SizedBox(
-        height: Sizes.spacingExtraLarge,
-      );
-
-  static Widget extraExtraLargeV() => const SizedBox(
-        height: Sizes.spacingExtraExtraLarge,
-      );
-
-  static Widget extraSmallH() => const SizedBox(
-        width: Sizes.spacingExtraSmall,
-      );
-
-  static Widget smallH() => const SizedBox(
-        width: Sizes.spacingSmall,
-      );
-
-  static Widget regularH() => const SizedBox(
-        width: Sizes.spacingRegular,
-      );
-
-  static Widget mediumH() => const SizedBox(
-        width: Sizes.spacingMedium,
-      );
-
-  static Widget mediumLargeH() => const SizedBox(
-        width: Sizes.spacingMediumLarge,
-      );
-
-  static Widget largeH() => const SizedBox(
-        width: Sizes.spacingLarge,
-      );
-
-  static Widget extraLargeH() => const SizedBox(
-        width: Sizes.spacingExtraLarge,
-      );
-
-  static Widget extraExtraLargeH() => const SizedBox(
-        width: Sizes.spacingExtraExtraLarge,
-      );
-
-  static Widget customV(double value) => SizedBox(
-        height: value,
-      );
-
-  static Widget customH(double value) => SizedBox(
-        width: value,
-      );
+  @override
+  Widget build(BuildContext context) {
+    final flex = context.findAncestorWidgetOfExactType<Flex>();
+    final isHorizontal = flex?.direction == Axis.horizontal;
+    return SizedBox(
+      width: isHorizontal ? size : 0,
+      height: isHorizontal ? 0 : size,
+    );
+  }
 }
+
+Widget spacerExtraSmall() => const AutoSpacer(Sizes.spacingExtraSmall);
+Widget spacerSmall() => const AutoSpacer(Sizes.spacingSmall);
+Widget spacerRegular() => const AutoSpacer(Sizes.spacingRegular);
+Widget spacerMedium() => const AutoSpacer(Sizes.spacingMedium);
+Widget spacerMediumLarge() => const AutoSpacer(Sizes.spacingMediumLarge);
+Widget spacerLarge() => const AutoSpacer(Sizes.spacingLarge);
+Widget spacerExtraLarge() => const AutoSpacer(Sizes.spacingExtraLarge);
+Widget spacerExtraExtraLarge() => const AutoSpacer(Sizes.spacingExtraExtraLarge);
+Widget spacerCustom(double value) => AutoSpacer(value);
