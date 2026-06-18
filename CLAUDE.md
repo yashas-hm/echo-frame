@@ -95,7 +95,7 @@ All constants live in `lib/constants/constants.dart` as a barrel using `part` fi
 - `Sizes` — window constraints (`kMinWindowSize`, `kInitWindowWidth/Height`, `kWindowAspectRatio`)
 - `Spacings`, `Styles`, `Routes` — currently empty part files, ready to populate
 
-**Spacing rule:** Never write a raw `SizedBox(height: …)` or `SizedBox(width: …)` in view code. Always use the top-level spacer functions from `lib/constants/spacings.dart` (e.g. `spacerMedium()`, `spacerLarge()`, `spacerCustom(6)`). These return an `AutoSpacer` widget that automatically sizes itself as height or width depending on whether its parent is a `Column` or `Row`.
+**Spacing rule:** Never write a raw `SizedBox(height: …)` or `SizedBox(width: …)` in view code. Always use the spacer widgets from `lib/constants/spacings.dart` (e.g. `const SpacerMedium()`, `const SpacerLarge()`, `AutoSpacer(6)`). These extend `AutoSpacer`, which automatically sizes itself as height or width depending on whether its parent is a `Column` or `Row`.
 
 **Text style rule:** Never write a raw `TextStyle(…)` or access `Theme.of(context).textTheme` in view code. Always use a constant from the `Styles` class in `lib/constants/styles.dart`.
 

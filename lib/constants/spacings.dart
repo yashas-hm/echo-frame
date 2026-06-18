@@ -16,12 +16,34 @@ class AutoSpacer extends StatelessWidget {
   }
 }
 
-Widget spacerExtraSmall() => const AutoSpacer(Sizes.spacingExtraSmall);
-Widget spacerSmall() => const AutoSpacer(Sizes.spacingSmall);
-Widget spacerRegular() => const AutoSpacer(Sizes.spacingRegular);
-Widget spacerMedium() => const AutoSpacer(Sizes.spacingMedium);
-Widget spacerMediumLarge() => const AutoSpacer(Sizes.spacingMediumLarge);
-Widget spacerLarge() => const AutoSpacer(Sizes.spacingLarge);
-Widget spacerExtraLarge() => const AutoSpacer(Sizes.spacingExtraLarge);
-Widget spacerExtraExtraLarge() => const AutoSpacer(Sizes.spacingExtraExtraLarge);
-Widget spacerCustom(double value) => AutoSpacer(value);
+class SpacerExtraSmall extends AutoSpacer {
+  const SpacerExtraSmall({super.key}) : super(Sizes.spacingExtraSmall);
+}
+
+class SpacerSmall extends AutoSpacer {
+  const SpacerSmall({super.key}) : super(Sizes.spacingSmall);
+}
+
+class SpacerRegular extends AutoSpacer {
+  const SpacerRegular({super.key}) : super(Sizes.spacingRegular);
+}
+
+class SpacerMedium extends AutoSpacer {
+  const SpacerMedium({super.key}) : super(Sizes.spacingMedium);
+}
+
+class SpacerMediumLarge extends AutoSpacer {
+  const SpacerMediumLarge({super.key}) : super(Sizes.spacingMediumLarge);
+}
+
+class SpacerLarge extends AutoSpacer {
+  const SpacerLarge({super.key}) : super(Sizes.spacingLarge);
+}
+
+class SpacerExtraLarge extends AutoSpacer {
+  const SpacerExtraLarge({super.key}) : super(Sizes.spacingExtraLarge);
+}
+
+class SpacerExtraExtraLarge extends AutoSpacer {
+  const SpacerExtraExtraLarge({super.key}) : super(Sizes.spacingExtraExtraLarge);
+}
