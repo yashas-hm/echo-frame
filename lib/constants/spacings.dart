@@ -7,8 +7,17 @@ class AutoSpacer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final flex = context.findAncestorWidgetOfExactType<Flex>();
-    final isHorizontal = flex?.direction == Axis.horizontal;
+    var isHorizontal = false;
+    context.visitAncestorElements((element) {
+      if (element.widget is Row) {
+        isHorizontal = true;
+        return false;
+      }
+      if (element.widget is Column) {
+        return false;
+      }
+      return true;
+    });
     return SizedBox(
       width: isHorizontal ? size : 0,
       height: isHorizontal ? 0 : size,
@@ -22,6 +31,10 @@ class SpacerExtraSmall extends AutoSpacer {
 
 class SpacerSmall extends AutoSpacer {
   const SpacerSmall({super.key}) : super(Sizes.spacingSmall);
+}
+
+class SpacerSmallRegular extends AutoSpacer {
+  const SpacerSmallRegular({super.key}) : super(Sizes.spacingSmallRegular);
 }
 
 class SpacerRegular extends AutoSpacer {
@@ -45,5 +58,6 @@ class SpacerExtraLarge extends AutoSpacer {
 }
 
 class SpacerExtraExtraLarge extends AutoSpacer {
-  const SpacerExtraExtraLarge({super.key}) : super(Sizes.spacingExtraExtraLarge);
+  const SpacerExtraExtraLarge({super.key})
+      : super(Sizes.spacingExtraExtraLarge);
 }

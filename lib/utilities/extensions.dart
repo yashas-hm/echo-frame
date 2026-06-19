@@ -1,6 +1,6 @@
 part of 'utilities.dart';
 
-extension ContextExtension on BuildContext {
+extension ContextExtensions on BuildContext {
   double get height => MediaQuery.of(this).size.height;
 
   double get width => MediaQuery.of(this).size.width;
@@ -10,6 +10,10 @@ extension ContextExtension on BuildContext {
   AppThemeColors get colors => Theme.of(this).extension<AppThemeColors>()!;
 }
 
-extension DurationExtension on int {
+extension DurationExtensions on int {
   Duration get milliseconds => Duration(milliseconds: this);
+}
+
+extension StringExtensions on String {
+  String plural(int value) => '$this${value == 1 ? '' : 's'}';
 }
