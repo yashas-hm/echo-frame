@@ -7,9 +7,9 @@ import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/import/import.dart' show ImportProgress;
 import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/services/drive_service.dart';
-import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
+import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 
 abstract class ImportService {
   /// Batch MMP call. Returns a map of path → Metadata (null results excluded).

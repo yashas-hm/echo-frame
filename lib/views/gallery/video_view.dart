@@ -159,7 +159,6 @@ class _ControlsState extends State<_Controls> {
               inactiveTrackColor: context.colors.borderPrimary,
               thumbColor: context.colors.onPrimary,
               overlayColor: context.colors.borderPrimary,
-
             ),
             child: Slider(
               value: progress,

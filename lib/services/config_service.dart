@@ -54,15 +54,13 @@ class ConfigService {
     Prefs.sharedPrefExists = true;
   }
 
-  static Future<void> writeThemeMode(
-      String libraryRoot, ThemeMode mode) async {
+  static Future<void> writeThemeMode(String libraryRoot, ThemeMode mode) async {
     final existing = await _readRaw(libraryRoot) ?? {};
     existing['themeMode'] = mode.name;
     await _write(libraryRoot, existing);
   }
 
-  static Future<void> writeShowNavLabel(
-      String libraryRoot, bool value) async {
+  static Future<void> writeShowNavLabel(String libraryRoot, bool value) async {
     final existing = await _readRaw(libraryRoot) ?? {};
     existing['showNavLabel'] = value;
     await _write(libraryRoot, existing);

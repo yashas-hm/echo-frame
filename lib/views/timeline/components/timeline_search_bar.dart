@@ -90,7 +90,8 @@ class _TimelineSearchBarState extends ConsumerState<TimelineSearchBar> {
                         ? const SizedBox.shrink()
                         : IconButton(
                             icon: Icon(Icons.close_rounded,
-                                color: colors.textPrimary.withValues(alpha: 0.5)),
+                                color:
+                                    colors.textPrimary.withValues(alpha: 0.5)),
                             onPressed: _clear,
                           ),
                   ),

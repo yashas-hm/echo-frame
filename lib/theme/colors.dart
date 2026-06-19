@@ -8,7 +8,7 @@ class KnownColors {
   static const Color transparent = Color(0x00000000);
 
   // Sky palette
-  static const Color sky50  = Color(0xFFEEF6FF);
+  static const Color sky50 = Color(0xFFEEF6FF);
   static const Color sky100 = Color(0xFFCFE5FF);
   static const Color sky200 = Color(0xFF9ACBFD);
   static const Color sky300 = Color(0xFF6BB5F2);
@@ -34,7 +34,7 @@ class KnownColors {
   static const Color mint500 = Color(0xFF20B586);
 
   // Slate – full grey ramp (backgrounds, surfaces, text, borders)
-  static const Color slate50  = Color(0xFFFAFAFA); // near-white bg (light)
+  static const Color slate50 = Color(0xFFFAFAFA); // near-white bg (light)
   static const Color slate100 = Color(0xFFECEEF0);
   static const Color slate200 = Color(0xFFE0DEDE); // light surface
   static const Color slate300 = Color(0xFFA7ACB1);
@@ -109,7 +109,7 @@ abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
   Color get hoverColor => onPrimary.withValues(alpha: 0.2);
 
   // Frosted glass background (blur filter overlay)
-  Color get frostColor =>  textPrimary.withValues(alpha: 0.1);
+  Color get frostColor => textPrimary.withValues(alpha: 0.1);
 
   @override
   AppThemeColors lerp(AppThemeColors b, double t) => _LerpedColors(

@@ -31,11 +31,19 @@ class TypeSelectionView extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Import Photos',
-                    style: Styles.title(color: colors.textPrimary)),
+                Text(
+                  'Import Photos',
+                  style: Styles.title(
+                    color: colors.textPrimary,
+                  ),
+                ),
                 const SpacerExtraSmall(),
-                Text('Choose how you want to import your photos.',
-                    style: Styles.subtitle(color: colors.textSecondary)),
+                Text(
+                  'Choose how you want to import your photos.',
+                  style: Styles.subtitle(
+                    color: colors.textSecondary,
+                  ),
+                ),
                 const SpacerLarge(),
                 Row(
                   spacing: Sizes.spacingRegular,

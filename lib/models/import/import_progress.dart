@@ -14,5 +14,6 @@ class ImportProgress {
   final List<DiscoveryError> errors;
 
   int get processed => imported + errors.length;
+
   double get fraction => total == 0 ? 1.0 : processed / total;
 }
