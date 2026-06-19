@@ -9,9 +9,6 @@ import 'package:echo_frame/services/importing/import_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 import 'package:intl/intl.dart';
 
-export 'package:echo_frame/services/importing/import_service.dart'
-    show ImportProgress;
-
 class TakeoutService extends ImportService {
   @override
   Stream<DiscoverEvent> discover({

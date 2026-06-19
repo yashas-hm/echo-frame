@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
-import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:echo_frame/views/gallery/gallery_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

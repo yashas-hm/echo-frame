@@ -1,5 +1,5 @@
+import 'package:echo_frame/components/title_bar.dart';
 import 'package:echo_frame/views/shell/components/nav_bar.dart';
-import 'package:echo_frame/widgets/title_bar.dart';
 import 'package:flutter/material.dart';
 
 class ShellScreen extends StatelessWidget {

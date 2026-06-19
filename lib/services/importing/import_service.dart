@@ -4,28 +4,12 @@ import 'dart:io';
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/discovery/discovery.dart';
+import 'package:echo_frame/models/import/import.dart' show ImportProgress;
 import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/services/drive_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
-
-class ImportProgress {
-  const ImportProgress({
-    required this.imported,
-    required this.total,
-    this.currentFile,
-    this.errors = const [],
-  });
-
-  final int imported;
-  final int total;
-  final String? currentFile;
-  final List<DiscoveryError> errors;
-
-  int get processed => imported + errors.length;
-  double get fraction => total == 0 ? 1.0 : processed / total;
-}
 
 abstract class ImportService {
   /// Batch MMP call. Returns a map of path → Metadata (null results excluded).

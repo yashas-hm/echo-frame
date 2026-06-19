@@ -4,7 +4,7 @@ import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
-    show ContextExtension, Prefs;
+    show ContextExtensions, Prefs;
 import 'package:echo_frame/views/timeline/components/photo_tile.dart';
 import 'package:echo_frame/views/timeline/components/timeline_search_bar.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
@@ -150,7 +150,8 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 17),
                         child: Text(
-                          DateFormat('MMMM yyyy').format(DateTime(month.year, month.month)),
+                          DateFormat('MMMM yyyy')
+                              .format(DateTime(month.year, month.month)),
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall
@@ -211,9 +212,13 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                   : '${p.filesFound} files found'),
               if (p.currentDir != null) ...[
                 const SizedBox(height: 4),
-                Text(p.currentDir!,
-                    style: TextStyle(
-                        color: context.colors.textSecondary, fontSize: 12)),
+                Text(
+                  p.currentDir!,
+                  style: TextStyle(
+                    color: context.colors.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ],
           ),

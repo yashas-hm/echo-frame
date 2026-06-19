@@ -1,5 +1,5 @@
 import 'package:echo_frame/models/media_item.dart';
-import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:echo_frame/views/timeline/components/photo_tile.dart';
 import 'package:flutter/material.dart';

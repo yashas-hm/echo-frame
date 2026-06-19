@@ -4,8 +4,7 @@ import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart';
 import 'package:echo_frame/views/favorites/favorites_screen.dart';
-import 'package:echo_frame/views/import/import_screen.dart';
-import 'package:echo_frame/views/organizer/organizer_screen.dart';
+import 'package:echo_frame/views/organizer/import_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
 import 'package:flutter/gestures.dart';
@@ -42,7 +41,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
       label: 'Favorites'
     ),
     (
-      route: OrganizerScreen.path,
+      route: ImportScreen.path,
       icon: Icons.drive_folder_upload_outlined,
       label: 'Organize'
     ),

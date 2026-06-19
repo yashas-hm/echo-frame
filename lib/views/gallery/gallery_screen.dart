@@ -1,10 +1,10 @@
-import 'package:echo_frame/constants/constants.dart';
-import 'package:echo_frame/utilities/utilities.dart' show ContextExtension;
+import 'package:echo_frame/components/buttons/buttons.dart';
+import 'package:echo_frame/components/title_bar.dart';
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
 import 'package:echo_frame/views/gallery/video_view.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
-import 'package:echo_frame/widgets/title_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -209,26 +209,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                     onPressed: _goNext,
                     loadingNext: _loadingNext,
                   ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Container(
-                    margin: EdgeInsets.all(Sizes.spacingRegular),
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      hoverColor: context.colors.borderPrimary,
-                      onTap: context.pop,
-                      child: Padding(
-                        padding: EdgeInsets.all(Sizes.iconPadding),
-                        child: Icon(
-                          Icons.arrow_back_rounded,
-                          color: context.colors.textPrimary,
-                          size: 25,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                const EFBackButton(),
               ],
             ),
           ),
