@@ -85,14 +85,14 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     final currentRoute = GoRouterState.of(context).uri.path;
 
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: Alignment.centerRight,
       child: MouseRegion(
         onEnter: _onEnter,
         onExit: _onExit,
         child: Container(
-          alignment: Alignment.centerLeft,
+          alignment: Alignment.centerRight,
           height: expandedHeight,
-          width: Sizes.navBarWidth * 1.3,
+          width: Sizes.navBarWidth,
           child: AnimatedBuilder(
             animation: _controller,
             builder: (context, _) {
@@ -127,7 +127,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Icon(
-                              Icons.chevron_right,
+                              Icons.chevron_left,
                               size: Sizes.iconSizeMedium,
                               color: colors.onPrimary,
                             ),
@@ -187,9 +187,8 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     bool showLabel = false,
     required String currentRoute,
   }) {
-
     final VoidCallback callback = switch (destination.route) {
-      ImportScreen.path => () {},
+      ImportScreen.path => () => context.push(destination.route),
       _ => () => context.go(destination.route),
     };
     return Material(
@@ -200,20 +199,24 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: callback,
-        hoverColor: colors.onPrimary.withValues(alpha: 0.2),
+        hoverColor: colors.onPrimary.hover,
         child: Container(
           margin: EdgeInsets.all(Sizes.iconWLabelPadding),
           alignment: Alignment.center,
           child: Column(
             spacing: Sizes.spacingExtraSmall,
             children: [
-              Icon(destination.icon, size: 20, color: colors.onPrimary),
+              Icon(
+                destination.icon,
+                size: Sizes.iconSizeRegular,
+                color: colors.onPrimary,
+              ),
               if (showLabel)
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
                     destination.label,
-                    style: Styles.regular(
+                    style: Styles.small(
                       color: colors.onPrimary,
                     ),
                   ),
