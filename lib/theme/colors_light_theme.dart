@@ -32,7 +32,7 @@ class LightColors extends AppThemeColors {
   Color get errorSurface => KnownColors.strawberry100;
 
   @override
-  Color get success => KnownColors.mint400;
+  Color get successPrimary => KnownColors.mint400;
 
   @override
   Color get successSurface => KnownColors.mint100;

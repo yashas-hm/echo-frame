@@ -42,11 +42,12 @@ class Styles {
         fontWeight: FontWeight.w400,
         color: color,
       );
+
   static TextStyle subTitleBold({Color? color}) => GoogleFonts.robotoMono(
-    fontSize: Sizes.fontSizeMedium,
-    fontWeight: FontWeight.w600,
-    color: color,
-  );
+        fontSize: Sizes.fontSizeMedium,
+        fontWeight: FontWeight.w600,
+        color: color,
+      );
 
   static TextStyle regular({Color? color}) => GoogleFonts.robotoMono(
         fontSize: Sizes.fontSizeRegular,
@@ -61,16 +62,16 @@ class Styles {
       );
 
   static TextStyle smallRegular({Color? color}) => GoogleFonts.robotoMono(
-    fontSize: Sizes.fontSizeRegular,
-    fontWeight: FontWeight.w400,
-    color: color,
-  );
+        fontSize: Sizes.fontSizeRegular,
+        fontWeight: FontWeight.w400,
+        color: color,
+      );
 
   static TextStyle smallRegularBold({Color? color}) => GoogleFonts.robotoMono(
-    fontSize: Sizes.fontSizeRegular,
-    fontWeight: FontWeight.w700,
-    color: color,
-  );
+        fontSize: Sizes.fontSizeRegular,
+        fontWeight: FontWeight.w700,
+        color: color,
+      );
 
   static TextStyle small({Color? color}) => GoogleFonts.robotoMono(
         fontSize: Sizes.fontSizeSmall,
@@ -91,13 +92,13 @@ class Styles {
       );
 
   static TextStyle button({Color? color}) => GoogleFonts.robotoMono(
-        fontSize: Sizes.fontSizeSmall,
+        fontSize: Sizes.fontSizeRegular,
         fontWeight: FontWeight.w400,
         color: color ?? KnownColors.basicWhite,
       );
 
   static TextStyle buttonBold({Color? color}) => GoogleFonts.robotoMono(
-        fontSize: Sizes.fontSizeSmall,
+        fontSize: Sizes.fontSizeRegular,
         fontWeight: FontWeight.w700,
         color: color ?? KnownColors.basicWhite,
       );

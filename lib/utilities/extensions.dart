@@ -17,3 +17,9 @@ extension DurationExtensions on int {
 extension StringExtensions on String {
   String plural(int value) => '$this${value == 1 ? '' : 's'}';
 }
+
+extension ColorExtensions on Color {
+  Color get hover => withValues(alpha: 0.15);
+
+  Color get splash => withValues(alpha: 0.35);
+}

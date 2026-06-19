@@ -82,11 +82,11 @@ abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
   Color get errorSurface;
 
   // Success
-  Color get success;
+  Color get successPrimary;
+
+  Color get onSuccessPrimary => onPrimary;
 
   Color get successSurface;
-
-  Color get onSuccess => onPrimary;
 
   // Cursor / selection
   Color get cursorColor;
@@ -123,7 +123,7 @@ abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
         shadowColor: Color.lerp(shadowColor, b.shadowColor, t)!,
         errorPrimary: Color.lerp(errorPrimary, b.errorPrimary, t)!,
         errorSurface: Color.lerp(errorSurface, b.errorSurface, t)!,
-        success: Color.lerp(success, b.success, t)!,
+        successPrimary: Color.lerp(successPrimary, b.successPrimary, t)!,
         successSurface: Color.lerp(successSurface, b.successSurface, t)!,
         frostColor: Color.lerp(frostColor, b.frostColor, t)!,
         cursorColor: Color.lerp(cursorColor, b.cursorColor, t)!,
@@ -147,7 +147,7 @@ final class _LerpedColors extends AppThemeColors {
     required this.shadowColor,
     required this.errorPrimary,
     required this.errorSurface,
-    required this.success,
+    required this.successPrimary,
     required this.successSurface,
     required this.frostColor,
     required this.cursorColor,
@@ -178,7 +178,7 @@ final class _LerpedColors extends AppThemeColors {
   @override
   final Color errorSurface;
   @override
-  final Color success;
+  final Color successPrimary;
   @override
   final Color successSurface;
   @override

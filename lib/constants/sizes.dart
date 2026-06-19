@@ -12,7 +12,7 @@ final class Sizes {
   static const double edgePadding = spacingMedium;
   static const double cardPadding = spacingRegular;
   static const double inputPadding = spacingMedium;
-  static const double iconPadding = spacingMedium;
+  static const double iconPadding = spacingSmallRegular;
   static const double iconWLabelPadding = 18.0;
 
   static const double iconSizeExtraSmall = 14.0;
@@ -44,4 +44,6 @@ final class Sizes {
   static const double inputBorderRadius = 8.0;
   static const double inputBorderWidth = 1.0;
   static const double inputBorderFocusedWidth = 1.5;
+
+  static const double maxFinite = 999999;
 }
