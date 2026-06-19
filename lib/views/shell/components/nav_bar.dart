@@ -4,7 +4,7 @@ import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart';
 import 'package:echo_frame/views/favorites/favorites_screen.dart';
-import 'package:echo_frame/views/organizer/import_screen.dart';
+import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
 import 'package:flutter/gestures.dart';
