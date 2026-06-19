@@ -15,7 +15,7 @@ class DoneView extends StatelessWidget {
 
     return Center(
       child: SizedBox(
-        width: 480,
+        width: Sizes.viewBoxWidth,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

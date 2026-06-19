@@ -1,7 +1,9 @@
 part of 'buttons.dart';
 
 class EFBackButton extends StatelessWidget {
-  const EFBackButton({super.key});
+  const EFBackButton({super.key, this.onPressed});
+
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +17,7 @@ class EFBackButton extends StatelessWidget {
           customBorder: const CircleBorder(),
           hoverColor: context.colors.textPrimary.hover,
           splashColor: context.colors.textPrimary.splash,
-          onTap: context.pop,
+          onTap: onPressed ?? context.pop,
           child: Padding(
             padding: EdgeInsets.all(Sizes.iconPadding),
             child: Icon(

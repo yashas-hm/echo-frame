@@ -5,7 +5,7 @@ import 'package:echo_frame/models/folder_tree.dart' show FolderTree;
 import 'package:echo_frame/models/import/import.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart'
-    show ContextExtensions, StringExtensions;
+    show ColorExtensions, ContextExtensions, StringExtensions;
 import 'package:echo_frame/views/import/provider/import_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +21,7 @@ part 'components/error_view.dart';
 part 'components/folder_tree_preview.dart';
 part 'components/idle_view.dart';
 part 'components/review_view.dart';
+part 'components/type_selection_view.dart';
 
 enum ImportType {
   mediaOrganizer,
@@ -28,20 +29,13 @@ enum ImportType {
 }
 
 class ImportScreen extends ConsumerStatefulWidget {
-  const ImportScreen({
-    super.key,
-    required this.type,
-  });
-
-  final ImportType type;
+  const ImportScreen({super.key});
 
   static const String path = '/import';
 
   static GoRoute get route => GoRoute(
         path: path,
-        builder: (_, state) => ImportScreen(
-          type: state.extra as ImportType,
-        ),
+        builder: (_, state) => ImportScreen(),
       );
 
   @override
@@ -49,20 +43,32 @@ class ImportScreen extends ConsumerStatefulWidget {
 }
 
 class _OrganizerScreenState extends ConsumerState<ImportScreen> {
+  ImportType? _importType;
+
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(importProvider(widget.type));
+    if (_importType != null) {
+      final state = ref.watch(importProvider(_importType!));
 
-    if (state.destRoot == null) return _destRouteErrorView();
+      if (state.destRoot == null) return _destRouteErrorView();
 
-    return switch (state.phase) {
-      ImportPhase.idle => IdleView(state, widget.type),
-      ImportPhase.review => ReviewView(state, widget.type),
-      ImportPhase.error => ErrorView(state, widget.type),
-      ImportPhase.discovering => DiscoveringView(state),
-      ImportPhase.applying => ApplyingView(state),
-      ImportPhase.done => DoneView(state),
-    };
+      return switch (state.phase) {
+        ImportPhase.review => ReviewView(state, _importType!),
+        ImportPhase.error => ErrorView(state, _importType!),
+        ImportPhase.discovering => DiscoveringView(state),
+        ImportPhase.applying => ApplyingView(state),
+        ImportPhase.done => DoneView(state),
+        ImportPhase.idle => IdleView(
+            state,
+            _importType!,
+            onBackPressed: () => setState(() => _importType = null),
+          ),
+      };
+    }
+
+    return TypeSelectionView(
+      onSelectType: (type) => setState(() => _importType = type),
+    );
   }
 
   Widget _destRouteErrorView() => Center(

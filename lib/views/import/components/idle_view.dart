@@ -1,10 +1,16 @@
 part of '../import_screen.dart';
 
 class IdleView extends ConsumerWidget {
-  const IdleView(this.state, this.type, {super.key});
+  const IdleView(
+    this.state,
+    this.type, {
+    super.key,
+    required this.onBackPressed,
+  });
 
   final ImportState state;
   final ImportType type;
+  final VoidCallback onBackPressed;
 
   Future<void> _pickSource(WidgetRef ref) async {
     final path = await FilePicker.getDirectoryPath(
@@ -15,23 +21,12 @@ class IdleView extends ConsumerWidget {
     }
   }
 
-  final Map<ImportType, (String, String)> _importText = const {
-    ImportType.mediaOrganizer: (
-      'Import photos from a folder',
-      'Sort a folder of unsorted photos into your library by date.'
-    ),
-    ImportType.googleTakeoutOrganizer: (
-      'Import from Google Photos Takeout',
-      'Point to your Google Takeout export folder, EchoFrame will '
-          'match and copy photos into your library.'
-    ),
-  };
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final destRoot = state.destRoot;
     final color = context.colors;
     final sourceDir = state.sourceDir;
+    final importText = TypeSelectionView.importText;
     final canDiscover =
         sourceDir != null && destRoot != null && sourceDir != destRoot;
 
@@ -39,18 +34,18 @@ class IdleView extends ConsumerWidget {
       children: [
         Center(
           child: SizedBox(
-            width: 480,
+            width: Sizes.viewBoxWidth,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _importText[type]!.$1,
+                  importText[type]!.$2,
                   style: Styles.title(color: color.textPrimary),
                 ),
                 const SpacerExtraSmall(),
                 Text(
-                  _importText[type]!.$2,
+                  importText[type]!.$3,
                   style: Styles.subtitle(color: color.textSecondary),
                 ),
                 const SpacerLarge(),
@@ -93,7 +88,9 @@ class IdleView extends ConsumerWidget {
             ),
           ),
         ),
-        EFBackButton(),
+        EFBackButton(
+          onPressed: onBackPressed,
+        ),
       ],
     );
   }

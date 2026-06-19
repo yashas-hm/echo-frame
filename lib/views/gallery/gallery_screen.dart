@@ -1,6 +1,4 @@
 import 'package:echo_frame/components/buttons/buttons.dart';
-import 'package:echo_frame/components/title_bar.dart';
-import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
 import 'package:echo_frame/views/gallery/video_view.dart';
@@ -15,16 +13,16 @@ import 'components/action_bubble.dart';
 import 'components/gallery_info_panel.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {
-  const GalleryScreen({super.key, required this.mediaId});
+  const GalleryScreen({super.key, required this.initialMediaId});
 
-  final int mediaId;
+  final int initialMediaId;
 
   static const String path = '/gallery';
 
   static GoRoute get routeDef => GoRoute(
         path: path,
         builder: (_, state) => GalleryScreen(
-          mediaId: state.extra as int,
+          initialMediaId: state.extra as int,
         ),
       );
 
@@ -44,7 +42,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   void initState() {
     super.initState();
     final flat = ref.read(timelineProvider).value?.flatItems ?? const [];
-    _currentIndex = flat.indexWhere((item) => item.id == widget.mediaId);
+    _currentIndex = flat.indexWhere((item) => item.id == widget.initialMediaId);
   }
 
   void _goNext() {
@@ -189,32 +187,22 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     bool canPrev = false,
     bool canNext = false,
   }) {
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      body: Column(
-        children: [
-          const TitleBar(),
-          Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(child: child),
-                if (canPrev)
-                  CaretArrow(
-                    left: true,
-                    onPressed: _goPrev,
-                  ),
-                if (canNext)
-                  CaretArrow(
-                    left: false,
-                    onPressed: _goNext,
-                    loadingNext: _loadingNext,
-                  ),
-                const EFBackButton(),
-              ],
-            ),
+    return Stack(
+      children: [
+        Positioned.fill(child: child),
+        if (canPrev)
+          CaretArrow(
+            left: true,
+            onPressed: _goPrev,
           ),
-        ],
-      ),
+        if (canNext)
+          CaretArrow(
+            left: false,
+            onPressed: _goNext,
+            loadingNext: _loadingNext,
+          ),
+        const EFBackButton(),
+      ],
     );
   }
 }
