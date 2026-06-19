@@ -194,58 +194,54 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
 
   Widget _buildIndexing(BuildContext context) {
     final p = _progress!;
-    return Scaffold(
-      body: Center(
-        child: SizedBox(
-          width: 320,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Indexing library…',
-                  style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 16),
-              LinearProgressIndicator(),
-              const SizedBox(height: 8),
-              Text(p.phase == IndexingPhase.reading
-                  ? 'Reading metadata for ${p.newFiles} files…'
-                  : '${p.filesFound} files found'),
-              if (p.currentDir != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  p.currentDir!,
-                  style: TextStyle(
-                    color: context.colors.textSecondary,
-                    fontSize: 12,
-                  ),
+    return Center(
+      child: SizedBox(
+        width: 320,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Indexing library…',
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 16),
+            LinearProgressIndicator(),
+            const SizedBox(height: 8),
+            Text(p.phase == IndexingPhase.reading
+                ? 'Reading metadata for ${p.newFiles} files…'
+                : '${p.filesFound} files found'),
+            if (p.currentDir != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                p.currentDir!,
+                style: TextStyle(
+                  color: context.colors.textSecondary,
+                  fontSize: 12,
                 ),
-              ],
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.photo_library_outlined,
-                size: 72, color: context.colors.borderPrimary),
-            const SizedBox(height: 20),
-            Text('No library selected',
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: _showSetupDialog,
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Add Frame Path'),
-            ),
-          ],
-        ),
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.photo_library_outlined,
+              size: 72, color: context.colors.borderPrimary),
+          const SizedBox(height: 20),
+          Text('No library selected',
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: _showSetupDialog,
+            icon: const Icon(Icons.add_rounded),
+            label: const Text('Add Frame Path'),
+          ),
+        ],
       ),
     );
   }

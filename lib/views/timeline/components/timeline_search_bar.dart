@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:echo_frame/theme/theme.dart';
-import 'package:echo_frame/utilities/utilities.dart';
+import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
+import 'package:echo_frame/views/timeline/provider/timeline_search_focus_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -52,6 +53,7 @@ class _TimelineSearchBarState extends ConsumerState<TimelineSearchBar> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final focusNode = ref.read(timelineSearchFocusProvider);
     return SizedBox(
       height: TimelineSearchBar.height,
       child: Padding(
@@ -77,6 +79,7 @@ class _TimelineSearchBarState extends ConsumerState<TimelineSearchBar> {
               ),
               TextField(
                 controller: _controller,
+                focusNode: focusNode,
                 onChanged: _onChanged,
                 decoration: InputDecoration(
                   fillColor: KnownColors.transparent,

@@ -1,5 +1,6 @@
 import 'package:echo_frame/theme/provider/theme_provider.dart';
 import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/utilities/utilities.dart' show SearchIntent;
 import 'package:echo_frame/views/favorites/favorites_screen.dart';
 import 'package:echo_frame/views/gallery/gallery_screen.dart';
 import 'package:echo_frame/views/import/import_screen.dart';
@@ -41,32 +42,17 @@ class EchoFrameApp extends ConsumerWidget {
     final themeMode = ref.watch(appThemeProvider).mode;
     return Shortcuts(
       shortcuts: const {
-        SingleActivator(LogicalKeyboardKey.keyF, meta: true): _SearchIntent(),
-        SingleActivator(LogicalKeyboardKey.keyF, control: true):
-            _SearchIntent(),
+        SingleActivator(LogicalKeyboardKey.keyF, meta: true): SearchIntent(),
+        SingleActivator(LogicalKeyboardKey.keyF, control: true): SearchIntent(),
       },
-      child: Actions(
-        actions: {
-          _SearchIntent: CallbackAction<_SearchIntent>(
-            onInvoke: (_) {
-              _router.go(TimelineScreen.path);
-              return null;
-            },
-          ),
-        },
-        child: MaterialApp.router(
-          routerConfig: _router,
-          theme: EchoFrameThemes.lightTheme,
-          darkTheme: EchoFrameThemes.darkTheme,
-          themeMode: themeMode,
-          debugShowCheckedModeBanner: false,
-          title: 'Echo Frame',
-        ),
+      child: MaterialApp.router(
+        routerConfig: _router,
+        theme: EchoFrameThemes.lightTheme,
+        darkTheme: EchoFrameThemes.darkTheme,
+        themeMode: themeMode,
+        debugShowCheckedModeBanner: false,
+        title: 'Echo Frame',
       ),
     );
   }
-}
-
-class _SearchIntent extends Intent {
-  const _SearchIntent();
 }
