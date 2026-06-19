@@ -3,10 +3,9 @@ import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/views/favorites/favorites_screen.dart';
 import 'package:echo_frame/views/gallery/gallery_screen.dart';
 import 'package:echo_frame/views/import/import_screen.dart';
-import 'package:echo_frame/views/organizer/organizer_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
+import 'package:echo_frame/views/shell/empty_shell.dart';
 import 'package:echo_frame/views/shell/nav_bar_shell.dart';
-import 'package:echo_frame/test/test_organizer_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,22 +13,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final _router = GoRouter(
-  initialLocation: TestOrganizerScreen.path,
+  initialLocation: TimelineScreen.path,
   routes: [
     ShellRoute(
-      builder: (_, __, child) {
-        return ShellScreen(child: child);
-      },
+      builder: (_, __, child) => ShellScreen(child: child),
       routes: [
         TimelineScreen.route,
         FavoritesScreen.route,
-        OrganizerScreen.route,
-        ImportScreen.route,
         SettingsScreen.route,
-        TestOrganizerScreen.route,
       ],
     ),
-    GalleryScreen.routeDef,
+    ShellRoute(
+      builder: (_, __, child) => EmptyShell(child: child),
+      routes: [
+        GalleryScreen.routeDef,
+        ImportScreen.route,
+      ],
+    ),
   ],
 );
 
