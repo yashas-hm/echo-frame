@@ -13,7 +13,6 @@ class ShellScreen extends StatelessWidget {
       body: Column(
         children: [
           const TitleBar(),
-          const Divider(height: 1, thickness: 1),
           Expanded(
             child: Stack(
               children: [

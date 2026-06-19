@@ -37,15 +37,14 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     ),
     (
       route: FavoritesScreen.path,
-      icon: Icons.favorite_outline_rounded,
-      label: 'Favorites'
+      icon: Icons.star_border_rounded,
+      label: 'Starred'
     ),
     (
       route: ImportScreen.path,
-      icon: Icons.drive_folder_upload_outlined,
-      label: 'Organize'
+      icon: Icons.add_rounded,
+      label: 'Import',
     ),
-    (route: ImportScreen.path, icon: Icons.download_rounded, label: 'Import'),
   ];
 
   @override
@@ -86,14 +85,14 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     final currentRoute = GoRouterState.of(context).uri.path;
 
     return Align(
-      alignment: Alignment.centerRight,
+      alignment: Alignment.centerLeft,
       child: MouseRegion(
         onEnter: _onEnter,
         onExit: _onExit,
         child: Container(
-          alignment: Alignment.centerRight,
+          alignment: Alignment.centerLeft,
           height: expandedHeight,
-          width: Sizes.navBarWidth * 1.5,
+          width: Sizes.navBarWidth * 1.3,
           child: AnimatedBuilder(
             animation: _controller,
             builder: (context, _) {
@@ -128,8 +127,8 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Icon(
-                              Icons.chevron_left,
-                              size: 25,
+                              Icons.chevron_right,
+                              size: Sizes.iconSizeMedium,
                               color: colors.onPrimary,
                             ),
                           ),
@@ -137,39 +136,39 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                       if (_showContent)
                         Positioned.fill(
                           child: Padding(
-                          padding: EdgeInsets.all(Sizes.spacingRegular),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    spacing: Sizes.spacingSmall,
-                                    children: [
-                                      for (final dest in _destinations)
-                                        _tappableIcon(
-                                          dest,
-                                          colors,
-                                          showLabel: showLabel,
-                                          currentRoute: currentRoute,
-                                        ),
-                                    ],
+                            padding: EdgeInsets.all(Sizes.spacingRegular),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      spacing: Sizes.spacingSmall,
+                                      children: [
+                                        for (final dest in _destinations)
+                                          _tappableIcon(
+                                            dest,
+                                            colors,
+                                            showLabel: showLabel,
+                                            currentRoute: currentRoute,
+                                          ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              _tappableIcon(
-                                (
-                                  route: SettingsScreen.path,
-                                  icon: Icons.settings_outlined,
-                                  label: 'Settings',
+                                _tappableIcon(
+                                  (
+                                    route: SettingsScreen.path,
+                                    icon: Icons.settings_outlined,
+                                    label: 'Settings',
+                                  ),
+                                  colors,
+                                  showLabel: showLabel,
+                                  currentRoute: currentRoute,
                                 ),
-                                colors,
-                                showLabel: showLabel,
-                                currentRoute: currentRoute,
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
                         ),
                     ],
                   ),
@@ -188,6 +187,11 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     bool showLabel = false,
     required String currentRoute,
   }) {
+
+    final VoidCallback callback = switch (destination.route) {
+      ImportScreen.path => () {},
+      _ => () => context.go(destination.route),
+    };
     return Material(
       color: currentRoute == destination.route
           ? colors.primaryColor.withValues(alpha: 0.6)
@@ -195,7 +199,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.go(destination.route),
+        onTap: callback,
         hoverColor: colors.onPrimary.withValues(alpha: 0.2),
         child: Container(
           margin: EdgeInsets.all(Sizes.iconWLabelPadding),
@@ -209,9 +213,7 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
                   fit: BoxFit.scaleDown,
                   child: Text(
                     destination.label,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                    style: Styles.regular(
                       color: colors.onPrimary,
                     ),
                   ),
