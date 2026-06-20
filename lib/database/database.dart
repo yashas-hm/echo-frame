@@ -2,12 +2,11 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:echo_frame/database/schemas/drive_schema.dart';
 import 'package:echo_frame/database/schemas/media_schema.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [MediaRecords, DriveRecords])
+@DriftDatabase(tables: [MediaRecords])
 class EchoDatabase extends _$EchoDatabase {
   EchoDatabase(super.e);
 

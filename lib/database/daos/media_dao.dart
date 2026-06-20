@@ -20,10 +20,9 @@ class MediaDao {
     });
   }
 
-  Future<Set<String>> listFilePaths(String driveId) async {
+  Future<Set<String>> listFilePaths() async {
     final rows = await (_db.selectOnly(_db.mediaRecords)
-          ..addColumns([_db.mediaRecords.filePath])
-          ..where(_db.mediaRecords.driveId.equals(driveId)))
+          ..addColumns([_db.mediaRecords.filePath]))
         .get();
     return rows.map((r) => r.read(_db.mediaRecords.filePath)!).toSet();
   }
@@ -113,29 +112,20 @@ class MediaDao {
       (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))
           .write(MediaRecordsCompanion(isFavorite: Value(value)));
 
-  Future<void> upsertMeta(
-    Metadata meta,
-    String driveId,
-    String libraryRoot,
-  ) =>
-      upsertBatch([_toCompanion(meta, driveId, libraryRoot)]);
+  Future<void> upsertMeta(Metadata meta, String libraryRoot) =>
+      upsertBatch([_toCompanion(meta, libraryRoot)]);
 
   static String? _existingThumbnail(String filePath) {
     final path = ThumbnailService.pathFor(filePath);
     return File(path).existsSync() ? path : null;
   }
 
-  MediaRecordsCompanion _toCompanion(
-    Metadata meta,
-    String driveId,
-    String libraryRoot,
-  ) {
+  MediaRecordsCompanion _toCompanion(Metadata meta, String libraryRoot) {
     final relativePath = meta.path.startsWith('$libraryRoot/')
         ? meta.path.substring(libraryRoot.length + 1)
         : meta.path.split('/').last;
     return MediaRecordsCompanion(
       filePath: Value(meta.path),
-      driveId: Value(driveId),
       relativePath: Value(relativePath),
       filename: Value(meta.path.split('/').last),
       mediaType: Value(meta.mediaType.name),

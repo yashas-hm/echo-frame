@@ -1,10 +1,8 @@
 import 'dart:developer' as dev;
 
-import 'package:echo_frame/database/daos/drive_dao.dart';
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
-import 'package:echo_frame/services/drive_service.dart';
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 
@@ -16,13 +14,6 @@ class IndexingService {
     required String libraryRoot,
   }) async* {
     final db = EchoDatabase.instance;
-    final driveId = await DriveService.volumeUuid(libraryRoot);
-    final label = await DriveService.volumeLabel(libraryRoot);
-    await DriveDao(db).upsertDrive(
-      uuid: driveId,
-      label: label,
-      mountPath: libraryRoot,
-    );
 
     final allPaths = <String>[];
     await for (final scan in DirUtils.walk(libraryRoot)) {
@@ -34,7 +25,7 @@ class IndexingService {
       );
     }
 
-    final existingPaths = await MediaDao(db).listFilePaths(driveId);
+    final existingPaths = await MediaDao(db).listFilePaths();
     final newPaths = allPaths.where((p) => !existingPaths.contains(p)).toList();
 
     if (newPaths.isEmpty) {
@@ -47,7 +38,7 @@ class IndexingService {
       newFiles: newPaths.length,
     );
 
-    await _fetchAndUpsert(newPaths, db, driveId, libraryRoot);
+    await _fetchAndUpsert(newPaths, db, libraryRoot);
 
     yield IndexingProgress(
       phase: IndexingPhase.done,
@@ -60,10 +51,6 @@ class IndexingService {
     required String libraryRoot,
   }) async* {
     final db = EchoDatabase.instance;
-    final driveId = await DriveService.volumeUuid(libraryRoot);
-    final label = await DriveService.volumeLabel(libraryRoot);
-    await DriveDao(db)
-        .upsertDrive(uuid: driveId, label: label, mountPath: libraryRoot);
 
     final allPaths = <String>[];
     await for (final scan in DirUtils.walk(libraryRoot)) {
@@ -85,7 +72,7 @@ class IndexingService {
       newFiles: allPaths.length,
     );
 
-    await _fetchAndUpsert(allPaths, db, driveId, libraryRoot);
+    await _fetchAndUpsert(allPaths, db, libraryRoot);
 
     yield IndexingProgress(
       phase: IndexingPhase.done,
@@ -96,7 +83,6 @@ class IndexingService {
   static Future<void> _fetchAndUpsert(
     List<String> paths,
     EchoDatabase db,
-    String driveId,
     String libraryRoot,
   ) async {
     final metas = await MetadataService.readAll(paths);
@@ -108,7 +94,7 @@ class IndexingService {
         continue;
       }
       try {
-        await mediaDao.upsertMeta(m, driveId, libraryRoot);
+        await mediaDao.upsertMeta(m, libraryRoot);
       } catch (e, st) {
         dev.log(
           'upsertMeta failed for ${paths[i]}: $e',

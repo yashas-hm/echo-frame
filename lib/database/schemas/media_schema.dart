@@ -5,8 +5,6 @@ class MediaRecords extends Table {
 
   TextColumn get filePath => text()();
 
-  TextColumn get driveId => text()();
-
   TextColumn get relativePath => text()();
 
   TextColumn get filename => text()();

@@ -8,9 +8,7 @@ class $MediaRecordsTable extends MediaRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-
   $MediaRecordsTable(this.attachedDatabase, [this._alias]);
-
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -25,12 +23,6 @@ class $MediaRecordsTable extends MediaRecords
   @override
   late final GeneratedColumn<String> filePath = GeneratedColumn<String>(
       'file_path', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _driveIdMeta =
-      const VerificationMeta('driveId');
-  @override
-  late final GeneratedColumn<String> driveId = GeneratedColumn<String>(
-      'drive_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _relativePathMeta =
       const VerificationMeta('relativePath');
@@ -164,12 +156,10 @@ class $MediaRecordsTable extends MediaRecords
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("has_json_index" IN (0, 1))'),
       defaultValue: const Constant(false));
-
   @override
   List<GeneratedColumn> get $columns => [
         id,
         filePath,
-        driveId,
         relativePath,
         filename,
         mediaType,
@@ -191,14 +181,11 @@ class $MediaRecordsTable extends MediaRecords
         isTrashed,
         hasJsonIndex
       ];
-
   @override
   String get aliasedName => _alias ?? actualTableName;
-
   @override
   String get actualTableName => $name;
   static const String $name = 'media_records';
-
   @override
   VerificationContext validateIntegrity(Insertable<MediaRecord> instance,
       {bool isInserting = false}) {
@@ -212,12 +199,6 @@ class $MediaRecordsTable extends MediaRecords
           filePath.isAcceptableOrUnknown(data['file_path']!, _filePathMeta));
     } else if (isInserting) {
       context.missing(_filePathMeta);
-    }
-    if (data.containsKey('drive_id')) {
-      context.handle(_driveIdMeta,
-          driveId.isAcceptableOrUnknown(data['drive_id']!, _driveIdMeta));
-    } else if (isInserting) {
-      context.missing(_driveIdMeta);
     }
     if (data.containsKey('relative_path')) {
       context.handle(
@@ -332,7 +313,6 @@ class $MediaRecordsTable extends MediaRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
-
   @override
   MediaRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -341,8 +321,6 @@ class $MediaRecordsTable extends MediaRecords
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       filePath: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}file_path'])!,
-      driveId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}drive_id'])!,
       relativePath: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}relative_path'])!,
       filename: attachedDatabase.typeMapping
@@ -395,7 +373,6 @@ class $MediaRecordsTable extends MediaRecords
 class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final int id;
   final String filePath;
-  final String driveId;
   final String relativePath;
   final String filename;
   final String mediaType;
@@ -416,11 +393,9 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final bool isFavorite;
   final bool isTrashed;
   final bool hasJsonIndex;
-
   const MediaRecord(
       {required this.id,
       required this.filePath,
-      required this.driveId,
       required this.relativePath,
       required this.filename,
       required this.mediaType,
@@ -441,13 +416,11 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       required this.isFavorite,
       required this.isTrashed,
       required this.hasJsonIndex});
-
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['file_path'] = Variable<String>(filePath);
-    map['drive_id'] = Variable<String>(driveId);
     map['relative_path'] = Variable<String>(relativePath);
     map['filename'] = Variable<String>(filename);
     map['media_type'] = Variable<String>(mediaType);
@@ -501,7 +474,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
     return MediaRecordsCompanion(
       id: Value(id),
       filePath: Value(filePath),
-      driveId: Value(driveId),
       relativePath: Value(relativePath),
       filename: Value(filename),
       mediaType: Value(mediaType),
@@ -555,7 +527,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
     return MediaRecord(
       id: serializer.fromJson<int>(json['id']),
       filePath: serializer.fromJson<String>(json['filePath']),
-      driveId: serializer.fromJson<String>(json['driveId']),
       relativePath: serializer.fromJson<String>(json['relativePath']),
       filename: serializer.fromJson<String>(json['filename']),
       mediaType: serializer.fromJson<String>(json['mediaType']),
@@ -578,14 +549,12 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       hasJsonIndex: serializer.fromJson<bool>(json['hasJsonIndex']),
     );
   }
-
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'filePath': serializer.toJson<String>(filePath),
-      'driveId': serializer.toJson<String>(driveId),
       'relativePath': serializer.toJson<String>(relativePath),
       'filename': serializer.toJson<String>(filename),
       'mediaType': serializer.toJson<String>(mediaType),
@@ -612,7 +581,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   MediaRecord copyWith(
           {int? id,
           String? filePath,
-          String? driveId,
           String? relativePath,
           String? filename,
           String? mediaType,
@@ -636,7 +604,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       MediaRecord(
         id: id ?? this.id,
         filePath: filePath ?? this.filePath,
-        driveId: driveId ?? this.driveId,
         relativePath: relativePath ?? this.relativePath,
         filename: filename ?? this.filename,
         mediaType: mediaType ?? this.mediaType,
@@ -661,12 +628,10 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         isTrashed: isTrashed ?? this.isTrashed,
         hasJsonIndex: hasJsonIndex ?? this.hasJsonIndex,
       );
-
   MediaRecord copyWithCompanion(MediaRecordsCompanion data) {
     return MediaRecord(
       id: data.id.present ? data.id.value : this.id,
       filePath: data.filePath.present ? data.filePath.value : this.filePath,
-      driveId: data.driveId.present ? data.driveId.value : this.driveId,
       relativePath: data.relativePath.present
           ? data.relativePath.value
           : this.relativePath,
@@ -711,7 +676,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
     return (StringBuffer('MediaRecord(')
           ..write('id: $id, ')
           ..write('filePath: $filePath, ')
-          ..write('driveId: $driveId, ')
           ..write('relativePath: $relativePath, ')
           ..write('filename: $filename, ')
           ..write('mediaType: $mediaType, ')
@@ -740,7 +704,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   int get hashCode => Object.hashAll([
         id,
         filePath,
-        driveId,
         relativePath,
         filename,
         mediaType,
@@ -762,14 +725,12 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         isTrashed,
         hasJsonIndex
       ]);
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is MediaRecord &&
           other.id == this.id &&
           other.filePath == this.filePath &&
-          other.driveId == this.driveId &&
           other.relativePath == this.relativePath &&
           other.filename == this.filename &&
           other.mediaType == this.mediaType &&
@@ -795,7 +756,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
 class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<int> id;
   final Value<String> filePath;
-  final Value<String> driveId;
   final Value<String> relativePath;
   final Value<String> filename;
   final Value<String> mediaType;
@@ -816,11 +776,9 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<bool> isFavorite;
   final Value<bool> isTrashed;
   final Value<bool> hasJsonIndex;
-
   const MediaRecordsCompanion({
     this.id = const Value.absent(),
     this.filePath = const Value.absent(),
-    this.driveId = const Value.absent(),
     this.relativePath = const Value.absent(),
     this.filename = const Value.absent(),
     this.mediaType = const Value.absent(),
@@ -842,11 +800,9 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.isTrashed = const Value.absent(),
     this.hasJsonIndex = const Value.absent(),
   });
-
   MediaRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String filePath,
-    required String driveId,
     required String relativePath,
     required String filename,
     this.mediaType = const Value.absent(),
@@ -868,15 +824,12 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.isTrashed = const Value.absent(),
     this.hasJsonIndex = const Value.absent(),
   })  : filePath = Value(filePath),
-        driveId = Value(driveId),
         relativePath = Value(relativePath),
         filename = Value(filename),
         indexedAt = Value(indexedAt);
-
   static Insertable<MediaRecord> custom({
     Expression<int>? id,
     Expression<String>? filePath,
-    Expression<String>? driveId,
     Expression<String>? relativePath,
     Expression<String>? filename,
     Expression<String>? mediaType,
@@ -901,7 +854,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (filePath != null) 'file_path': filePath,
-      if (driveId != null) 'drive_id': driveId,
       if (relativePath != null) 'relative_path': relativePath,
       if (filename != null) 'filename': filename,
       if (mediaType != null) 'media_type': mediaType,
@@ -928,7 +880,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   MediaRecordsCompanion copyWith(
       {Value<int>? id,
       Value<String>? filePath,
-      Value<String>? driveId,
       Value<String>? relativePath,
       Value<String>? filename,
       Value<String>? mediaType,
@@ -952,7 +903,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     return MediaRecordsCompanion(
       id: id ?? this.id,
       filePath: filePath ?? this.filePath,
-      driveId: driveId ?? this.driveId,
       relativePath: relativePath ?? this.relativePath,
       filename: filename ?? this.filename,
       mediaType: mediaType ?? this.mediaType,
@@ -984,9 +934,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     }
     if (filePath.present) {
       map['file_path'] = Variable<String>(filePath.value);
-    }
-    if (driveId.present) {
-      map['drive_id'] = Variable<String>(driveId.value);
     }
     if (relativePath.present) {
       map['relative_path'] = Variable<String>(relativePath.value);
@@ -1056,7 +1003,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     return (StringBuffer('MediaRecordsCompanion(')
           ..write('id: $id, ')
           ..write('filePath: $filePath, ')
-          ..write('driveId: $driveId, ')
           ..write('relativePath: $relativePath, ')
           ..write('filename: $filename, ')
           ..write('mediaType: $mediaType, ')
@@ -1082,431 +1028,21 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   }
 }
 
-class $DriveRecordsTable extends DriveRecords
-    with TableInfo<$DriveRecordsTable, DriveRecord> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-
-  $DriveRecordsTable(this.attachedDatabase, [this._alias]);
-
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
-  @override
-  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
-      'uuid', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _labelMeta = const VerificationMeta('label');
-  @override
-  late final GeneratedColumn<String> label = GeneratedColumn<String>(
-      'label', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _lastMountPathMeta =
-      const VerificationMeta('lastMountPath');
-  @override
-  late final GeneratedColumn<String> lastMountPath = GeneratedColumn<String>(
-      'last_mount_path', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _firstIndexedAtMeta =
-      const VerificationMeta('firstIndexedAt');
-  @override
-  late final GeneratedColumn<DateTime> firstIndexedAt =
-      GeneratedColumn<DateTime>('first_indexed_at', aliasedName, false,
-          type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _lastScannedAtMeta =
-      const VerificationMeta('lastScannedAt');
-  @override
-  late final GeneratedColumn<DateTime> lastScannedAt =
-      GeneratedColumn<DateTime>('last_scanned_at', aliasedName, true,
-          type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _isOnlineMeta =
-      const VerificationMeta('isOnline');
-  @override
-  late final GeneratedColumn<bool> isOnline = GeneratedColumn<bool>(
-      'is_online', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("is_online" IN (0, 1))'),
-      defaultValue: const Constant(false));
-
-  @override
-  List<GeneratedColumn> get $columns =>
-      [id, uuid, label, lastMountPath, firstIndexedAt, lastScannedAt, isOnline];
-
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'drive_records';
-
-  @override
-  VerificationContext validateIntegrity(Insertable<DriveRecord> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('uuid')) {
-      context.handle(
-          _uuidMeta, uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta));
-    } else if (isInserting) {
-      context.missing(_uuidMeta);
-    }
-    if (data.containsKey('label')) {
-      context.handle(
-          _labelMeta, label.isAcceptableOrUnknown(data['label']!, _labelMeta));
-    } else if (isInserting) {
-      context.missing(_labelMeta);
-    }
-    if (data.containsKey('last_mount_path')) {
-      context.handle(
-          _lastMountPathMeta,
-          lastMountPath.isAcceptableOrUnknown(
-              data['last_mount_path']!, _lastMountPathMeta));
-    }
-    if (data.containsKey('first_indexed_at')) {
-      context.handle(
-          _firstIndexedAtMeta,
-          firstIndexedAt.isAcceptableOrUnknown(
-              data['first_indexed_at']!, _firstIndexedAtMeta));
-    } else if (isInserting) {
-      context.missing(_firstIndexedAtMeta);
-    }
-    if (data.containsKey('last_scanned_at')) {
-      context.handle(
-          _lastScannedAtMeta,
-          lastScannedAt.isAcceptableOrUnknown(
-              data['last_scanned_at']!, _lastScannedAtMeta));
-    }
-    if (data.containsKey('is_online')) {
-      context.handle(_isOnlineMeta,
-          isOnline.isAcceptableOrUnknown(data['is_online']!, _isOnlineMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-
-  @override
-  DriveRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DriveRecord(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      uuid: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}uuid'])!,
-      label: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}label'])!,
-      lastMountPath: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}last_mount_path']),
-      firstIndexedAt: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}first_indexed_at'])!,
-      lastScannedAt: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}last_scanned_at']),
-      isOnline: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}is_online'])!,
-    );
-  }
-
-  @override
-  $DriveRecordsTable createAlias(String alias) {
-    return $DriveRecordsTable(attachedDatabase, alias);
-  }
-}
-
-class DriveRecord extends DataClass implements Insertable<DriveRecord> {
-  final int id;
-  final String uuid;
-  final String label;
-  final String? lastMountPath;
-  final DateTime firstIndexedAt;
-  final DateTime? lastScannedAt;
-  final bool isOnline;
-
-  const DriveRecord(
-      {required this.id,
-      required this.uuid,
-      required this.label,
-      this.lastMountPath,
-      required this.firstIndexedAt,
-      this.lastScannedAt,
-      required this.isOnline});
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['uuid'] = Variable<String>(uuid);
-    map['label'] = Variable<String>(label);
-    if (!nullToAbsent || lastMountPath != null) {
-      map['last_mount_path'] = Variable<String>(lastMountPath);
-    }
-    map['first_indexed_at'] = Variable<DateTime>(firstIndexedAt);
-    if (!nullToAbsent || lastScannedAt != null) {
-      map['last_scanned_at'] = Variable<DateTime>(lastScannedAt);
-    }
-    map['is_online'] = Variable<bool>(isOnline);
-    return map;
-  }
-
-  DriveRecordsCompanion toCompanion(bool nullToAbsent) {
-    return DriveRecordsCompanion(
-      id: Value(id),
-      uuid: Value(uuid),
-      label: Value(label),
-      lastMountPath: lastMountPath == null && nullToAbsent
-          ? const Value.absent()
-          : Value(lastMountPath),
-      firstIndexedAt: Value(firstIndexedAt),
-      lastScannedAt: lastScannedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(lastScannedAt),
-      isOnline: Value(isOnline),
-    );
-  }
-
-  factory DriveRecord.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DriveRecord(
-      id: serializer.fromJson<int>(json['id']),
-      uuid: serializer.fromJson<String>(json['uuid']),
-      label: serializer.fromJson<String>(json['label']),
-      lastMountPath: serializer.fromJson<String?>(json['lastMountPath']),
-      firstIndexedAt: serializer.fromJson<DateTime>(json['firstIndexedAt']),
-      lastScannedAt: serializer.fromJson<DateTime?>(json['lastScannedAt']),
-      isOnline: serializer.fromJson<bool>(json['isOnline']),
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'uuid': serializer.toJson<String>(uuid),
-      'label': serializer.toJson<String>(label),
-      'lastMountPath': serializer.toJson<String?>(lastMountPath),
-      'firstIndexedAt': serializer.toJson<DateTime>(firstIndexedAt),
-      'lastScannedAt': serializer.toJson<DateTime?>(lastScannedAt),
-      'isOnline': serializer.toJson<bool>(isOnline),
-    };
-  }
-
-  DriveRecord copyWith(
-          {int? id,
-          String? uuid,
-          String? label,
-          Value<String?> lastMountPath = const Value.absent(),
-          DateTime? firstIndexedAt,
-          Value<DateTime?> lastScannedAt = const Value.absent(),
-          bool? isOnline}) =>
-      DriveRecord(
-        id: id ?? this.id,
-        uuid: uuid ?? this.uuid,
-        label: label ?? this.label,
-        lastMountPath:
-            lastMountPath.present ? lastMountPath.value : this.lastMountPath,
-        firstIndexedAt: firstIndexedAt ?? this.firstIndexedAt,
-        lastScannedAt:
-            lastScannedAt.present ? lastScannedAt.value : this.lastScannedAt,
-        isOnline: isOnline ?? this.isOnline,
-      );
-
-  DriveRecord copyWithCompanion(DriveRecordsCompanion data) {
-    return DriveRecord(
-      id: data.id.present ? data.id.value : this.id,
-      uuid: data.uuid.present ? data.uuid.value : this.uuid,
-      label: data.label.present ? data.label.value : this.label,
-      lastMountPath: data.lastMountPath.present
-          ? data.lastMountPath.value
-          : this.lastMountPath,
-      firstIndexedAt: data.firstIndexedAt.present
-          ? data.firstIndexedAt.value
-          : this.firstIndexedAt,
-      lastScannedAt: data.lastScannedAt.present
-          ? data.lastScannedAt.value
-          : this.lastScannedAt,
-      isOnline: data.isOnline.present ? data.isOnline.value : this.isOnline,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DriveRecord(')
-          ..write('id: $id, ')
-          ..write('uuid: $uuid, ')
-          ..write('label: $label, ')
-          ..write('lastMountPath: $lastMountPath, ')
-          ..write('firstIndexedAt: $firstIndexedAt, ')
-          ..write('lastScannedAt: $lastScannedAt, ')
-          ..write('isOnline: $isOnline')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-      id, uuid, label, lastMountPath, firstIndexedAt, lastScannedAt, isOnline);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is DriveRecord &&
-          other.id == this.id &&
-          other.uuid == this.uuid &&
-          other.label == this.label &&
-          other.lastMountPath == this.lastMountPath &&
-          other.firstIndexedAt == this.firstIndexedAt &&
-          other.lastScannedAt == this.lastScannedAt &&
-          other.isOnline == this.isOnline);
-}
-
-class DriveRecordsCompanion extends UpdateCompanion<DriveRecord> {
-  final Value<int> id;
-  final Value<String> uuid;
-  final Value<String> label;
-  final Value<String?> lastMountPath;
-  final Value<DateTime> firstIndexedAt;
-  final Value<DateTime?> lastScannedAt;
-  final Value<bool> isOnline;
-
-  const DriveRecordsCompanion({
-    this.id = const Value.absent(),
-    this.uuid = const Value.absent(),
-    this.label = const Value.absent(),
-    this.lastMountPath = const Value.absent(),
-    this.firstIndexedAt = const Value.absent(),
-    this.lastScannedAt = const Value.absent(),
-    this.isOnline = const Value.absent(),
-  });
-
-  DriveRecordsCompanion.insert({
-    this.id = const Value.absent(),
-    required String uuid,
-    required String label,
-    this.lastMountPath = const Value.absent(),
-    required DateTime firstIndexedAt,
-    this.lastScannedAt = const Value.absent(),
-    this.isOnline = const Value.absent(),
-  })  : uuid = Value(uuid),
-        label = Value(label),
-        firstIndexedAt = Value(firstIndexedAt);
-
-  static Insertable<DriveRecord> custom({
-    Expression<int>? id,
-    Expression<String>? uuid,
-    Expression<String>? label,
-    Expression<String>? lastMountPath,
-    Expression<DateTime>? firstIndexedAt,
-    Expression<DateTime>? lastScannedAt,
-    Expression<bool>? isOnline,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (uuid != null) 'uuid': uuid,
-      if (label != null) 'label': label,
-      if (lastMountPath != null) 'last_mount_path': lastMountPath,
-      if (firstIndexedAt != null) 'first_indexed_at': firstIndexedAt,
-      if (lastScannedAt != null) 'last_scanned_at': lastScannedAt,
-      if (isOnline != null) 'is_online': isOnline,
-    });
-  }
-
-  DriveRecordsCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? uuid,
-      Value<String>? label,
-      Value<String?>? lastMountPath,
-      Value<DateTime>? firstIndexedAt,
-      Value<DateTime?>? lastScannedAt,
-      Value<bool>? isOnline}) {
-    return DriveRecordsCompanion(
-      id: id ?? this.id,
-      uuid: uuid ?? this.uuid,
-      label: label ?? this.label,
-      lastMountPath: lastMountPath ?? this.lastMountPath,
-      firstIndexedAt: firstIndexedAt ?? this.firstIndexedAt,
-      lastScannedAt: lastScannedAt ?? this.lastScannedAt,
-      isOnline: isOnline ?? this.isOnline,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (uuid.present) {
-      map['uuid'] = Variable<String>(uuid.value);
-    }
-    if (label.present) {
-      map['label'] = Variable<String>(label.value);
-    }
-    if (lastMountPath.present) {
-      map['last_mount_path'] = Variable<String>(lastMountPath.value);
-    }
-    if (firstIndexedAt.present) {
-      map['first_indexed_at'] = Variable<DateTime>(firstIndexedAt.value);
-    }
-    if (lastScannedAt.present) {
-      map['last_scanned_at'] = Variable<DateTime>(lastScannedAt.value);
-    }
-    if (isOnline.present) {
-      map['is_online'] = Variable<bool>(isOnline.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DriveRecordsCompanion(')
-          ..write('id: $id, ')
-          ..write('uuid: $uuid, ')
-          ..write('label: $label, ')
-          ..write('lastMountPath: $lastMountPath, ')
-          ..write('firstIndexedAt: $firstIndexedAt, ')
-          ..write('lastScannedAt: $lastScannedAt, ')
-          ..write('isOnline: $isOnline')
-          ..write(')'))
-        .toString();
-  }
-}
-
 abstract class _$EchoDatabase extends GeneratedDatabase {
   _$EchoDatabase(QueryExecutor e) : super(e);
-
   $EchoDatabaseManager get managers => $EchoDatabaseManager(this);
   late final $MediaRecordsTable mediaRecords = $MediaRecordsTable(this);
-  late final $DriveRecordsTable driveRecords = $DriveRecordsTable(this);
-
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
-
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [mediaRecords, driveRecords];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [mediaRecords];
 }
 
 typedef $$MediaRecordsTableCreateCompanionBuilder = MediaRecordsCompanion
     Function({
   Value<int> id,
   required String filePath,
-  required String driveId,
   required String relativePath,
   required String filename,
   Value<String> mediaType,
@@ -1532,7 +1068,6 @@ typedef $$MediaRecordsTableUpdateCompanionBuilder = MediaRecordsCompanion
     Function({
   Value<int> id,
   Value<String> filePath,
-  Value<String> driveId,
   Value<String> relativePath,
   Value<String> filename,
   Value<String> mediaType,
@@ -1564,15 +1099,11 @@ class $$MediaRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get filePath => $composableBuilder(
       column: $table.filePath, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get driveId => $composableBuilder(
-      column: $table.driveId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get relativePath => $composableBuilder(
       column: $table.relativePath, builder: (column) => ColumnFilters(column));
@@ -1644,15 +1175,11 @@ class $$MediaRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get filePath => $composableBuilder(
       column: $table.filePath, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get driveId => $composableBuilder(
-      column: $table.driveId, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get relativePath => $composableBuilder(
       column: $table.relativePath,
@@ -1729,15 +1256,11 @@ class $$MediaRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get filePath =>
       $composableBuilder(column: $table.filePath, builder: (column) => column);
-
-  GeneratedColumn<String> get driveId =>
-      $composableBuilder(column: $table.driveId, builder: (column) => column);
 
   GeneratedColumn<String> get relativePath => $composableBuilder(
       column: $table.relativePath, builder: (column) => column);
@@ -1828,7 +1351,6 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> filePath = const Value.absent(),
-            Value<String> driveId = const Value.absent(),
             Value<String> relativePath = const Value.absent(),
             Value<String> filename = const Value.absent(),
             Value<String> mediaType = const Value.absent(),
@@ -1853,7 +1375,6 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
               MediaRecordsCompanion(
             id: id,
             filePath: filePath,
-            driveId: driveId,
             relativePath: relativePath,
             filename: filename,
             mediaType: mediaType,
@@ -1878,7 +1399,6 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String filePath,
-            required String driveId,
             required String relativePath,
             required String filename,
             Value<String> mediaType = const Value.absent(),
@@ -1903,7 +1423,6 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
               MediaRecordsCompanion.insert(
             id: id,
             filePath: filePath,
-            driveId: driveId,
             relativePath: relativePath,
             filename: filename,
             mediaType: mediaType,
@@ -1947,219 +1466,10 @@ typedef $$MediaRecordsTableProcessedTableManager = ProcessedTableManager<
     ),
     MediaRecord,
     PrefetchHooks Function()>;
-typedef $$DriveRecordsTableCreateCompanionBuilder = DriveRecordsCompanion
-    Function({
-  Value<int> id,
-  required String uuid,
-  required String label,
-  Value<String?> lastMountPath,
-  required DateTime firstIndexedAt,
-  Value<DateTime?> lastScannedAt,
-  Value<bool> isOnline,
-});
-typedef $$DriveRecordsTableUpdateCompanionBuilder = DriveRecordsCompanion
-    Function({
-  Value<int> id,
-  Value<String> uuid,
-  Value<String> label,
-  Value<String?> lastMountPath,
-  Value<DateTime> firstIndexedAt,
-  Value<DateTime?> lastScannedAt,
-  Value<bool> isOnline,
-});
-
-class $$DriveRecordsTableFilterComposer
-    extends Composer<_$EchoDatabase, $DriveRecordsTable> {
-  $$DriveRecordsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-
-  ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get uuid => $composableBuilder(
-      column: $table.uuid, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get label => $composableBuilder(
-      column: $table.label, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get lastMountPath => $composableBuilder(
-      column: $table.lastMountPath, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get firstIndexedAt => $composableBuilder(
-      column: $table.firstIndexedAt,
-      builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get lastScannedAt => $composableBuilder(
-      column: $table.lastScannedAt, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<bool> get isOnline => $composableBuilder(
-      column: $table.isOnline, builder: (column) => ColumnFilters(column));
-}
-
-class $$DriveRecordsTableOrderingComposer
-    extends Composer<_$EchoDatabase, $DriveRecordsTable> {
-  $$DriveRecordsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-
-  ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get uuid => $composableBuilder(
-      column: $table.uuid, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get label => $composableBuilder(
-      column: $table.label, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get lastMountPath => $composableBuilder(
-      column: $table.lastMountPath,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get firstIndexedAt => $composableBuilder(
-      column: $table.firstIndexedAt,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get lastScannedAt => $composableBuilder(
-      column: $table.lastScannedAt,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<bool> get isOnline => $composableBuilder(
-      column: $table.isOnline, builder: (column) => ColumnOrderings(column));
-}
-
-class $$DriveRecordsTableAnnotationComposer
-    extends Composer<_$EchoDatabase, $DriveRecordsTable> {
-  $$DriveRecordsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get uuid =>
-      $composableBuilder(column: $table.uuid, builder: (column) => column);
-
-  GeneratedColumn<String> get label =>
-      $composableBuilder(column: $table.label, builder: (column) => column);
-
-  GeneratedColumn<String> get lastMountPath => $composableBuilder(
-      column: $table.lastMountPath, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get firstIndexedAt => $composableBuilder(
-      column: $table.firstIndexedAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get lastScannedAt => $composableBuilder(
-      column: $table.lastScannedAt, builder: (column) => column);
-
-  GeneratedColumn<bool> get isOnline =>
-      $composableBuilder(column: $table.isOnline, builder: (column) => column);
-}
-
-class $$DriveRecordsTableTableManager extends RootTableManager<
-    _$EchoDatabase,
-    $DriveRecordsTable,
-    DriveRecord,
-    $$DriveRecordsTableFilterComposer,
-    $$DriveRecordsTableOrderingComposer,
-    $$DriveRecordsTableAnnotationComposer,
-    $$DriveRecordsTableCreateCompanionBuilder,
-    $$DriveRecordsTableUpdateCompanionBuilder,
-    (
-      DriveRecord,
-      BaseReferences<_$EchoDatabase, $DriveRecordsTable, DriveRecord>
-    ),
-    DriveRecord,
-    PrefetchHooks Function()> {
-  $$DriveRecordsTableTableManager(_$EchoDatabase db, $DriveRecordsTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$DriveRecordsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$DriveRecordsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$DriveRecordsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> uuid = const Value.absent(),
-            Value<String> label = const Value.absent(),
-            Value<String?> lastMountPath = const Value.absent(),
-            Value<DateTime> firstIndexedAt = const Value.absent(),
-            Value<DateTime?> lastScannedAt = const Value.absent(),
-            Value<bool> isOnline = const Value.absent(),
-          }) =>
-              DriveRecordsCompanion(
-            id: id,
-            uuid: uuid,
-            label: label,
-            lastMountPath: lastMountPath,
-            firstIndexedAt: firstIndexedAt,
-            lastScannedAt: lastScannedAt,
-            isOnline: isOnline,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String uuid,
-            required String label,
-            Value<String?> lastMountPath = const Value.absent(),
-            required DateTime firstIndexedAt,
-            Value<DateTime?> lastScannedAt = const Value.absent(),
-            Value<bool> isOnline = const Value.absent(),
-          }) =>
-              DriveRecordsCompanion.insert(
-            id: id,
-            uuid: uuid,
-            label: label,
-            lastMountPath: lastMountPath,
-            firstIndexedAt: firstIndexedAt,
-            lastScannedAt: lastScannedAt,
-            isOnline: isOnline,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ));
-}
-
-typedef $$DriveRecordsTableProcessedTableManager = ProcessedTableManager<
-    _$EchoDatabase,
-    $DriveRecordsTable,
-    DriveRecord,
-    $$DriveRecordsTableFilterComposer,
-    $$DriveRecordsTableOrderingComposer,
-    $$DriveRecordsTableAnnotationComposer,
-    $$DriveRecordsTableCreateCompanionBuilder,
-    $$DriveRecordsTableUpdateCompanionBuilder,
-    (
-      DriveRecord,
-      BaseReferences<_$EchoDatabase, $DriveRecordsTable, DriveRecord>
-    ),
-    DriveRecord,
-    PrefetchHooks Function()>;
 
 class $EchoDatabaseManager {
   final _$EchoDatabase _db;
-
   $EchoDatabaseManager(this._db);
-
   $$MediaRecordsTableTableManager get mediaRecords =>
       $$MediaRecordsTableTableManager(_db, _db.mediaRecords);
-
-  $$DriveRecordsTableTableManager get driveRecords =>
-      $$DriveRecordsTableTableManager(_db, _db.driveRecords);
 }

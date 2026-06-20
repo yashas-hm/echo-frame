@@ -6,7 +6,6 @@ import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/import/import.dart' show ImportProgress;
 import 'package:echo_frame/models/metadata.dart';
-import 'package:echo_frame/services/drive_service.dart';
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
@@ -51,7 +50,6 @@ abstract class ImportService {
 
     final db = EchoDatabase.instance;
     final mediaDao = MediaDao(db);
-    final driveId = await DriveService.volumeUuid(libraryRoot);
 
     int imported = 0;
     final applyErrors = <DiscoveryError>[];
@@ -82,7 +80,7 @@ abstract class ImportService {
         if (DirUtils.isVideo(item.destPath)) {
           await ThumbnailService.generate(item.destPath);
         }
-        await mediaDao.upsertMeta(item.meta, driveId, libraryRoot);
+        await mediaDao.upsertMeta(item.meta, libraryRoot);
       } catch (e, st) {
         dev.log('Post-copy failed for ${item.destPath}: $e',
             stackTrace: st, name: '$runtimeType.apply');
