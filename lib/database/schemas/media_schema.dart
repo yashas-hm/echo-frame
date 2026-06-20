@@ -28,7 +28,8 @@ class MediaRecords extends Table {
 
   BoolColumn get isTrashed => boolean().withDefault(const Constant(false))();
 
-  List<Set<Column>> get uniqueColumns => [
+  @override
+  List<Set<Column>> get uniqueKeys => [
         {relativePath}
       ];
 }

@@ -1,12 +1,13 @@
 part of '../import_screen.dart';
 
-class DoneView extends StatelessWidget {
-  const DoneView(this.state, {super.key});
+class DoneView extends ConsumerWidget {
+  const DoneView(this.state, this.type, {super.key});
 
   final ImportState state;
+  final ImportType type;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final allErrors = [
       ...?state.plan?.errors,
@@ -44,7 +45,10 @@ class DoneView extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: EFSuccessButton(
-                onPressed: context.pop,
+                onPressed: () {
+                  ref.read(importProvider(type).notifier).reset();
+                  context.pop();
+                },
                 text: 'Sort Complete',
               ),
             ),

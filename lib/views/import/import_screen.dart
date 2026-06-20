@@ -55,9 +55,9 @@ class _OrganizerScreenState extends ConsumerState<ImportScreen> {
       return switch (state.phase) {
         ImportPhase.review => ReviewView(state, _importType!),
         ImportPhase.error => ErrorView(state, _importType!),
+        ImportPhase.done => DoneView(state,_importType!),
         ImportPhase.discovering => DiscoveringView(state),
         ImportPhase.applying => ApplyingView(state),
-        ImportPhase.done => DoneView(state),
         ImportPhase.idle => IdleView(
             state,
             _importType!,
