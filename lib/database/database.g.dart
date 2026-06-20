@@ -8,7 +8,9 @@ class $MediaRecordsTable extends MediaRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $MediaRecordsTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
@@ -90,6 +92,7 @@ class $MediaRecordsTable extends MediaRecords
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_trashed" IN (0, 1))'),
       defaultValue: const Constant(false));
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -105,11 +108,14 @@ class $MediaRecordsTable extends MediaRecords
         isFavorite,
         isTrashed
       ];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'media_records';
+
   @override
   VerificationContext validateIntegrity(Insertable<MediaRecord> instance,
       {bool isInserting = false}) {
@@ -187,6 +193,7 @@ class $MediaRecordsTable extends MediaRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+
   @override
   MediaRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -237,6 +244,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final String? jsonData;
   final bool isFavorite;
   final bool isTrashed;
+
   const MediaRecord(
       {required this.id,
       required this.relativePath,
@@ -250,6 +258,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       this.jsonData,
       required this.isFavorite,
       required this.isTrashed});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -327,6 +336,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       isTrashed: serializer.fromJson<bool>(json['isTrashed']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -375,6 +385,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         isFavorite: isFavorite ?? this.isFavorite,
         isTrashed: isTrashed ?? this.isTrashed,
       );
+
   MediaRecord copyWithCompanion(MediaRecordsCompanion data) {
     return MediaRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -435,6 +446,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       jsonData,
       isFavorite,
       isTrashed);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -467,6 +479,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<bool> isFavorite;
   final Value<bool> isTrashed;
   final Value<int> rowid;
+
   const MediaRecordsCompanion({
     this.id = const Value.absent(),
     this.relativePath = const Value.absent(),
@@ -482,6 +495,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.isTrashed = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   MediaRecordsCompanion.insert({
     required String id,
     required String relativePath,
@@ -499,6 +513,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   })  : id = Value(id),
         relativePath = Value(relativePath),
         filename = Value(filename);
+
   static Insertable<MediaRecord> custom({
     Expression<String>? id,
     Expression<String>? relativePath,
@@ -633,7 +648,9 @@ class $TagRecordsTable extends TagRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $TagRecordsTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
@@ -646,13 +663,17 @@ class $TagRecordsTable extends TagRecords
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+
   @override
   List<GeneratedColumn> get $columns => [id, value];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'tag_records';
+
   @override
   VerificationContext validateIntegrity(Insertable<TagRecord> instance,
       {bool isInserting = false}) {
@@ -674,6 +695,7 @@ class $TagRecordsTable extends TagRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+
   @override
   TagRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -694,7 +716,9 @@ class $TagRecordsTable extends TagRecords
 class TagRecord extends DataClass implements Insertable<TagRecord> {
   final String id;
   final String value;
+
   const TagRecord({required this.id, required this.value});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -718,6 +742,7 @@ class TagRecord extends DataClass implements Insertable<TagRecord> {
       value: serializer.fromJson<String>(json['value']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -731,6 +756,7 @@ class TagRecord extends DataClass implements Insertable<TagRecord> {
         id: id ?? this.id,
         value: value ?? this.value,
       );
+
   TagRecord copyWithCompanion(TagRecordsCompanion data) {
     return TagRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -749,6 +775,7 @@ class TagRecord extends DataClass implements Insertable<TagRecord> {
 
   @override
   int get hashCode => Object.hash(id, value);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -759,17 +786,20 @@ class TagRecordsCompanion extends UpdateCompanion<TagRecord> {
   final Value<String> id;
   final Value<String> value;
   final Value<int> rowid;
+
   const TagRecordsCompanion({
     this.id = const Value.absent(),
     this.value = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   TagRecordsCompanion.insert({
     required String id,
     required String value,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         value = Value(value);
+
   static Insertable<TagRecord> custom({
     Expression<String>? id,
     Expression<String>? value,
@@ -822,7 +852,9 @@ class $MediaTagRecordsTable extends MediaTagRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $MediaTagRecordsTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _mediaIdMeta =
       const VerificationMeta('mediaId');
   @override
@@ -840,13 +872,17 @@ class $MediaTagRecordsTable extends MediaTagRecords
       requiredDuringInsert: true,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES tag_records (id)'));
+
   @override
   List<GeneratedColumn> get $columns => [mediaId, tagId];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'media_tag_records';
+
   @override
   VerificationContext validateIntegrity(Insertable<MediaTagRecord> instance,
       {bool isInserting = false}) {
@@ -869,6 +905,7 @@ class $MediaTagRecordsTable extends MediaTagRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {mediaId, tagId};
+
   @override
   MediaTagRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -889,7 +926,9 @@ class $MediaTagRecordsTable extends MediaTagRecords
 class MediaTagRecord extends DataClass implements Insertable<MediaTagRecord> {
   final String mediaId;
   final String tagId;
+
   const MediaTagRecord({required this.mediaId, required this.tagId});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -913,6 +952,7 @@ class MediaTagRecord extends DataClass implements Insertable<MediaTagRecord> {
       tagId: serializer.fromJson<String>(json['tagId']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -926,6 +966,7 @@ class MediaTagRecord extends DataClass implements Insertable<MediaTagRecord> {
         mediaId: mediaId ?? this.mediaId,
         tagId: tagId ?? this.tagId,
       );
+
   MediaTagRecord copyWithCompanion(MediaTagRecordsCompanion data) {
     return MediaTagRecord(
       mediaId: data.mediaId.present ? data.mediaId.value : this.mediaId,
@@ -944,6 +985,7 @@ class MediaTagRecord extends DataClass implements Insertable<MediaTagRecord> {
 
   @override
   int get hashCode => Object.hash(mediaId, tagId);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -956,17 +998,20 @@ class MediaTagRecordsCompanion extends UpdateCompanion<MediaTagRecord> {
   final Value<String> mediaId;
   final Value<String> tagId;
   final Value<int> rowid;
+
   const MediaTagRecordsCompanion({
     this.mediaId = const Value.absent(),
     this.tagId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   MediaTagRecordsCompanion.insert({
     required String mediaId,
     required String tagId,
     this.rowid = const Value.absent(),
   })  : mediaId = Value(mediaId),
         tagId = Value(tagId);
+
   static Insertable<MediaTagRecord> custom({
     Expression<String>? mediaId,
     Expression<String>? tagId,
@@ -1016,14 +1061,17 @@ class MediaTagRecordsCompanion extends UpdateCompanion<MediaTagRecord> {
 
 abstract class _$EchoDatabase extends GeneratedDatabase {
   _$EchoDatabase(QueryExecutor e) : super(e);
+
   $EchoDatabaseManager get managers => $EchoDatabaseManager(this);
   late final $MediaRecordsTable mediaRecords = $MediaRecordsTable(this);
   late final $TagRecordsTable tagRecords = $TagRecordsTable(this);
   late final $MediaTagRecordsTable mediaTagRecords =
       $MediaTagRecordsTable(this);
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
       [mediaRecords, tagRecords, mediaTagRecords];
@@ -1093,6 +1141,7 @@ class $$MediaRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnFilters<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -1160,6 +1209,7 @@ class $$MediaRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnOrderings<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -1209,6 +1259,7 @@ class $$MediaRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -1438,6 +1489,7 @@ class $$TagRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnFilters<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -1475,6 +1527,7 @@ class $$TagRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnOrderings<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -1491,6 +1544,7 @@ class $$TagRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -1666,6 +1720,7 @@ class $$MediaTagRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   $$MediaRecordsTableFilterComposer get mediaId {
     final $$MediaRecordsTableFilterComposer composer = $composerBuilder(
         composer: this,
@@ -1716,6 +1771,7 @@ class $$MediaTagRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   $$MediaRecordsTableOrderingComposer get mediaId {
     final $$MediaRecordsTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -1766,6 +1822,7 @@ class $$MediaTagRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   $$MediaRecordsTableAnnotationComposer get mediaId {
     final $$MediaRecordsTableAnnotationComposer composer = $composerBuilder(
         composer: this,
@@ -1919,11 +1976,15 @@ typedef $$MediaTagRecordsTableProcessedTableManager = ProcessedTableManager<
 
 class $EchoDatabaseManager {
   final _$EchoDatabase _db;
+
   $EchoDatabaseManager(this._db);
+
   $$MediaRecordsTableTableManager get mediaRecords =>
       $$MediaRecordsTableTableManager(_db, _db.mediaRecords);
+
   $$TagRecordsTableTableManager get tagRecords =>
       $$TagRecordsTableTableManager(_db, _db.tagRecords);
+
   $$MediaTagRecordsTableTableManager get mediaTagRecords =>
       $$MediaTagRecordsTableTableManager(_db, _db.mediaTagRecords);
 }

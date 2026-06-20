@@ -36,8 +36,8 @@ class MediaItem {
       thumbnailPath: j['thumbnailPath'] as String?,
       tags: tags,
       meta: Metadata(
-        capturedAt: r.capturedAt ??
-            DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+        capturedAt:
+            r.capturedAt ?? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
         modifiedAt: j['modifiedAt'] != null
             ? DateTime.parse(j['modifiedAt'] as String)
             : null,
