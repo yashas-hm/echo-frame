@@ -87,12 +87,10 @@ class _PhotoDetailPanelState extends ConsumerState<GalleryInfoPanel> {
               widget.item.capturedAt,
             ),
           ),
-          if (widget.item.meta.modifiedAt != null)
+          if (widget.item.modifiedAt != null)
             _Row(
               Icons.edit_calendar_outlined,
-              _formatDate(
-                widget.item.meta.modifiedAt,
-              ),
+              _formatDate(widget.item.modifiedAt),
             ),
           if (widget.item.width != null && widget.item.height != null)
             _Row(

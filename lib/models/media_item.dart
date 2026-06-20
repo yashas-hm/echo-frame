@@ -8,16 +8,16 @@ class MediaItem {
   final String filePath;
   final String? thumbnailPath;
   final List<Tag> tags;
-  final Metadata meta;
+  final Metadata _meta;
 
   const MediaItem({
     required this.id,
     required this.isFavorite,
     required this.filePath,
-    required this.meta,
+    required Metadata meta,
     this.thumbnailPath,
     this.tags = const [],
-  });
+  }) : _meta = meta;
 
   factory MediaItem.fromRecord(
     MediaRecord r,
@@ -49,25 +49,27 @@ class MediaItem {
         ),
       );
 
-  DateTime get capturedAt => meta.capturedAt;
+  DateTime get capturedAt => _meta.capturedAt;
 
-  int? get width => meta.width;
+  DateTime? get modifiedAt => _meta.modifiedAt;
 
-  int? get height => meta.height;
+  int? get width => _meta.width;
 
-  int? get durationMs => meta.durationMs;
+  int? get height => _meta.height;
 
-  String? get cameraMake => meta.cameraMake;
+  int? get durationMs => _meta.durationMs;
 
-  String? get cameraModel => meta.cameraModel;
+  String? get cameraMake => _meta.cameraMake;
 
-  double? get latitude => meta.latitude;
+  String? get cameraModel => _meta.cameraModel;
 
-  double? get longitude => meta.longitude;
+  double? get latitude => _meta.latitude;
 
-  double? get altitude => meta.altitude;
+  double? get longitude => _meta.longitude;
 
-  MediaType get mediaType => meta.mediaType;
+  double? get altitude => _meta.altitude;
 
-  bool get isVideo => meta.mediaType == MediaType.video;
+  MediaType get mediaType => _meta.mediaType;
+
+  bool get isVideo => _meta.mediaType == MediaType.video;
 }
