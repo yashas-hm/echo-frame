@@ -17,8 +17,11 @@ class ConfigService {
     try {
       return jsonDecode(await file.readAsString()) as Map<String, dynamic>;
     } catch (e, st) {
-      dev.log('Failed to read echo_config.json: $e',
-          stackTrace: st, name: 'ConfigService._readRaw');
+      dev.log(
+        'Failed to read echo_config.json: $e',
+        stackTrace: st,
+        name: 'ConfigService._readRaw',
+      );
       return null;
     }
   }
@@ -30,8 +33,11 @@ class ConfigService {
       await file.parent.create(recursive: true);
       await file.writeAsString(jsonEncode(data));
     } catch (e, st) {
-      dev.log('Failed to write echo_config.json: $e',
-          stackTrace: st, name: 'ConfigService._write');
+      dev.log(
+        'Failed to write echo_config.json: $e',
+        stackTrace: st,
+        name: 'ConfigService._write',
+      );
     }
   }
 

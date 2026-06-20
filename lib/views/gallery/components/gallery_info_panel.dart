@@ -82,27 +82,41 @@ class _PhotoDetailPanelState extends ConsumerState<GalleryInfoPanel> {
           // ── Metadata ─────────────────────────────────────────────────
           Text('Info', style: theme.textTheme.labelLarge),
           const SizedBox(height: 12),
-          _Row(Icons.calendar_today_outlined,
-              _formatDate(widget.item.capturedAt)),
+          _Row(
+            Icons.calendar_today_outlined,
+            _formatDate(
+              widget.item.capturedAt,
+            ),
+          ),
           if (widget.item.meta.modifiedAt != null)
-            _Row(Icons.edit_calendar_outlined,
-                _formatDate(widget.item.meta.modifiedAt)),
+            _Row(
+              Icons.edit_calendar_outlined,
+              _formatDate(
+                widget.item.meta.modifiedAt,
+              ),
+            ),
           if (widget.item.width != null && widget.item.height != null)
-            _Row(Icons.photo_size_select_actual_outlined,
-                '${widget.item.width} × ${widget.item.height}'),
+            _Row(
+              Icons.photo_size_select_actual_outlined,
+              '${widget.item.width} × ${widget.item.height}',
+            ),
           if (widget.item.cameraMake != null || widget.item.cameraModel != null)
             _Row(
-                Icons.camera_outlined,
-                [widget.item.cameraMake, widget.item.cameraModel]
-                    .nonNulls
-                    .join(' ')),
+              Icons.camera_outlined,
+              [widget.item.cameraMake, widget.item.cameraModel]
+                  .nonNulls
+                  .join(' '),
+            ),
           if (widget.item.latitude != null && widget.item.longitude != null)
             _Row(
-                Icons.location_on_outlined,
-                '${widget.item.latitude!.toStringAsFixed(4)}, '
-                '${widget.item.longitude!.toStringAsFixed(4)}'),
-          _Row(Icons.insert_drive_file_outlined,
-              widget.item.filePath.split('/').last),
+              Icons.location_on_outlined,
+              '${widget.item.latitude!.toStringAsFixed(4)}, '
+              '${widget.item.longitude!.toStringAsFixed(4)}',
+            ),
+          _Row(
+            Icons.insert_drive_file_outlined,
+            widget.item.filePath.split('/').last,
+          ),
         ],
       ),
     );

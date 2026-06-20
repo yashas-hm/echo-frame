@@ -174,7 +174,9 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                     const SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.all(24),
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
                       ),
                     ),
                 ],

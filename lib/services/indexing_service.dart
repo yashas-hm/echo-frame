@@ -90,7 +90,10 @@ class IndexingService {
     for (int i = 0; i < paths.length; i++) {
       final m = metas[i];
       if (m == null) {
-        dev.log('No metadata for ${paths[i]}', name: 'IndexingService');
+        dev.log(
+          'No metadata for ${paths[i]}',
+          name: 'IndexingService',
+        );
         continue;
       }
       try {

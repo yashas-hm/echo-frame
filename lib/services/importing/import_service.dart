@@ -59,8 +59,11 @@ abstract class ImportService {
         await Directory(item.destPath).parent.create(recursive: true);
         await File(item.mediaPath).copy(item.destPath);
       } catch (e, st) {
-        dev.log('Copy failed for ${item.mediaPath}: $e',
-            stackTrace: st, name: '$runtimeType.apply');
+        dev.log(
+          'Copy failed for ${item.mediaPath}: $e',
+          stackTrace: st,
+          name: '$runtimeType.apply',
+        );
         applyErrors.add(DiscoveryError(
           sourcePath: item.mediaPath,
           reason: 'File Copy Error',

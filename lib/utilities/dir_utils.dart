@@ -19,8 +19,11 @@ class DirUtils {
       try {
         entries = dir.listSync();
       } catch (e, st) {
-        dev.log('Failed to list ${dir.path}: $e',
-            stackTrace: st, name: 'DirUtils.walk');
+        dev.log(
+          'Failed to list ${dir.path}: $e',
+          stackTrace: st,
+          name: 'DirUtils.walk',
+        );
         continue;
       }
 

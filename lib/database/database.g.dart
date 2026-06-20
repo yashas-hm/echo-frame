@@ -8,7 +8,9 @@ class $MediaRecordsTable extends MediaRecords
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $MediaRecordsTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -150,6 +152,7 @@ class $MediaRecordsTable extends MediaRecords
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("has_json_index" IN (0, 1))'),
       defaultValue: const Constant(false));
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -174,11 +177,14 @@ class $MediaRecordsTable extends MediaRecords
         isTrashed,
         hasJsonIndex
       ];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'media_records';
+
   @override
   VerificationContext validateIntegrity(Insertable<MediaRecord> instance,
       {bool isInserting = false}) {
@@ -300,6 +306,7 @@ class $MediaRecordsTable extends MediaRecords
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+
   @override
   MediaRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -377,6 +384,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final bool isFavorite;
   final bool isTrashed;
   final bool hasJsonIndex;
+
   const MediaRecord(
       {required this.id,
       required this.relativePath,
@@ -399,6 +407,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       required this.isFavorite,
       required this.isTrashed,
       required this.hasJsonIndex});
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -529,6 +538,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       hasJsonIndex: serializer.fromJson<bool>(json['hasJsonIndex']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -605,6 +615,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         isTrashed: isTrashed ?? this.isTrashed,
         hasJsonIndex: hasJsonIndex ?? this.hasJsonIndex,
       );
+
   MediaRecord copyWithCompanion(MediaRecordsCompanion data) {
     return MediaRecord(
       id: data.id.present ? data.id.value : this.id,
@@ -699,6 +710,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
         isTrashed,
         hasJsonIndex
       ]);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -748,6 +760,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<bool> isFavorite;
   final Value<bool> isTrashed;
   final Value<bool> hasJsonIndex;
+
   const MediaRecordsCompanion({
     this.id = const Value.absent(),
     this.relativePath = const Value.absent(),
@@ -771,6 +784,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.isTrashed = const Value.absent(),
     this.hasJsonIndex = const Value.absent(),
   });
+
   MediaRecordsCompanion.insert({
     this.id = const Value.absent(),
     required String relativePath,
@@ -796,6 +810,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   })  : relativePath = Value(relativePath),
         filename = Value(filename),
         indexedAt = Value(indexedAt);
+
   static Insertable<MediaRecord> custom({
     Expression<int>? id,
     Expression<String>? relativePath,
@@ -991,11 +1006,14 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
 
 abstract class _$EchoDatabase extends GeneratedDatabase {
   _$EchoDatabase(QueryExecutor e) : super(e);
+
   $EchoDatabaseManager get managers => $EchoDatabaseManager(this);
   late final $MediaRecordsTable mediaRecords = $MediaRecordsTable(this);
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [mediaRecords];
 }
@@ -1058,6 +1076,7 @@ class $$MediaRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
@@ -1131,6 +1150,7 @@ class $$MediaRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
@@ -1209,6 +1229,7 @@ class $$MediaRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -1415,7 +1436,9 @@ typedef $$MediaRecordsTableProcessedTableManager = ProcessedTableManager<
 
 class $EchoDatabaseManager {
   final _$EchoDatabase _db;
+
   $EchoDatabaseManager(this._db);
+
   $$MediaRecordsTableTableManager get mediaRecords =>
       $$MediaRecordsTableTableManager(_db, _db.mediaRecords);
 }

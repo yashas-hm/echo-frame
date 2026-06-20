@@ -1,6 +1,6 @@
-import 'package:echo_frame/views/shell/components/title_bar.dart';
 import 'package:echo_frame/utilities/utilities.dart' show SearchIntent;
 import 'package:echo_frame/views/shell/components/nav_bar.dart';
+import 'package:echo_frame/views/shell/components/title_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

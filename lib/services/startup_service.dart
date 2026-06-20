@@ -72,8 +72,11 @@ class _EchoWindowListener extends WindowListener {
       Prefs.windowX = pos.dx;
       Prefs.windowY = pos.dy;
     } catch (e, st) {
-      dev.log('failed to persist window geometry: $e',
-          stackTrace: st, name: 'StartupService');
+      dev.log(
+        'failed to persist window geometry: $e',
+        stackTrace: st,
+        name: 'StartupService',
+      );
     }
   }
 

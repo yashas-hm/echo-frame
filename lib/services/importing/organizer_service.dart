@@ -33,8 +33,10 @@ class OrganizerService extends ImportService {
       final mmp = mmpByPath[mediaPath];
 
       if (mmp == null) {
-        dev.log('Skipping $mediaPath — MMP null',
-            name: 'OrganizerService.discover');
+        dev.log(
+          'Skipping $mediaPath — MMP null',
+          name: 'OrganizerService.discover',
+        );
         discoveryErrors.add(DiscoveryError(
           sourcePath: mediaPath,
           reason: 'File Possibly Corrupted (No Metadata)',

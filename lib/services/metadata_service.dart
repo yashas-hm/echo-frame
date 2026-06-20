@@ -27,8 +27,7 @@ class MetadataService {
     ];
   }
 
-  static Metadata _fromPlugin(MediaMetadata meta, DateTime mtime) =>
-      Metadata(
+  static Metadata _fromPlugin(MediaMetadata meta, DateTime mtime) => Metadata(
         capturedAt: meta.capturedAt ?? mtime,
         modifiedAt: meta.modifiedAt,
         width: meta.width,
