@@ -27,12 +27,15 @@ class PhotoTile extends StatelessWidget {
     );
   }
 
-  Widget _imageTile(AppThemeColors colors) => Image.file(
-        File(item.filePath),
-        cacheWidth: item.width == null ? 180 : item.width! ~/ 10,
-        cacheHeight: item.height == null ? 180 : item.height! ~/ 10,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _placeholder(colors),
+  Widget _imageTile(AppThemeColors colors) => Hero(
+        tag: item.id,
+        child: Image.file(
+          File(item.filePath),
+          cacheWidth: item.width == null ? 180 : item.width! ~/ 10,
+          cacheHeight: item.height == null ? 180 : item.height! ~/ 10,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _placeholder(colors),
+        ),
       );
 
   Widget _videoTile(AppThemeColors colors) {
@@ -41,7 +44,13 @@ class PhotoTile extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         if (thumb != null)
-          Image.file(File(thumb), fit: BoxFit.cover)
+          Hero(
+            tag: item.id,
+            child: Image.file(
+              File(thumb),
+              fit: BoxFit.cover,
+            ),
+          )
         else
           _placeholder(
             colors,
@@ -75,8 +84,11 @@ class PhotoTile extends StatelessWidget {
     AppThemeColors colors, {
     IconData icon = Icons.hide_image_outlined,
   }) =>
-      ColoredBox(
-        color: colors.surfacePrimary,
-        child: Icon(icon, color: colors.borderPrimary),
+      Hero(
+        tag: item.id,
+        child: ColoredBox(
+          color: colors.surfacePrimary,
+          child: Icon(icon, color: colors.borderPrimary),
+        ),
       );
 }

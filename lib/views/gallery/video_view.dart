@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as dev;
+import 'dart:io';
 
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
@@ -68,10 +69,19 @@ class _VideoViewState extends State<VideoView> {
       children: [
         GestureDetector(
           onTap: _player.playOrPause,
-          child: Video(
-            controller: _controller,
-            controls: NoVideoControls,
-            fill: KnownColors.transparent,
+          child: Hero(
+            flightShuttleBuilder: (_, __, ___, ____, _____) {
+              final thumb = widget.item.thumbnailPath;
+              return thumb != null
+                  ? Image.file(File(thumb), fit: BoxFit.contain)
+                  : const ColoredBox(color: Colors.black);
+            },
+            tag: widget.item.id,
+            child: Video(
+              controller: _controller,
+              controls: NoVideoControls,
+              fill: KnownColors.transparent,
+            ),
           ),
         ),
         Positioned(
