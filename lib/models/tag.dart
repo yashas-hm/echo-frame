@@ -1,6 +1,6 @@
 class Tag {
-  final String uuid;
+  final String id;
   final String value;
 
-  const Tag({required this.uuid, required this.value});
+  const Tag({required this.id, required this.value});
 }

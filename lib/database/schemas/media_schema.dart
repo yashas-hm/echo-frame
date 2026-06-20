@@ -1,7 +1,10 @@
 import 'package:drift/drift.dart';
 
 class MediaRecords extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 
   TextColumn get relativePath => text()();
 

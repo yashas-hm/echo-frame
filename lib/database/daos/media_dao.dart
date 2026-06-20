@@ -8,6 +8,7 @@ import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/models/tag.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
+import 'package:uuid/uuid.dart';
 
 class MediaDao {
   const MediaDao._();
@@ -27,24 +28,24 @@ class MediaDao {
     final tagRows = await (_db.select(_db.tagRecords).join([
       innerJoin(
         _db.mediaTagRecords,
-        _db.mediaTagRecords.tagUuid.equalsExp(_db.tagRecords.uuid),
+        _db.mediaTagRecords.tagId.equalsExp(_db.tagRecords.id),
       ),
     ])
           ..where(_db.mediaTagRecords.mediaId.isIn(ids)))
         .get();
 
-    final tagsByMediaId = <int, List<Tag>>{};
+    final tagsById = <String, List<Tag>>{};
     for (final row in tagRows) {
       final mediaId = row.readTable(_db.mediaTagRecords).mediaId;
       final t = row.readTable(_db.tagRecords);
-      (tagsByMediaId[mediaId] ??= []).add(Tag(uuid: t.uuid, value: t.value));
+      (tagsById[mediaId] ??= []).add(Tag(id: t.id, value: t.value));
     }
 
     return records
         .map((r) => MediaItem.fromRecord(
               r,
               '$root/${r.relativePath}',
-              tagsByMediaId[r.id] ?? const [],
+              tagsById[r.id] ?? const [],
             ))
         .toList();
   }
@@ -98,7 +99,7 @@ class MediaDao {
     return _toItems(records);
   }
 
-  Future<MediaItem?> getById(int id) async {
+  Future<MediaItem?> getById(String id) async {
     final r = await (_db.select(_db.mediaRecords)
           ..where((r) => r.id.equals(id)))
         .getSingleOrNull();
@@ -112,16 +113,14 @@ class MediaDao {
     final records = await (_db.select(_db.mediaRecords)
           ..where((r) => r.isFavorite.equals(true) & r.isTrashed.equals(false))
           ..orderBy([
-            (r) => OrderingTerm(
-                  expression: r.capturedAt,
-                  mode: OrderingMode.desc,
-                ),
+            (r) =>
+                OrderingTerm(expression: r.capturedAt, mode: OrderingMode.desc),
           ]))
         .get();
     return _toItems(records);
   }
 
-  Future<void> setFavorite(int id, {required bool value}) =>
+  Future<void> setFavorite(String id, {required bool value}) =>
       (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))
           .write(MediaRecordsCompanion(isFavorite: Value(value)));
 
@@ -137,7 +136,15 @@ class MediaDao {
   Future<void> _upsertBatch(List<MediaRecordsCompanion> companions) =>
       _db.batch((b) {
         for (final c in companions) {
-          b.insert(_db.mediaRecords, c, onConflict: DoUpdate((old) => c));
+          b.insert(
+            _db.mediaRecords,
+            c,
+            onConflict: DoUpdate(
+              // preserve existing id on conflict — only update metadata fields
+              (old) => c.copyWith(id: const Value.absent()),
+              target: [_db.mediaRecords.relativePath],
+            ),
+          );
         }
       });
 
@@ -164,6 +171,7 @@ class MediaDao {
     final thumbnail = _existingThumbnail(absolutePath);
     if (thumbnail != null) jsonMap['thumbnailPath'] = thumbnail;
     return MediaRecordsCompanion(
+      id: Value(Uuid().v4()),
       relativePath: Value(relativePath),
       filename: Value(absolutePath.split('/').last),
       mediaType: Value(meta.mediaType.name),

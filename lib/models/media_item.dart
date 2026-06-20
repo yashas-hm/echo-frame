@@ -5,7 +5,7 @@ import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/models/tag.dart';
 
 class MediaItem {
-  final int id;
+  final String id;
   final bool isFavorite;
   final String filePath;
   final String? thumbnailPath;

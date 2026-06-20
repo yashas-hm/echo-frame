@@ -11,13 +11,9 @@ class $MediaRecordsTable extends MediaRecords
   $MediaRecordsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _relativePathMeta =
       const VerificationMeta('relativePath');
   @override
@@ -121,6 +117,8 @@ class $MediaRecordsTable extends MediaRecords
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('relative_path')) {
       context.handle(
@@ -194,7 +192,7 @@ class $MediaRecordsTable extends MediaRecords
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MediaRecord(
       id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       relativePath: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}relative_path'])!,
       filename: attachedDatabase.typeMapping
@@ -227,7 +225,7 @@ class $MediaRecordsTable extends MediaRecords
 }
 
 class MediaRecord extends DataClass implements Insertable<MediaRecord> {
-  final int id;
+  final String id;
   final String relativePath;
   final String filename;
   final String mediaType;
@@ -255,7 +253,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['relative_path'] = Variable<String>(relativePath);
     map['filename'] = Variable<String>(filename);
     map['media_type'] = Variable<String>(mediaType);
@@ -315,7 +313,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MediaRecord(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       relativePath: serializer.fromJson<String>(json['relativePath']),
       filename: serializer.fromJson<String>(json['filename']),
       mediaType: serializer.fromJson<String>(json['mediaType']),
@@ -333,7 +331,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'relativePath': serializer.toJson<String>(relativePath),
       'filename': serializer.toJson<String>(filename),
       'mediaType': serializer.toJson<String>(mediaType),
@@ -349,7 +347,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   }
 
   MediaRecord copyWith(
-          {int? id,
+          {String? id,
           String? relativePath,
           String? filename,
           String? mediaType,
@@ -456,7 +454,7 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
 }
 
 class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> relativePath;
   final Value<String> filename;
   final Value<String> mediaType;
@@ -468,6 +466,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<String?> jsonData;
   final Value<bool> isFavorite;
   final Value<bool> isTrashed;
+  final Value<int> rowid;
   const MediaRecordsCompanion({
     this.id = const Value.absent(),
     this.relativePath = const Value.absent(),
@@ -481,9 +480,10 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.jsonData = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.isTrashed = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   MediaRecordsCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String relativePath,
     required String filename,
     this.mediaType = const Value.absent(),
@@ -495,10 +495,12 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.jsonData = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.isTrashed = const Value.absent(),
-  })  : relativePath = Value(relativePath),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        relativePath = Value(relativePath),
         filename = Value(filename);
   static Insertable<MediaRecord> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? relativePath,
     Expression<String>? filename,
     Expression<String>? mediaType,
@@ -510,6 +512,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     Expression<String>? jsonData,
     Expression<bool>? isFavorite,
     Expression<bool>? isTrashed,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -524,11 +527,12 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       if (jsonData != null) 'json_data': jsonData,
       if (isFavorite != null) 'is_favorite': isFavorite,
       if (isTrashed != null) 'is_trashed': isTrashed,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   MediaRecordsCompanion copyWith(
-      {Value<int>? id,
+      {Value<String>? id,
       Value<String>? relativePath,
       Value<String>? filename,
       Value<String>? mediaType,
@@ -539,7 +543,8 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       Value<String?>? cameraModel,
       Value<String?>? jsonData,
       Value<bool>? isFavorite,
-      Value<bool>? isTrashed}) {
+      Value<bool>? isTrashed,
+      Value<int>? rowid}) {
     return MediaRecordsCompanion(
       id: id ?? this.id,
       relativePath: relativePath ?? this.relativePath,
@@ -553,6 +558,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       jsonData: jsonData ?? this.jsonData,
       isFavorite: isFavorite ?? this.isFavorite,
       isTrashed: isTrashed ?? this.isTrashed,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -560,7 +566,7 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (relativePath.present) {
       map['relative_path'] = Variable<String>(relativePath.value);
@@ -595,6 +601,9 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     if (isTrashed.present) {
       map['is_trashed'] = Variable<bool>(isTrashed.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -612,7 +621,8 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
           ..write('cameraModel: $cameraModel, ')
           ..write('jsonData: $jsonData, ')
           ..write('isFavorite: $isFavorite, ')
-          ..write('isTrashed: $isTrashed')
+          ..write('isTrashed: $isTrashed, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -624,10 +634,10 @@ class $TagRecordsTable extends TagRecords
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $TagRecordsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
-      'uuid', aliasedName, false,
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _valueMeta = const VerificationMeta('value');
   @override
@@ -637,7 +647,7 @@ class $TagRecordsTable extends TagRecords
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
   @override
-  List<GeneratedColumn> get $columns => [uuid, value];
+  List<GeneratedColumn> get $columns => [id, value];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -648,11 +658,10 @@ class $TagRecordsTable extends TagRecords
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('uuid')) {
-      context.handle(
-          _uuidMeta, uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta));
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     } else if (isInserting) {
-      context.missing(_uuidMeta);
+      context.missing(_idMeta);
     }
     if (data.containsKey('value')) {
       context.handle(
@@ -664,13 +673,13 @@ class $TagRecordsTable extends TagRecords
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {uuid};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TagRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TagRecord(
-      uuid: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}uuid'])!,
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       value: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}value'])!,
     );
@@ -683,20 +692,20 @@ class $TagRecordsTable extends TagRecords
 }
 
 class TagRecord extends DataClass implements Insertable<TagRecord> {
-  final String uuid;
+  final String id;
   final String value;
-  const TagRecord({required this.uuid, required this.value});
+  const TagRecord({required this.id, required this.value});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['uuid'] = Variable<String>(uuid);
+    map['id'] = Variable<String>(id);
     map['value'] = Variable<String>(value);
     return map;
   }
 
   TagRecordsCompanion toCompanion(bool nullToAbsent) {
     return TagRecordsCompanion(
-      uuid: Value(uuid),
+      id: Value(id),
       value: Value(value),
     );
   }
@@ -705,7 +714,7 @@ class TagRecord extends DataClass implements Insertable<TagRecord> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TagRecord(
-      uuid: serializer.fromJson<String>(json['uuid']),
+      id: serializer.fromJson<String>(json['id']),
       value: serializer.fromJson<String>(json['value']),
     );
   }
@@ -713,18 +722,18 @@ class TagRecord extends DataClass implements Insertable<TagRecord> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'uuid': serializer.toJson<String>(uuid),
+      'id': serializer.toJson<String>(id),
       'value': serializer.toJson<String>(value),
     };
   }
 
-  TagRecord copyWith({String? uuid, String? value}) => TagRecord(
-        uuid: uuid ?? this.uuid,
+  TagRecord copyWith({String? id, String? value}) => TagRecord(
+        id: id ?? this.id,
         value: value ?? this.value,
       );
   TagRecord copyWithCompanion(TagRecordsCompanion data) {
     return TagRecord(
-      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      id: data.id.present ? data.id.value : this.id,
       value: data.value.present ? data.value.value : this.value,
     );
   }
@@ -732,53 +741,51 @@ class TagRecord extends DataClass implements Insertable<TagRecord> {
   @override
   String toString() {
     return (StringBuffer('TagRecord(')
-          ..write('uuid: $uuid, ')
+          ..write('id: $id, ')
           ..write('value: $value')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(uuid, value);
+  int get hashCode => Object.hash(id, value);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is TagRecord &&
-          other.uuid == this.uuid &&
-          other.value == this.value);
+      (other is TagRecord && other.id == this.id && other.value == this.value);
 }
 
 class TagRecordsCompanion extends UpdateCompanion<TagRecord> {
-  final Value<String> uuid;
+  final Value<String> id;
   final Value<String> value;
   final Value<int> rowid;
   const TagRecordsCompanion({
-    this.uuid = const Value.absent(),
+    this.id = const Value.absent(),
     this.value = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TagRecordsCompanion.insert({
-    required String uuid,
+    required String id,
     required String value,
     this.rowid = const Value.absent(),
-  })  : uuid = Value(uuid),
+  })  : id = Value(id),
         value = Value(value);
   static Insertable<TagRecord> custom({
-    Expression<String>? uuid,
+    Expression<String>? id,
     Expression<String>? value,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (uuid != null) 'uuid': uuid,
+      if (id != null) 'id': id,
       if (value != null) 'value': value,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   TagRecordsCompanion copyWith(
-      {Value<String>? uuid, Value<String>? value, Value<int>? rowid}) {
+      {Value<String>? id, Value<String>? value, Value<int>? rowid}) {
     return TagRecordsCompanion(
-      uuid: uuid ?? this.uuid,
+      id: id ?? this.id,
       value: value ?? this.value,
       rowid: rowid ?? this.rowid,
     );
@@ -787,8 +794,8 @@ class TagRecordsCompanion extends UpdateCompanion<TagRecord> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (uuid.present) {
-      map['uuid'] = Variable<String>(uuid.value);
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
     }
     if (value.present) {
       map['value'] = Variable<String>(value.value);
@@ -802,7 +809,7 @@ class TagRecordsCompanion extends UpdateCompanion<TagRecord> {
   @override
   String toString() {
     return (StringBuffer('TagRecordsCompanion(')
-          ..write('uuid: $uuid, ')
+          ..write('id: $id, ')
           ..write('value: $value, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -819,20 +826,22 @@ class $MediaTagRecordsTable extends MediaTagRecords
   static const VerificationMeta _mediaIdMeta =
       const VerificationMeta('mediaId');
   @override
-  late final GeneratedColumn<int> mediaId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> mediaId = GeneratedColumn<String>(
       'media_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _tagUuidMeta =
-      const VerificationMeta('tagUuid');
-  @override
-  late final GeneratedColumn<String> tagUuid = GeneratedColumn<String>(
-      'tag_uuid', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES tag_records (uuid)'));
+          GeneratedColumn.constraintIsAlways('REFERENCES media_records (id)'));
+  static const VerificationMeta _tagIdMeta = const VerificationMeta('tagId');
   @override
-  List<GeneratedColumn> get $columns => [mediaId, tagUuid];
+  late final GeneratedColumn<String> tagId = GeneratedColumn<String>(
+      'tag_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES tag_records (id)'));
+  @override
+  List<GeneratedColumn> get $columns => [mediaId, tagId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -849,25 +858,25 @@ class $MediaTagRecordsTable extends MediaTagRecords
     } else if (isInserting) {
       context.missing(_mediaIdMeta);
     }
-    if (data.containsKey('tag_uuid')) {
-      context.handle(_tagUuidMeta,
-          tagUuid.isAcceptableOrUnknown(data['tag_uuid']!, _tagUuidMeta));
+    if (data.containsKey('tag_id')) {
+      context.handle(
+          _tagIdMeta, tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta));
     } else if (isInserting) {
-      context.missing(_tagUuidMeta);
+      context.missing(_tagIdMeta);
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {mediaId, tagUuid};
+  Set<GeneratedColumn> get $primaryKey => {mediaId, tagId};
   @override
   MediaTagRecord map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MediaTagRecord(
       mediaId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}media_id'])!,
-      tagUuid: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}tag_uuid'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}media_id'])!,
+      tagId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}tag_id'])!,
     );
   }
 
@@ -878,21 +887,21 @@ class $MediaTagRecordsTable extends MediaTagRecords
 }
 
 class MediaTagRecord extends DataClass implements Insertable<MediaTagRecord> {
-  final int mediaId;
-  final String tagUuid;
-  const MediaTagRecord({required this.mediaId, required this.tagUuid});
+  final String mediaId;
+  final String tagId;
+  const MediaTagRecord({required this.mediaId, required this.tagId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['media_id'] = Variable<int>(mediaId);
-    map['tag_uuid'] = Variable<String>(tagUuid);
+    map['media_id'] = Variable<String>(mediaId);
+    map['tag_id'] = Variable<String>(tagId);
     return map;
   }
 
   MediaTagRecordsCompanion toCompanion(bool nullToAbsent) {
     return MediaTagRecordsCompanion(
       mediaId: Value(mediaId),
-      tagUuid: Value(tagUuid),
+      tagId: Value(tagId),
     );
   }
 
@@ -900,27 +909,27 @@ class MediaTagRecord extends DataClass implements Insertable<MediaTagRecord> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MediaTagRecord(
-      mediaId: serializer.fromJson<int>(json['mediaId']),
-      tagUuid: serializer.fromJson<String>(json['tagUuid']),
+      mediaId: serializer.fromJson<String>(json['mediaId']),
+      tagId: serializer.fromJson<String>(json['tagId']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'mediaId': serializer.toJson<int>(mediaId),
-      'tagUuid': serializer.toJson<String>(tagUuid),
+      'mediaId': serializer.toJson<String>(mediaId),
+      'tagId': serializer.toJson<String>(tagId),
     };
   }
 
-  MediaTagRecord copyWith({int? mediaId, String? tagUuid}) => MediaTagRecord(
+  MediaTagRecord copyWith({String? mediaId, String? tagId}) => MediaTagRecord(
         mediaId: mediaId ?? this.mediaId,
-        tagUuid: tagUuid ?? this.tagUuid,
+        tagId: tagId ?? this.tagId,
       );
   MediaTagRecord copyWithCompanion(MediaTagRecordsCompanion data) {
     return MediaTagRecord(
       mediaId: data.mediaId.present ? data.mediaId.value : this.mediaId,
-      tagUuid: data.tagUuid.present ? data.tagUuid.value : this.tagUuid,
+      tagId: data.tagId.present ? data.tagId.value : this.tagId,
     );
   }
 
@@ -928,53 +937,53 @@ class MediaTagRecord extends DataClass implements Insertable<MediaTagRecord> {
   String toString() {
     return (StringBuffer('MediaTagRecord(')
           ..write('mediaId: $mediaId, ')
-          ..write('tagUuid: $tagUuid')
+          ..write('tagId: $tagId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(mediaId, tagUuid);
+  int get hashCode => Object.hash(mediaId, tagId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is MediaTagRecord &&
           other.mediaId == this.mediaId &&
-          other.tagUuid == this.tagUuid);
+          other.tagId == this.tagId);
 }
 
 class MediaTagRecordsCompanion extends UpdateCompanion<MediaTagRecord> {
-  final Value<int> mediaId;
-  final Value<String> tagUuid;
+  final Value<String> mediaId;
+  final Value<String> tagId;
   final Value<int> rowid;
   const MediaTagRecordsCompanion({
     this.mediaId = const Value.absent(),
-    this.tagUuid = const Value.absent(),
+    this.tagId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MediaTagRecordsCompanion.insert({
-    required int mediaId,
-    required String tagUuid,
+    required String mediaId,
+    required String tagId,
     this.rowid = const Value.absent(),
   })  : mediaId = Value(mediaId),
-        tagUuid = Value(tagUuid);
+        tagId = Value(tagId);
   static Insertable<MediaTagRecord> custom({
-    Expression<int>? mediaId,
-    Expression<String>? tagUuid,
+    Expression<String>? mediaId,
+    Expression<String>? tagId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (mediaId != null) 'media_id': mediaId,
-      if (tagUuid != null) 'tag_uuid': tagUuid,
+      if (tagId != null) 'tag_id': tagId,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   MediaTagRecordsCompanion copyWith(
-      {Value<int>? mediaId, Value<String>? tagUuid, Value<int>? rowid}) {
+      {Value<String>? mediaId, Value<String>? tagId, Value<int>? rowid}) {
     return MediaTagRecordsCompanion(
       mediaId: mediaId ?? this.mediaId,
-      tagUuid: tagUuid ?? this.tagUuid,
+      tagId: tagId ?? this.tagId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -983,10 +992,10 @@ class MediaTagRecordsCompanion extends UpdateCompanion<MediaTagRecord> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (mediaId.present) {
-      map['media_id'] = Variable<int>(mediaId.value);
+      map['media_id'] = Variable<String>(mediaId.value);
     }
-    if (tagUuid.present) {
-      map['tag_uuid'] = Variable<String>(tagUuid.value);
+    if (tagId.present) {
+      map['tag_id'] = Variable<String>(tagId.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -998,7 +1007,7 @@ class MediaTagRecordsCompanion extends UpdateCompanion<MediaTagRecord> {
   String toString() {
     return (StringBuffer('MediaTagRecordsCompanion(')
           ..write('mediaId: $mediaId, ')
-          ..write('tagUuid: $tagUuid, ')
+          ..write('tagId: $tagId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1022,7 +1031,7 @@ abstract class _$EchoDatabase extends GeneratedDatabase {
 
 typedef $$MediaRecordsTableCreateCompanionBuilder = MediaRecordsCompanion
     Function({
-  Value<int> id,
+  required String id,
   required String relativePath,
   required String filename,
   Value<String> mediaType,
@@ -1034,10 +1043,11 @@ typedef $$MediaRecordsTableCreateCompanionBuilder = MediaRecordsCompanion
   Value<String?> jsonData,
   Value<bool> isFavorite,
   Value<bool> isTrashed,
+  Value<int> rowid,
 });
 typedef $$MediaRecordsTableUpdateCompanionBuilder = MediaRecordsCompanion
     Function({
-  Value<int> id,
+  Value<String> id,
   Value<String> relativePath,
   Value<String> filename,
   Value<String> mediaType,
@@ -1049,7 +1059,30 @@ typedef $$MediaRecordsTableUpdateCompanionBuilder = MediaRecordsCompanion
   Value<String?> jsonData,
   Value<bool> isFavorite,
   Value<bool> isTrashed,
+  Value<int> rowid,
 });
+
+final class $$MediaRecordsTableReferences
+    extends BaseReferences<_$EchoDatabase, $MediaRecordsTable, MediaRecord> {
+  $$MediaRecordsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$MediaTagRecordsTable, List<MediaTagRecord>>
+      _mediaTagRecordsRefsTable(_$EchoDatabase db) =>
+          MultiTypedResultKey.fromTable(db.mediaTagRecords,
+              aliasName: $_aliasNameGenerator(
+                  db.mediaRecords.id, db.mediaTagRecords.mediaId));
+
+  $$MediaTagRecordsTableProcessedTableManager get mediaTagRecordsRefs {
+    final manager =
+        $$MediaTagRecordsTableTableManager($_db, $_db.mediaTagRecords)
+            .filter((f) => f.mediaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_mediaTagRecordsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
 
 class $$MediaRecordsTableFilterComposer
     extends Composer<_$EchoDatabase, $MediaRecordsTable> {
@@ -1060,7 +1093,7 @@ class $$MediaRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get relativePath => $composableBuilder(
@@ -1095,6 +1128,27 @@ class $$MediaRecordsTableFilterComposer
 
   ColumnFilters<bool> get isTrashed => $composableBuilder(
       column: $table.isTrashed, builder: (column) => ColumnFilters(column));
+
+  Expression<bool> mediaTagRecordsRefs(
+      Expression<bool> Function($$MediaTagRecordsTableFilterComposer f) f) {
+    final $$MediaTagRecordsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.mediaTagRecords,
+        getReferencedColumn: (t) => t.mediaId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$MediaTagRecordsTableFilterComposer(
+              $db: $db,
+              $table: $db.mediaTagRecords,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$MediaRecordsTableOrderingComposer
@@ -1106,7 +1160,7 @@ class $$MediaRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get relativePath => $composableBuilder(
@@ -1155,7 +1209,7 @@ class $$MediaRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get relativePath => $composableBuilder(
@@ -1190,6 +1244,27 @@ class $$MediaRecordsTableAnnotationComposer
 
   GeneratedColumn<bool> get isTrashed =>
       $composableBuilder(column: $table.isTrashed, builder: (column) => column);
+
+  Expression<T> mediaTagRecordsRefs<T extends Object>(
+      Expression<T> Function($$MediaTagRecordsTableAnnotationComposer a) f) {
+    final $$MediaTagRecordsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.mediaTagRecords,
+        getReferencedColumn: (t) => t.mediaId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$MediaTagRecordsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.mediaTagRecords,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$MediaRecordsTableTableManager extends RootTableManager<
@@ -1201,12 +1276,9 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
     $$MediaRecordsTableAnnotationComposer,
     $$MediaRecordsTableCreateCompanionBuilder,
     $$MediaRecordsTableUpdateCompanionBuilder,
-    (
-      MediaRecord,
-      BaseReferences<_$EchoDatabase, $MediaRecordsTable, MediaRecord>
-    ),
+    (MediaRecord, $$MediaRecordsTableReferences),
     MediaRecord,
-    PrefetchHooks Function()> {
+    PrefetchHooks Function({bool mediaTagRecordsRefs})> {
   $$MediaRecordsTableTableManager(_$EchoDatabase db, $MediaRecordsTable table)
       : super(TableManagerState(
           db: db,
@@ -1218,7 +1290,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$MediaRecordsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
+            Value<String> id = const Value.absent(),
             Value<String> relativePath = const Value.absent(),
             Value<String> filename = const Value.absent(),
             Value<String> mediaType = const Value.absent(),
@@ -1230,6 +1302,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             Value<String?> jsonData = const Value.absent(),
             Value<bool> isFavorite = const Value.absent(),
             Value<bool> isTrashed = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               MediaRecordsCompanion(
             id: id,
@@ -1244,9 +1317,10 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             jsonData: jsonData,
             isFavorite: isFavorite,
             isTrashed: isTrashed,
+            rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
+            required String id,
             required String relativePath,
             required String filename,
             Value<String> mediaType = const Value.absent(),
@@ -1258,6 +1332,7 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             Value<String?> jsonData = const Value.absent(),
             Value<bool> isFavorite = const Value.absent(),
             Value<bool> isTrashed = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               MediaRecordsCompanion.insert(
             id: id,
@@ -1272,11 +1347,40 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
             jsonData: jsonData,
             isFavorite: isFavorite,
             isTrashed: isTrashed,
+            rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable(table),
+                    $$MediaRecordsTableReferences(db, table, e)
+                  ))
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({mediaTagRecordsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (mediaTagRecordsRefs) db.mediaTagRecords
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (mediaTagRecordsRefs)
+                    await $_getPrefetchedData<MediaRecord, $MediaRecordsTable,
+                            MediaTagRecord>(
+                        currentTable: table,
+                        referencedTable: $$MediaRecordsTableReferences
+                            ._mediaTagRecordsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$MediaRecordsTableReferences(db, table, p0)
+                                .mediaTagRecordsRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.mediaId == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
         ));
 }
 
@@ -1289,19 +1393,16 @@ typedef $$MediaRecordsTableProcessedTableManager = ProcessedTableManager<
     $$MediaRecordsTableAnnotationComposer,
     $$MediaRecordsTableCreateCompanionBuilder,
     $$MediaRecordsTableUpdateCompanionBuilder,
-    (
-      MediaRecord,
-      BaseReferences<_$EchoDatabase, $MediaRecordsTable, MediaRecord>
-    ),
+    (MediaRecord, $$MediaRecordsTableReferences),
     MediaRecord,
-    PrefetchHooks Function()>;
+    PrefetchHooks Function({bool mediaTagRecordsRefs})>;
 typedef $$TagRecordsTableCreateCompanionBuilder = TagRecordsCompanion Function({
-  required String uuid,
+  required String id,
   required String value,
   Value<int> rowid,
 });
 typedef $$TagRecordsTableUpdateCompanionBuilder = TagRecordsCompanion Function({
-  Value<String> uuid,
+  Value<String> id,
   Value<String> value,
   Value<int> rowid,
 });
@@ -1314,12 +1415,12 @@ final class $$TagRecordsTableReferences
       _mediaTagRecordsRefsTable(_$EchoDatabase db) =>
           MultiTypedResultKey.fromTable(db.mediaTagRecords,
               aliasName: $_aliasNameGenerator(
-                  db.tagRecords.uuid, db.mediaTagRecords.tagUuid));
+                  db.tagRecords.id, db.mediaTagRecords.tagId));
 
   $$MediaTagRecordsTableProcessedTableManager get mediaTagRecordsRefs {
-    final manager = $$MediaTagRecordsTableTableManager(
-            $_db, $_db.mediaTagRecords)
-        .filter((f) => f.tagUuid.uuid.sqlEquals($_itemColumn<String>('uuid')!));
+    final manager =
+        $$MediaTagRecordsTableTableManager($_db, $_db.mediaTagRecords)
+            .filter((f) => f.tagId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache =
         $_typedResult.readTableOrNull(_mediaTagRecordsRefsTable($_db));
@@ -1337,8 +1438,8 @@ class $$TagRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get uuid => $composableBuilder(
-      column: $table.uuid, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get value => $composableBuilder(
       column: $table.value, builder: (column) => ColumnFilters(column));
@@ -1347,9 +1448,9 @@ class $$TagRecordsTableFilterComposer
       Expression<bool> Function($$MediaTagRecordsTableFilterComposer f) f) {
     final $$MediaTagRecordsTableFilterComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.uuid,
+        getCurrentColumn: (t) => t.id,
         referencedTable: $db.mediaTagRecords,
-        getReferencedColumn: (t) => t.tagUuid,
+        getReferencedColumn: (t) => t.tagId,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
@@ -1374,8 +1475,8 @@ class $$TagRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get uuid => $composableBuilder(
-      column: $table.uuid, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get value => $composableBuilder(
       column: $table.value, builder: (column) => ColumnOrderings(column));
@@ -1390,8 +1491,8 @@ class $$TagRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get uuid =>
-      $composableBuilder(column: $table.uuid, builder: (column) => column);
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get value =>
       $composableBuilder(column: $table.value, builder: (column) => column);
@@ -1400,9 +1501,9 @@ class $$TagRecordsTableAnnotationComposer
       Expression<T> Function($$MediaTagRecordsTableAnnotationComposer a) f) {
     final $$MediaTagRecordsTableAnnotationComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.uuid,
+        getCurrentColumn: (t) => t.id,
         referencedTable: $db.mediaTagRecords,
-        getReferencedColumn: (t) => t.tagUuid,
+        getReferencedColumn: (t) => t.tagId,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
@@ -1441,22 +1542,22 @@ class $$TagRecordsTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$TagRecordsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> uuid = const Value.absent(),
+            Value<String> id = const Value.absent(),
             Value<String> value = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TagRecordsCompanion(
-            uuid: uuid,
+            id: id,
             value: value,
             rowid: rowid,
           ),
           createCompanionCallback: ({
-            required String uuid,
+            required String id,
             required String value,
             Value<int> rowid = const Value.absent(),
           }) =>
               TagRecordsCompanion.insert(
-            uuid: uuid,
+            id: id,
             value: value,
             rowid: rowid,
           ),
@@ -1484,9 +1585,9 @@ class $$TagRecordsTableTableManager extends RootTableManager<
                         managerFromTypedResult: (p0) =>
                             $$TagRecordsTableReferences(db, table, p0)
                                 .mediaTagRecordsRefs,
-                        referencedItemsForCurrentItem:
-                            (item, referencedItems) => referencedItems
-                                .where((e) => e.tagUuid == item.uuid),
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.tagId == item.id),
                         typedResults: items)
                 ];
               },
@@ -1509,14 +1610,14 @@ typedef $$TagRecordsTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function({bool mediaTagRecordsRefs})>;
 typedef $$MediaTagRecordsTableCreateCompanionBuilder = MediaTagRecordsCompanion
     Function({
-  required int mediaId,
-  required String tagUuid,
+  required String mediaId,
+  required String tagId,
   Value<int> rowid,
 });
 typedef $$MediaTagRecordsTableUpdateCompanionBuilder = MediaTagRecordsCompanion
     Function({
-  Value<int> mediaId,
-  Value<String> tagUuid,
+  Value<String> mediaId,
+  Value<String> tagId,
   Value<int> rowid,
 });
 
@@ -1525,16 +1626,31 @@ final class $$MediaTagRecordsTableReferences extends BaseReferences<
   $$MediaTagRecordsTableReferences(
       super.$_db, super.$_table, super.$_typedResult);
 
-  static $TagRecordsTable _tagUuidTable(_$EchoDatabase db) =>
-      db.tagRecords.createAlias(
-          $_aliasNameGenerator(db.mediaTagRecords.tagUuid, db.tagRecords.uuid));
+  static $MediaRecordsTable _mediaIdTable(_$EchoDatabase db) =>
+      db.mediaRecords.createAlias(
+          $_aliasNameGenerator(db.mediaTagRecords.mediaId, db.mediaRecords.id));
 
-  $$TagRecordsTableProcessedTableManager get tagUuid {
-    final $_column = $_itemColumn<String>('tag_uuid')!;
+  $$MediaRecordsTableProcessedTableManager get mediaId {
+    final $_column = $_itemColumn<String>('media_id')!;
+
+    final manager = $$MediaRecordsTableTableManager($_db, $_db.mediaRecords)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_mediaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $TagRecordsTable _tagIdTable(_$EchoDatabase db) =>
+      db.tagRecords.createAlias(
+          $_aliasNameGenerator(db.mediaTagRecords.tagId, db.tagRecords.id));
+
+  $$TagRecordsTableProcessedTableManager get tagId {
+    final $_column = $_itemColumn<String>('tag_id')!;
 
     final manager = $$TagRecordsTableTableManager($_db, $_db.tagRecords)
-        .filter((f) => f.uuid.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_tagUuidTable($_db));
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_tagIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: [item]));
@@ -1550,15 +1666,32 @@ class $$MediaTagRecordsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get mediaId => $composableBuilder(
-      column: $table.mediaId, builder: (column) => ColumnFilters(column));
+  $$MediaRecordsTableFilterComposer get mediaId {
+    final $$MediaRecordsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.mediaId,
+        referencedTable: $db.mediaRecords,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$MediaRecordsTableFilterComposer(
+              $db: $db,
+              $table: $db.mediaRecords,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
-  $$TagRecordsTableFilterComposer get tagUuid {
+  $$TagRecordsTableFilterComposer get tagId {
     final $$TagRecordsTableFilterComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.tagUuid,
+        getCurrentColumn: (t) => t.tagId,
         referencedTable: $db.tagRecords,
-        getReferencedColumn: (t) => t.uuid,
+        getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
@@ -1583,15 +1716,32 @@ class $$MediaTagRecordsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get mediaId => $composableBuilder(
-      column: $table.mediaId, builder: (column) => ColumnOrderings(column));
+  $$MediaRecordsTableOrderingComposer get mediaId {
+    final $$MediaRecordsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.mediaId,
+        referencedTable: $db.mediaRecords,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$MediaRecordsTableOrderingComposer(
+              $db: $db,
+              $table: $db.mediaRecords,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
-  $$TagRecordsTableOrderingComposer get tagUuid {
+  $$TagRecordsTableOrderingComposer get tagId {
     final $$TagRecordsTableOrderingComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.tagUuid,
+        getCurrentColumn: (t) => t.tagId,
         referencedTable: $db.tagRecords,
-        getReferencedColumn: (t) => t.uuid,
+        getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
@@ -1616,15 +1766,32 @@ class $$MediaTagRecordsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get mediaId =>
-      $composableBuilder(column: $table.mediaId, builder: (column) => column);
+  $$MediaRecordsTableAnnotationComposer get mediaId {
+    final $$MediaRecordsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.mediaId,
+        referencedTable: $db.mediaRecords,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$MediaRecordsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.mediaRecords,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
 
-  $$TagRecordsTableAnnotationComposer get tagUuid {
+  $$TagRecordsTableAnnotationComposer get tagId {
     final $$TagRecordsTableAnnotationComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.tagUuid,
+        getCurrentColumn: (t) => t.tagId,
         referencedTable: $db.tagRecords,
-        getReferencedColumn: (t) => t.uuid,
+        getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
@@ -1651,7 +1818,7 @@ class $$MediaTagRecordsTableTableManager extends RootTableManager<
     $$MediaTagRecordsTableUpdateCompanionBuilder,
     (MediaTagRecord, $$MediaTagRecordsTableReferences),
     MediaTagRecord,
-    PrefetchHooks Function({bool tagUuid})> {
+    PrefetchHooks Function({bool mediaId, bool tagId})> {
   $$MediaTagRecordsTableTableManager(
       _$EchoDatabase db, $MediaTagRecordsTable table)
       : super(TableManagerState(
@@ -1664,23 +1831,23 @@ class $$MediaTagRecordsTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$MediaTagRecordsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<int> mediaId = const Value.absent(),
-            Value<String> tagUuid = const Value.absent(),
+            Value<String> mediaId = const Value.absent(),
+            Value<String> tagId = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               MediaTagRecordsCompanion(
             mediaId: mediaId,
-            tagUuid: tagUuid,
+            tagId: tagId,
             rowid: rowid,
           ),
           createCompanionCallback: ({
-            required int mediaId,
-            required String tagUuid,
+            required String mediaId,
+            required String tagId,
             Value<int> rowid = const Value.absent(),
           }) =>
               MediaTagRecordsCompanion.insert(
             mediaId: mediaId,
-            tagUuid: tagUuid,
+            tagId: tagId,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -1689,7 +1856,7 @@ class $$MediaTagRecordsTableTableManager extends RootTableManager<
                     $$MediaTagRecordsTableReferences(db, table, e)
                   ))
               .toList(),
-          prefetchHooksCallback: ({tagUuid = false}) {
+          prefetchHooksCallback: ({mediaId = false, tagId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -1706,14 +1873,24 @@ class $$MediaTagRecordsTableTableManager extends RootTableManager<
                       dynamic,
                       dynamic,
                       dynamic>>(state) {
-                if (tagUuid) {
+                if (mediaId) {
                   state = state.withJoin(
                     currentTable: table,
-                    currentColumn: table.tagUuid,
+                    currentColumn: table.mediaId,
                     referencedTable:
-                        $$MediaTagRecordsTableReferences._tagUuidTable(db),
+                        $$MediaTagRecordsTableReferences._mediaIdTable(db),
                     referencedColumn:
-                        $$MediaTagRecordsTableReferences._tagUuidTable(db).uuid,
+                        $$MediaTagRecordsTableReferences._mediaIdTable(db).id,
+                  ) as T;
+                }
+                if (tagId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.tagId,
+                    referencedTable:
+                        $$MediaTagRecordsTableReferences._tagIdTable(db),
+                    referencedColumn:
+                        $$MediaTagRecordsTableReferences._tagIdTable(db).id,
                   ) as T;
                 }
 
@@ -1738,7 +1915,7 @@ typedef $$MediaTagRecordsTableProcessedTableManager = ProcessedTableManager<
     $$MediaTagRecordsTableUpdateCompanionBuilder,
     (MediaTagRecord, $$MediaTagRecordsTableReferences),
     MediaTagRecord,
-    PrefetchHooks Function({bool tagUuid})>;
+    PrefetchHooks Function({bool mediaId, bool tagId})>;
 
 class $EchoDatabaseManager {
   final _$EchoDatabase _db;

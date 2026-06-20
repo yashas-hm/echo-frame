@@ -15,14 +15,14 @@ import 'components/gallery_info_panel.dart';
 class GalleryScreen extends ConsumerStatefulWidget {
   const GalleryScreen({super.key, required this.initialMediaId});
 
-  final int initialMediaId;
+  final String initialMediaId;
 
   static const String path = '/gallery';
 
   static GoRoute get routeDef => GoRoute(
         path: path,
         builder: (_, state) => GalleryScreen(
-          initialMediaId: state.extra as int,
+          initialMediaId: state.extra as String,
         ),
       );
 

@@ -10,32 +10,29 @@ class TagDao {
 
   EchoDatabase get _db => EchoDatabase.instance;
 
-  static const _uuid = Uuid();
-
   Future<List<Tag>> listAll() async {
     final rows = await _db.select(_db.tagRecords).get();
-    return rows.map((r) => Tag(uuid: r.uuid, value: r.value)).toList();
+    return rows.map((r) => Tag(id: r.id, value: r.value)).toList();
   }
 
   Future<Tag> createTag(String value) async {
-    final tag = Tag(uuid: _uuid.v4(), value: value);
+    final tag = Tag(id: Uuid().v4(), value: value);
     await _db.into(_db.tagRecords).insert(
-          TagRecordsCompanion.insert(uuid: tag.uuid, value: tag.value),
+          TagRecordsCompanion.insert(id: tag.id, value: tag.value),
         );
     return tag;
   }
 
-  Future<void> attachTag(int mediaId, String tagUuid) =>
+  Future<void> attachTag(String mediaId, String tagId) =>
       _db.into(_db.mediaTagRecords).insertOnConflictUpdate(
             MediaTagRecordsCompanion.insert(
               mediaId: mediaId,
-              tagUuid: tagUuid,
+              tagId: tagId,
             ),
           );
 
-  Future<void> detachTag(int mediaId, String tagUuid) =>
+  Future<void> detachTag(String mediaId, String tagId) =>
       (_db.delete(_db.mediaTagRecords)
-            ..where((r) =>
-                r.mediaId.equals(mediaId) & r.tagUuid.equals(tagUuid)))
+            ..where((r) => r.mediaId.equals(mediaId) & r.tagId.equals(tagId)))
           .go();
 }
