@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:echo_frame/database/database.dart';
+import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
+import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 
 // ── Timeline queries ──────────────────────────────────────────────────────────
 
@@ -11,6 +13,9 @@ class MediaDao {
   const MediaDao(this._db);
 
   final EchoDatabase _db;
+
+  static MediaItem toItem(MediaRecord r) =>
+      MediaItem.fromRecord(r, '${Prefs.libraryRootPath!}/${r.relativePath}');
 
   Future<void> upsertBatch(List<MediaRecordsCompanion> companions) async {
     await _db.batch((b) {
@@ -21,10 +26,13 @@ class MediaDao {
   }
 
   Future<Set<String>> listFilePaths() async {
+    final root = Prefs.libraryRootPath!;
     final rows = await (_db.selectOnly(_db.mediaRecords)
-          ..addColumns([_db.mediaRecords.filePath]))
+          ..addColumns([_db.mediaRecords.relativePath]))
         .get();
-    return rows.map((r) => r.read(_db.mediaRecords.filePath)!).toSet();
+    return rows
+        .map((r) => '$root/${r.read(_db.mediaRecords.relativePath)!}')
+        .toSet();
   }
 
   Future<List<({int year, int month, int count})>> listMonths() async {
@@ -112,22 +120,23 @@ class MediaDao {
       (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))
           .write(MediaRecordsCompanion(isFavorite: Value(value)));
 
-  Future<void> upsertMeta(Metadata meta, String libraryRoot) =>
-      upsertBatch([_toCompanion(meta, libraryRoot)]);
+  Future<void> upsertMeta(
+          Metadata meta, String absolutePath, String libraryRoot) =>
+      upsertBatch([_toCompanion(meta, absolutePath, libraryRoot)]);
 
   static String? _existingThumbnail(String filePath) {
     final path = ThumbnailService.pathFor(filePath);
     return File(path).existsSync() ? path : null;
   }
 
-  MediaRecordsCompanion _toCompanion(Metadata meta, String libraryRoot) {
-    final relativePath = meta.path.startsWith('$libraryRoot/')
-        ? meta.path.substring(libraryRoot.length + 1)
-        : meta.path.split('/').last;
+  MediaRecordsCompanion _toCompanion(
+      Metadata meta, String absolutePath, String libraryRoot) {
+    final relativePath = absolutePath.startsWith('$libraryRoot/')
+        ? absolutePath.substring(libraryRoot.length + 1)
+        : absolutePath.split('/').last;
     return MediaRecordsCompanion(
-      filePath: Value(meta.path),
       relativePath: Value(relativePath),
-      filename: Value(meta.path.split('/').last),
+      filename: Value(absolutePath.split('/').last),
       mediaType: Value(meta.mediaType.name),
       capturedAt: Value(meta.capturedAt),
       indexedAt: Value(DateTime.now().toUtc()),
@@ -141,7 +150,7 @@ class MediaDao {
       altitude: Value(meta.altitude),
       cameraMake: Value(meta.cameraMake),
       cameraModel: Value(meta.cameraModel),
-      thumbnailPath: Value(_existingThumbnail(meta.path)),
+      thumbnailPath: Value(_existingThumbnail(absolutePath)),
       hasJsonIndex: const Value(true),
     );
   }

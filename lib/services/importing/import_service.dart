@@ -80,10 +80,13 @@ abstract class ImportService {
         if (DirUtils.isVideo(item.destPath)) {
           await ThumbnailService.generate(item.destPath);
         }
-        await mediaDao.upsertMeta(item.meta, libraryRoot);
+        await mediaDao.upsertMeta(item.meta, item.destPath, libraryRoot);
       } catch (e, st) {
-        dev.log('Post-copy failed for ${item.destPath}: $e',
-            stackTrace: st, name: '$runtimeType.apply');
+        dev.log(
+          'Post-copy failed for ${item.destPath}: $e',
+          stackTrace: st,
+          name: '$runtimeType.apply',
+        );
       }
 
       yield ImportProgress(

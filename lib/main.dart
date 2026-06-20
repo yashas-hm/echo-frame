@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await StartupService.initWindowManager();
   await StartupService.initialize();
+  await StartupService.initWindowManager();
   runApp(const ProviderScope(child: EchoFrameApp()));
 }

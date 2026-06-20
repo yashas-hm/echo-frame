@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart' show ValueGetter;
 enum MediaType { image, video, unknown }
 
 class Metadata {
-  final String path;
   final DateTime capturedAt;
   final int? width;
   final int? height;
@@ -16,7 +15,6 @@ class Metadata {
   final MediaType mediaType;
 
   const Metadata({
-    required this.path,
     required this.capturedAt,
     this.width,
     this.height,
@@ -29,15 +27,14 @@ class Metadata {
     this.mediaType = MediaType.image,
   });
 
-  factory Metadata.fallback({required String path, required DateTime mtime}) =>
-      Metadata(path: path, capturedAt: mtime, mediaType: MediaType.unknown);
+  factory Metadata.fallback({required DateTime mtime}) => Metadata(
+        capturedAt: mtime,
+        mediaType: MediaType.unknown,
+      );
 
-  factory Metadata.fromJson(Map<String, dynamic> json,
-      {required String folderPath}) {
-    final filename = json['filename'] as String;
+  factory Metadata.fromJson(Map<String, dynamic> json) {
     final durationMs = json['durationMs'] as int?;
     return Metadata(
-      path: '$folderPath/$filename',
       capturedAt: DateTime.parse(json['capturedAt'] as String),
       width: json['width'] as int?,
       height: json['height'] as int?,
@@ -52,7 +49,6 @@ class Metadata {
   }
 
   Metadata copyWith({
-    String? path,
     DateTime? capturedAt,
     ValueGetter<int?>? width,
     ValueGetter<int?>? height,
@@ -65,7 +61,6 @@ class Metadata {
     MediaType? mediaType,
   }) =>
       Metadata(
-        path: path ?? this.path,
         capturedAt: capturedAt ?? this.capturedAt,
         width: width != null ? width() : this.width,
         height: height != null ? height() : this.height,
@@ -78,8 +73,8 @@ class Metadata {
         mediaType: mediaType ?? this.mediaType,
       );
 
-  Map<String, dynamic> toJson() => {
-        'filename': path.split('/').last,
+  Map<String, dynamic> toJson({required String filename}) => {
+        'filename': filename,
         'capturedAt': capturedAt.toIso8601String(),
         if (width != null) 'width': width,
         if (height != null) 'height': height,

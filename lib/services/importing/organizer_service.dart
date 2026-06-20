@@ -52,7 +52,7 @@ class OrganizerService extends ImportService {
       planned.add(DiscoveryData(
         mediaPath: mediaPath,
         destPath: destPath,
-        meta: mmp.copyWith(path: destPath),
+        meta: mmp,
       ));
 
       (treeData[year] ??= {})[month] = (treeData[year]![month] ?? 0) + 1;

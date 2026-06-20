@@ -94,7 +94,7 @@ class IndexingService {
         continue;
       }
       try {
-        await mediaDao.upsertMeta(m, libraryRoot);
+        await mediaDao.upsertMeta(m, paths[i], libraryRoot);
       } catch (e, st) {
         dev.log(
           'upsertMeta failed for ${paths[i]}: $e',

@@ -87,7 +87,6 @@ class TakeoutService extends ImportService {
         mediaPath: mediaPath,
         destPath: destPath,
         meta: mmp.copyWith(
-          path: destPath,
           capturedAt: capturedAt,
           latitude: () => sidecar?.latitude ?? mmp.latitude,
           longitude: () => sidecar?.longitude ?? mmp.longitude,

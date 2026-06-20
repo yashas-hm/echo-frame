@@ -4,22 +4,24 @@ import 'package:echo_frame/models/metadata.dart';
 class MediaItem {
   final int id;
   final bool isFavorite;
+  final String filePath;
   final String? thumbnailPath;
   final Metadata meta;
 
   const MediaItem({
     required this.id,
     required this.isFavorite,
+    required this.filePath,
     required this.meta,
     this.thumbnailPath,
   });
 
-  factory MediaItem.fromRecord(MediaRecord r) => MediaItem(
+  factory MediaItem.fromRecord(MediaRecord r, String filePath) => MediaItem(
         id: r.id,
         isFavorite: r.isFavorite,
+        filePath: filePath,
         thumbnailPath: r.thumbnailPath,
         meta: Metadata(
-          path: r.filePath,
           capturedAt: r.capturedAt ??
               DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
           width: r.width,
@@ -36,9 +38,6 @@ class MediaItem {
           ),
         ),
       );
-
-  // Convenience accessors — delegates to meta so UI call sites are unchanged.
-  String get filePath => meta.path;
 
   DateTime get capturedAt => meta.capturedAt;
 

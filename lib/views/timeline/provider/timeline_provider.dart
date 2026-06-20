@@ -55,7 +55,7 @@ class TimelineNotifier extends AsyncNotifier<TimelineState> {
       query: current.query.isEmpty ? null : current.query,
     );
     state = AsyncData(current.copyWith(
-      loaded: [...current.loaded, ...records.map(MediaItem.fromRecord)],
+      loaded: [...current.loaded, ...records.map(MediaDao.toItem)],
       hasMore: records.length == _pageSize,
     ));
   }
@@ -78,7 +78,7 @@ class TimelineNotifier extends AsyncNotifier<TimelineState> {
       query: query.isEmpty ? null : query,
     );
     return TimelineState(
-      loaded: records.map(MediaItem.fromRecord).toList(),
+      loaded: records.map(MediaDao.toItem).toList(),
       hasMore: records.length == _pageSize,
       query: query,
     );

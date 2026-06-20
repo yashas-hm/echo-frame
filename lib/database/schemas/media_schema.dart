@@ -3,8 +3,6 @@ import 'package:drift/drift.dart';
 class MediaRecords extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  TextColumn get filePath => text()();
-
   TextColumn get relativePath => text()();
 
   TextColumn get filename => text()();
@@ -46,6 +44,6 @@ class MediaRecords extends Table {
   BoolColumn get hasJsonIndex => boolean().withDefault(const Constant(false))();
 
   List<Set<Column>> get uniqueColumns => [
-        {filePath}
+        {relativePath}
       ];
 }

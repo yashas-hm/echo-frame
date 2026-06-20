@@ -18,12 +18,6 @@ class $MediaRecordsTable extends MediaRecords
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _filePathMeta =
-      const VerificationMeta('filePath');
-  @override
-  late final GeneratedColumn<String> filePath = GeneratedColumn<String>(
-      'file_path', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _relativePathMeta =
       const VerificationMeta('relativePath');
   @override
@@ -159,7 +153,6 @@ class $MediaRecordsTable extends MediaRecords
   @override
   List<GeneratedColumn> get $columns => [
         id,
-        filePath,
         relativePath,
         filename,
         mediaType,
@@ -193,12 +186,6 @@ class $MediaRecordsTable extends MediaRecords
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('file_path')) {
-      context.handle(_filePathMeta,
-          filePath.isAcceptableOrUnknown(data['file_path']!, _filePathMeta));
-    } else if (isInserting) {
-      context.missing(_filePathMeta);
     }
     if (data.containsKey('relative_path')) {
       context.handle(
@@ -319,8 +306,6 @@ class $MediaRecordsTable extends MediaRecords
     return MediaRecord(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      filePath: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}file_path'])!,
       relativePath: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}relative_path'])!,
       filename: attachedDatabase.typeMapping
@@ -372,7 +357,6 @@ class $MediaRecordsTable extends MediaRecords
 
 class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final int id;
-  final String filePath;
   final String relativePath;
   final String filename;
   final String mediaType;
@@ -395,7 +379,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   final bool hasJsonIndex;
   const MediaRecord(
       {required this.id,
-      required this.filePath,
       required this.relativePath,
       required this.filename,
       required this.mediaType,
@@ -420,7 +403,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['file_path'] = Variable<String>(filePath);
     map['relative_path'] = Variable<String>(relativePath);
     map['filename'] = Variable<String>(filename);
     map['media_type'] = Variable<String>(mediaType);
@@ -473,7 +455,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   MediaRecordsCompanion toCompanion(bool nullToAbsent) {
     return MediaRecordsCompanion(
       id: Value(id),
-      filePath: Value(filePath),
       relativePath: Value(relativePath),
       filename: Value(filename),
       mediaType: Value(mediaType),
@@ -526,7 +507,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MediaRecord(
       id: serializer.fromJson<int>(json['id']),
-      filePath: serializer.fromJson<String>(json['filePath']),
       relativePath: serializer.fromJson<String>(json['relativePath']),
       filename: serializer.fromJson<String>(json['filename']),
       mediaType: serializer.fromJson<String>(json['mediaType']),
@@ -554,7 +534,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'filePath': serializer.toJson<String>(filePath),
       'relativePath': serializer.toJson<String>(relativePath),
       'filename': serializer.toJson<String>(filename),
       'mediaType': serializer.toJson<String>(mediaType),
@@ -580,7 +559,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
 
   MediaRecord copyWith(
           {int? id,
-          String? filePath,
           String? relativePath,
           String? filename,
           String? mediaType,
@@ -603,7 +581,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
           bool? hasJsonIndex}) =>
       MediaRecord(
         id: id ?? this.id,
-        filePath: filePath ?? this.filePath,
         relativePath: relativePath ?? this.relativePath,
         filename: filename ?? this.filename,
         mediaType: mediaType ?? this.mediaType,
@@ -631,7 +608,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   MediaRecord copyWithCompanion(MediaRecordsCompanion data) {
     return MediaRecord(
       id: data.id.present ? data.id.value : this.id,
-      filePath: data.filePath.present ? data.filePath.value : this.filePath,
       relativePath: data.relativePath.present
           ? data.relativePath.value
           : this.relativePath,
@@ -675,7 +651,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   String toString() {
     return (StringBuffer('MediaRecord(')
           ..write('id: $id, ')
-          ..write('filePath: $filePath, ')
           ..write('relativePath: $relativePath, ')
           ..write('filename: $filename, ')
           ..write('mediaType: $mediaType, ')
@@ -703,7 +678,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
   @override
   int get hashCode => Object.hashAll([
         id,
-        filePath,
         relativePath,
         filename,
         mediaType,
@@ -730,7 +704,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
       identical(this, other) ||
       (other is MediaRecord &&
           other.id == this.id &&
-          other.filePath == this.filePath &&
           other.relativePath == this.relativePath &&
           other.filename == this.filename &&
           other.mediaType == this.mediaType &&
@@ -755,7 +728,6 @@ class MediaRecord extends DataClass implements Insertable<MediaRecord> {
 
 class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<int> id;
-  final Value<String> filePath;
   final Value<String> relativePath;
   final Value<String> filename;
   final Value<String> mediaType;
@@ -778,7 +750,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   final Value<bool> hasJsonIndex;
   const MediaRecordsCompanion({
     this.id = const Value.absent(),
-    this.filePath = const Value.absent(),
     this.relativePath = const Value.absent(),
     this.filename = const Value.absent(),
     this.mediaType = const Value.absent(),
@@ -802,7 +773,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   });
   MediaRecordsCompanion.insert({
     this.id = const Value.absent(),
-    required String filePath,
     required String relativePath,
     required String filename,
     this.mediaType = const Value.absent(),
@@ -823,13 +793,11 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     this.isFavorite = const Value.absent(),
     this.isTrashed = const Value.absent(),
     this.hasJsonIndex = const Value.absent(),
-  })  : filePath = Value(filePath),
-        relativePath = Value(relativePath),
+  })  : relativePath = Value(relativePath),
         filename = Value(filename),
         indexedAt = Value(indexedAt);
   static Insertable<MediaRecord> custom({
     Expression<int>? id,
-    Expression<String>? filePath,
     Expression<String>? relativePath,
     Expression<String>? filename,
     Expression<String>? mediaType,
@@ -853,7 +821,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (filePath != null) 'file_path': filePath,
       if (relativePath != null) 'relative_path': relativePath,
       if (filename != null) 'filename': filename,
       if (mediaType != null) 'media_type': mediaType,
@@ -879,7 +846,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
 
   MediaRecordsCompanion copyWith(
       {Value<int>? id,
-      Value<String>? filePath,
       Value<String>? relativePath,
       Value<String>? filename,
       Value<String>? mediaType,
@@ -902,7 +868,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
       Value<bool>? hasJsonIndex}) {
     return MediaRecordsCompanion(
       id: id ?? this.id,
-      filePath: filePath ?? this.filePath,
       relativePath: relativePath ?? this.relativePath,
       filename: filename ?? this.filename,
       mediaType: mediaType ?? this.mediaType,
@@ -931,9 +896,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
-    }
-    if (filePath.present) {
-      map['file_path'] = Variable<String>(filePath.value);
     }
     if (relativePath.present) {
       map['relative_path'] = Variable<String>(relativePath.value);
@@ -1002,7 +964,6 @@ class MediaRecordsCompanion extends UpdateCompanion<MediaRecord> {
   String toString() {
     return (StringBuffer('MediaRecordsCompanion(')
           ..write('id: $id, ')
-          ..write('filePath: $filePath, ')
           ..write('relativePath: $relativePath, ')
           ..write('filename: $filename, ')
           ..write('mediaType: $mediaType, ')
@@ -1042,7 +1003,6 @@ abstract class _$EchoDatabase extends GeneratedDatabase {
 typedef $$MediaRecordsTableCreateCompanionBuilder = MediaRecordsCompanion
     Function({
   Value<int> id,
-  required String filePath,
   required String relativePath,
   required String filename,
   Value<String> mediaType,
@@ -1067,7 +1027,6 @@ typedef $$MediaRecordsTableCreateCompanionBuilder = MediaRecordsCompanion
 typedef $$MediaRecordsTableUpdateCompanionBuilder = MediaRecordsCompanion
     Function({
   Value<int> id,
-  Value<String> filePath,
   Value<String> relativePath,
   Value<String> filename,
   Value<String> mediaType,
@@ -1101,9 +1060,6 @@ class $$MediaRecordsTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get filePath => $composableBuilder(
-      column: $table.filePath, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get relativePath => $composableBuilder(
       column: $table.relativePath, builder: (column) => ColumnFilters(column));
@@ -1177,9 +1133,6 @@ class $$MediaRecordsTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get filePath => $composableBuilder(
-      column: $table.filePath, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get relativePath => $composableBuilder(
       column: $table.relativePath,
@@ -1258,9 +1211,6 @@ class $$MediaRecordsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get filePath =>
-      $composableBuilder(column: $table.filePath, builder: (column) => column);
 
   GeneratedColumn<String> get relativePath => $composableBuilder(
       column: $table.relativePath, builder: (column) => column);
@@ -1350,7 +1300,6 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
               $$MediaRecordsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<String> filePath = const Value.absent(),
             Value<String> relativePath = const Value.absent(),
             Value<String> filename = const Value.absent(),
             Value<String> mediaType = const Value.absent(),
@@ -1374,7 +1323,6 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
           }) =>
               MediaRecordsCompanion(
             id: id,
-            filePath: filePath,
             relativePath: relativePath,
             filename: filename,
             mediaType: mediaType,
@@ -1398,7 +1346,6 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required String filePath,
             required String relativePath,
             required String filename,
             Value<String> mediaType = const Value.absent(),
@@ -1422,7 +1369,6 @@ class $$MediaRecordsTableTableManager extends RootTableManager<
           }) =>
               MediaRecordsCompanion.insert(
             id: id,
-            filePath: filePath,
             relativePath: relativePath,
             filename: filename,
             mediaType: mediaType,

@@ -8,8 +8,8 @@ class MetadataService {
     final mtime = File(filePath).statSync().modified.toUtc();
     final meta = await MediaMetadata.read(filePath);
     return meta != null
-        ? _fromPlugin(filePath, meta, mtime)
-        : Metadata.fallback(path: filePath, mtime: mtime);
+        ? _fromPlugin(meta, mtime)
+        : Metadata.fallback(mtime: mtime);
   }
 
   // Rust/Rayon handles parallelism internally — no compute() needed.
@@ -22,18 +22,13 @@ class MetadataService {
     return [
       for (int i = 0; i < paths.length; i++)
         metas[i] != null
-            ? _fromPlugin(paths[i], metas[i]!, mtimes[paths[i]]!)
-            : Metadata.fallback(path: paths[i], mtime: mtimes[paths[i]]!),
+            ? _fromPlugin(metas[i]!, mtimes[paths[i]]!)
+            : Metadata.fallback(mtime: mtimes[paths[i]]!),
     ];
   }
 
-  static Metadata _fromPlugin(
-    String path,
-    MediaMetadata meta,
-    DateTime mtime,
-  ) =>
+  static Metadata _fromPlugin(MediaMetadata meta, DateTime mtime) =>
       Metadata(
-        path: path,
         capturedAt: meta.capturedAt ?? mtime,
         width: meta.width,
         height: meta.height,
