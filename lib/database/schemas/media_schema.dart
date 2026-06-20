@@ -11,37 +11,19 @@ class MediaRecords extends Table {
 
   DateTimeColumn get capturedAt => dateTime().nullable()();
 
-  DateTimeColumn get modifiedAt => dateTime().nullable()();
-
-  DateTimeColumn get indexedAt => dateTime()();
-
   IntColumn get capturedYear => integer().nullable()();
 
   IntColumn get capturedMonth => integer().nullable()();
-
-  IntColumn get width => integer().nullable()();
-
-  IntColumn get height => integer().nullable()();
-
-  IntColumn get durationMs => integer().nullable()();
-
-  RealColumn get latitude => real().nullable()();
-
-  RealColumn get longitude => real().nullable()();
-
-  RealColumn get altitude => real().nullable()();
 
   TextColumn get cameraMake => text().nullable()();
 
   TextColumn get cameraModel => text().nullable()();
 
-  TextColumn get thumbnailPath => text().nullable()();
+  TextColumn get jsonData => text().nullable()();
 
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
 
   BoolColumn get isTrashed => boolean().withDefault(const Constant(false))();
-
-  BoolColumn get hasJsonIndex => boolean().withDefault(const Constant(false))();
 
   List<Set<Column>> get uniqueColumns => [
         {relativePath}

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/models/tag.dart';
@@ -23,31 +25,37 @@ class MediaItem {
     MediaRecord r,
     String filePath,
     List<Tag> tags,
-  ) =>
-      MediaItem(
-        id: r.id,
-        isFavorite: r.isFavorite,
-        filePath: filePath,
-        thumbnailPath: r.thumbnailPath,
-        tags: tags,
-        meta: Metadata(
-          capturedAt: r.capturedAt ??
-              DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
-          modifiedAt: r.modifiedAt,
-          width: r.width,
-          height: r.height,
-          durationMs: r.durationMs,
-          cameraMake: r.cameraMake,
-          cameraModel: r.cameraModel,
-          latitude: r.latitude,
-          longitude: r.longitude,
-          altitude: r.altitude,
-          mediaType: MediaType.values.firstWhere(
-            (m) => m.name == r.mediaType,
-            orElse: () => MediaType.unknown,
-          ),
+  ) {
+    final j = r.jsonData != null
+        ? jsonDecode(r.jsonData!) as Map<String, dynamic>
+        : const <String, dynamic>{};
+    return MediaItem(
+      id: r.id,
+      isFavorite: r.isFavorite,
+      filePath: filePath,
+      thumbnailPath: j['thumbnailPath'] as String?,
+      tags: tags,
+      meta: Metadata(
+        capturedAt: r.capturedAt ??
+            DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+        modifiedAt: j['modifiedAt'] != null
+            ? DateTime.parse(j['modifiedAt'] as String)
+            : null,
+        width: j['width'] as int?,
+        height: j['height'] as int?,
+        durationMs: j['durationMs'] as int?,
+        cameraMake: r.cameraMake,
+        cameraModel: r.cameraModel,
+        latitude: (j['latitude'] as num?)?.toDouble(),
+        longitude: (j['longitude'] as num?)?.toDouble(),
+        altitude: (j['altitude'] as num?)?.toDouble(),
+        mediaType: MediaType.values.firstWhere(
+          (m) => m.name == r.mediaType,
+          orElse: () => MediaType.unknown,
         ),
-      );
+      ),
+    );
+  }
 
   DateTime get capturedAt => _meta.capturedAt;
 

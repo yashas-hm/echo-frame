@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -111,8 +112,10 @@ class MediaDao {
     final records = await (_db.select(_db.mediaRecords)
           ..where((r) => r.isFavorite.equals(true) & r.isTrashed.equals(false))
           ..orderBy([
-            (r) =>
-                OrderingTerm(expression: r.capturedAt, mode: OrderingMode.desc),
+            (r) => OrderingTerm(
+                  expression: r.capturedAt,
+                  mode: OrderingMode.desc,
+                ),
           ]))
         .get();
     return _toItems(records);
@@ -148,25 +151,28 @@ class MediaDao {
     final relativePath = absolutePath.startsWith('$libraryRoot/')
         ? absolutePath.substring(libraryRoot.length + 1)
         : absolutePath.split('/').last;
+    final jsonMap = <String, dynamic>{
+      if (meta.modifiedAt != null)
+        'modifiedAt': meta.modifiedAt!.toIso8601String(),
+      if (meta.width != null) 'width': meta.width,
+      if (meta.height != null) 'height': meta.height,
+      if (meta.durationMs != null) 'durationMs': meta.durationMs,
+      if (meta.latitude != null) 'latitude': meta.latitude,
+      if (meta.longitude != null) 'longitude': meta.longitude,
+      if (meta.altitude != null) 'altitude': meta.altitude,
+    };
+    final thumbnail = _existingThumbnail(absolutePath);
+    if (thumbnail != null) jsonMap['thumbnailPath'] = thumbnail;
     return MediaRecordsCompanion(
       relativePath: Value(relativePath),
       filename: Value(absolutePath.split('/').last),
       mediaType: Value(meta.mediaType.name),
       capturedAt: Value(meta.capturedAt),
-      modifiedAt: Value(meta.modifiedAt),
-      indexedAt: Value(DateTime.now().toUtc()),
       capturedYear: Value(meta.capturedAt.year),
       capturedMonth: Value(meta.capturedAt.month),
-      width: Value(meta.width),
-      height: Value(meta.height),
-      durationMs: Value(meta.durationMs),
-      latitude: Value(meta.latitude),
-      longitude: Value(meta.longitude),
-      altitude: Value(meta.altitude),
       cameraMake: Value(meta.cameraMake),
       cameraModel: Value(meta.cameraModel),
-      thumbnailPath: Value(_existingThumbnail(absolutePath)),
-      hasJsonIndex: const Value(true),
+      jsonData: Value(jsonMap.isEmpty ? null : jsonEncode(jsonMap)),
     );
   }
 }
