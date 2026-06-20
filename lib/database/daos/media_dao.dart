@@ -139,6 +139,7 @@ class MediaDao {
       filename: Value(absolutePath.split('/').last),
       mediaType: Value(meta.mediaType.name),
       capturedAt: Value(meta.capturedAt),
+      modifiedAt: Value(meta.modifiedAt),
       indexedAt: Value(DateTime.now().toUtc()),
       capturedYear: Value(meta.capturedAt.year),
       capturedMonth: Value(meta.capturedAt.month),

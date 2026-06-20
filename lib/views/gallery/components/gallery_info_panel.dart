@@ -84,6 +84,9 @@ class _PhotoDetailPanelState extends ConsumerState<GalleryInfoPanel> {
           const SizedBox(height: 12),
           _Row(Icons.calendar_today_outlined,
               _formatDate(widget.item.capturedAt)),
+          if (widget.item.meta.modifiedAt != null)
+            _Row(Icons.edit_calendar_outlined,
+                _formatDate(widget.item.meta.modifiedAt)),
           if (widget.item.width != null && widget.item.height != null)
             _Row(Icons.photo_size_select_actual_outlined,
                 '${widget.item.width} × ${widget.item.height}'),

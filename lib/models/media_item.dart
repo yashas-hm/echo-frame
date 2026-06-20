@@ -24,6 +24,7 @@ class MediaItem {
         meta: Metadata(
           capturedAt: r.capturedAt ??
               DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+          modifiedAt: r.modifiedAt,
           width: r.width,
           height: r.height,
           durationMs: r.durationMs,

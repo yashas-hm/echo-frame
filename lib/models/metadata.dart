@@ -4,6 +4,7 @@ enum MediaType { image, video, unknown }
 
 class Metadata {
   final DateTime capturedAt;
+  final DateTime? modifiedAt;
   final int? width;
   final int? height;
   final int? durationMs;
@@ -16,6 +17,7 @@ class Metadata {
 
   const Metadata({
     required this.capturedAt,
+    this.modifiedAt,
     this.width,
     this.height,
     this.durationMs,
@@ -50,6 +52,7 @@ class Metadata {
 
   Metadata copyWith({
     DateTime? capturedAt,
+    ValueGetter<DateTime?>? modifiedAt,
     ValueGetter<int?>? width,
     ValueGetter<int?>? height,
     ValueGetter<int?>? durationMs,
@@ -62,6 +65,7 @@ class Metadata {
   }) =>
       Metadata(
         capturedAt: capturedAt ?? this.capturedAt,
+        modifiedAt: modifiedAt != null ? modifiedAt() : this.modifiedAt,
         width: width != null ? width() : this.width,
         height: height != null ? height() : this.height,
         durationMs: durationMs != null ? durationMs() : this.durationMs,
