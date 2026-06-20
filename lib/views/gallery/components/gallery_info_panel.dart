@@ -40,8 +40,7 @@ class _PhotoDetailPanelState extends ConsumerState<GalleryInfoPanel> {
       _toggling = true;
       _isFavorite = !_isFavorite;
     });
-    await MediaDao(EchoDatabase.instance)
-        .setFavorite(widget.item.id, value: _isFavorite);
+    await MediaDao.instance.setFavorite(widget.item.id, value: _isFavorite);
     ref.invalidate(favoritesProvider);
     if (mounted) setState(() => _toggling = false);
   }

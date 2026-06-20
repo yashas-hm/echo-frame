@@ -4,26 +4,51 @@ import 'package:drift/drift.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/models/metadata.dart';
+import 'package:echo_frame/models/tag.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 
-// ── Timeline queries ──────────────────────────────────────────────────────────
-
 class MediaDao {
-  const MediaDao(this._db);
+  const MediaDao._();
 
-  final EchoDatabase _db;
+  static const instance = MediaDao._();
 
-  static MediaItem toItem(MediaRecord r) =>
-      MediaItem.fromRecord(r, '${Prefs.libraryRootPath!}/${r.relativePath}');
+  EchoDatabase get _db => EchoDatabase.instance;
 
-  Future<void> upsertBatch(List<MediaRecordsCompanion> companions) async {
-    await _db.batch((b) {
-      for (final c in companions) {
-        b.insert(_db.mediaRecords, c, onConflict: DoUpdate((old) => c));
-      }
-    });
+  // ── Record → MediaItem ────────────────────────────────────────────────────
+
+  Future<List<MediaItem>> _toItems(List<MediaRecord> records) async {
+    if (records.isEmpty) return [];
+
+    final ids = records.map((r) => r.id).toList();
+    final root = Prefs.libraryRootPath!;
+
+    final tagRows = await (_db.select(_db.tagRecords).join([
+      innerJoin(
+        _db.mediaTagRecords,
+        _db.mediaTagRecords.tagUuid.equalsExp(_db.tagRecords.uuid),
+      ),
+    ])
+          ..where(_db.mediaTagRecords.mediaId.isIn(ids)))
+        .get();
+
+    final tagsByMediaId = <int, List<Tag>>{};
+    for (final row in tagRows) {
+      final mediaId = row.readTable(_db.mediaTagRecords).mediaId;
+      final t = row.readTable(_db.tagRecords);
+      (tagsByMediaId[mediaId] ??= []).add(Tag(uuid: t.uuid, value: t.value));
+    }
+
+    return records
+        .map((r) => MediaItem.fromRecord(
+              r,
+              '$root/${r.relativePath}',
+              tagsByMediaId[r.id] ?? const [],
+            ))
+        .toList();
   }
+
+  // ── Queries ───────────────────────────────────────────────────────────────
 
   Future<Set<String>> listFilePaths() async {
     final root = Prefs.libraryRootPath!;
@@ -35,58 +60,12 @@ class MediaDao {
         .toSet();
   }
 
-  Future<List<({int year, int month, int count})>> listMonths() async {
-    final countExpr = countAll();
-    final query = _db.selectOnly(_db.mediaRecords)
-      ..addColumns([
-        _db.mediaRecords.capturedYear,
-        _db.mediaRecords.capturedMonth,
-        countExpr,
-      ])
-      ..where(_db.mediaRecords.isTrashed.equals(false) &
-          _db.mediaRecords.capturedYear.isNotNull())
-      ..groupBy([
-        _db.mediaRecords.capturedYear,
-        _db.mediaRecords.capturedMonth,
-      ])
-      ..orderBy([
-        OrderingTerm(
-            expression: _db.mediaRecords.capturedYear, mode: OrderingMode.desc),
-        OrderingTerm(
-            expression: _db.mediaRecords.capturedMonth,
-            mode: OrderingMode.desc),
-      ]);
-
-    return query
-        .map((row) => (
-              year: row.read(_db.mediaRecords.capturedYear) ?? 0,
-              month: row.read(_db.mediaRecords.capturedMonth) ?? 0,
-              count: row.read(countExpr) ?? 0,
-            ))
-        .get();
-  }
-
-  Future<List<MediaRecord>> queryByMonth(int year, int month) =>
-      (_db.select(_db.mediaRecords)
-            ..where((r) =>
-                r.capturedYear.equals(year) &
-                r.capturedMonth.equals(month) &
-                r.isTrashed.equals(false))
-            ..orderBy([
-              (r) => OrderingTerm(expression: r.capturedAt),
-            ]))
-          .get();
-
-  Future<MediaRecord?> getById(int id) =>
-      (_db.select(_db.mediaRecords)..where((r) => r.id.equals(id)))
-          .getSingleOrNull();
-
-  Future<List<MediaRecord>> queryPage({
+  Future<List<MediaItem>> queryPage({
     int offset = 0,
     int limit = 100,
     String? query,
-  }) {
-    return (_db.select(_db.mediaRecords)
+  }) async {
+    final records = await (_db.select(_db.mediaRecords)
           ..where((r) {
             var cond = r.isTrashed.equals(false);
             if (query != null && query.isNotEmpty) {
@@ -104,25 +83,60 @@ class MediaDao {
           ])
           ..limit(limit, offset: offset))
         .get();
+    return _toItems(records);
+  }
+
+  Future<List<MediaItem>> queryByMonth(int year, int month) async {
+    final records = await (_db.select(_db.mediaRecords)
+          ..where((r) =>
+              r.capturedYear.equals(year) &
+              r.capturedMonth.equals(month) &
+              r.isTrashed.equals(false))
+          ..orderBy([(r) => OrderingTerm(expression: r.capturedAt)]))
+        .get();
+    return _toItems(records);
+  }
+
+  Future<MediaItem?> getById(int id) async {
+    final r = await (_db.select(_db.mediaRecords)
+          ..where((r) => r.id.equals(id)))
+        .getSingleOrNull();
+    if (r == null) return null;
+    return (await _toItems([r])).first;
   }
 
   // ── Favorites ─────────────────────────────────────────────────────────────
 
-  Future<List<MediaRecord>> listFavorites() => (_db.select(_db.mediaRecords)
-        ..where((r) => r.isFavorite.equals(true) & r.isTrashed.equals(false))
-        ..orderBy([
-          (r) =>
-              OrderingTerm(expression: r.capturedAt, mode: OrderingMode.desc),
-        ]))
-      .get();
+  Future<List<MediaItem>> listFavorites() async {
+    final records = await (_db.select(_db.mediaRecords)
+          ..where((r) => r.isFavorite.equals(true) & r.isTrashed.equals(false))
+          ..orderBy([
+            (r) =>
+                OrderingTerm(expression: r.capturedAt, mode: OrderingMode.desc),
+          ]))
+        .get();
+    return _toItems(records);
+  }
 
   Future<void> setFavorite(int id, {required bool value}) =>
       (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))
           .write(MediaRecordsCompanion(isFavorite: Value(value)));
 
+  // ── Writes ────────────────────────────────────────────────────────────────
+
   Future<void> upsertMeta(
-          Metadata meta, String absolutePath, String libraryRoot) =>
-      upsertBatch([_toCompanion(meta, absolutePath, libraryRoot)]);
+    Metadata meta,
+    String absolutePath,
+    String libraryRoot,
+  ) =>
+      _upsertBatch([_toCompanion(meta, absolutePath, libraryRoot)]);
+
+  Future<void> _upsertBatch(List<MediaRecordsCompanion> companions) =>
+      _db.batch((b) {
+        for (final c in companions) {
+          b.insert(_db.mediaRecords, c, onConflict: DoUpdate((old) => c));
+        }
+      });
 
   static String? _existingThumbnail(String filePath) {
     final path = ThumbnailService.pathFor(filePath);

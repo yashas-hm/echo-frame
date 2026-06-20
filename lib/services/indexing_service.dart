@@ -1,7 +1,6 @@
 import 'dart:developer' as dev;
 
 import 'package:echo_frame/database/daos/media_dao.dart';
-import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
@@ -13,8 +12,6 @@ class IndexingService {
   static Stream<IndexingProgress> autoIndex({
     required String libraryRoot,
   }) async* {
-    final db = EchoDatabase.instance;
-
     final allPaths = <String>[];
     await for (final scan in DirUtils.walk(libraryRoot)) {
       allPaths.addAll(scan.mediaPaths);
@@ -25,7 +22,7 @@ class IndexingService {
       );
     }
 
-    final existingPaths = await MediaDao(db).listFilePaths();
+    final existingPaths = await MediaDao.instance.listFilePaths();
     final newPaths = allPaths.where((p) => !existingPaths.contains(p)).toList();
 
     if (newPaths.isEmpty) {
@@ -38,7 +35,7 @@ class IndexingService {
       newFiles: newPaths.length,
     );
 
-    await _fetchAndUpsert(newPaths, db, libraryRoot);
+    await _fetchAndUpsert(newPaths, libraryRoot);
 
     yield IndexingProgress(
       phase: IndexingPhase.done,
@@ -50,8 +47,6 @@ class IndexingService {
   static Stream<IndexingProgress> fullIndex({
     required String libraryRoot,
   }) async* {
-    final db = EchoDatabase.instance;
-
     final allPaths = <String>[];
     await for (final scan in DirUtils.walk(libraryRoot)) {
       allPaths.addAll(scan.mediaPaths);
@@ -72,7 +67,7 @@ class IndexingService {
       newFiles: allPaths.length,
     );
 
-    await _fetchAndUpsert(allPaths, db, libraryRoot);
+    await _fetchAndUpsert(allPaths, libraryRoot);
 
     yield IndexingProgress(
       phase: IndexingPhase.done,
@@ -82,11 +77,9 @@ class IndexingService {
 
   static Future<void> _fetchAndUpsert(
     List<String> paths,
-    EchoDatabase db,
     String libraryRoot,
   ) async {
     final metas = await MetadataService.readAll(paths);
-    final mediaDao = MediaDao(db);
     for (int i = 0; i < paths.length; i++) {
       final m = metas[i];
       if (m == null) {
@@ -97,7 +90,7 @@ class IndexingService {
         continue;
       }
       try {
-        await mediaDao.upsertMeta(m, paths[i], libraryRoot);
+        await MediaDao.instance.upsertMeta(m, paths[i], libraryRoot);
       } catch (e, st) {
         dev.log(
           'upsertMeta failed for ${paths[i]}: $e',

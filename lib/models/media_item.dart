@@ -1,11 +1,13 @@
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/metadata.dart';
+import 'package:echo_frame/models/tag.dart';
 
 class MediaItem {
   final int id;
   final bool isFavorite;
   final String filePath;
   final String? thumbnailPath;
+  final List<Tag> tags;
   final Metadata meta;
 
   const MediaItem({
@@ -14,13 +16,20 @@ class MediaItem {
     required this.filePath,
     required this.meta,
     this.thumbnailPath,
+    this.tags = const [],
   });
 
-  factory MediaItem.fromRecord(MediaRecord r, String filePath) => MediaItem(
+  factory MediaItem.fromRecord(
+    MediaRecord r,
+    String filePath,
+    List<Tag> tags,
+  ) =>
+      MediaItem(
         id: r.id,
         isFavorite: r.isFavorite,
         filePath: filePath,
         thumbnailPath: r.thumbnailPath,
+        tags: tags,
         meta: Metadata(
           capturedAt: r.capturedAt ??
               DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),

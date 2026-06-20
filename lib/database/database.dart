@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:echo_frame/database/schemas/media_schema.dart';
+import 'package:echo_frame/database/schemas/media_tag_schema.dart';
+import 'package:echo_frame/database/schemas/tag_schema.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [MediaRecords])
+@DriftDatabase(tables: [MediaRecords, TagRecords, MediaTagRecords])
 class EchoDatabase extends _$EchoDatabase {
   EchoDatabase(super.e);
 

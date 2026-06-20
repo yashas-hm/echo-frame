@@ -49,14 +49,14 @@ class TimelineNotifier extends AsyncNotifier<TimelineState> {
   Future<void> loadNextPage() async {
     final current = state.value;
     if (current == null || !current.hasMore) return;
-    final records = await MediaDao(EchoDatabase.instance).queryPage(
+    final items = await MediaDao.instance.queryPage(
       offset: current.loaded.length,
       limit: _pageSize,
       query: current.query.isEmpty ? null : current.query,
     );
     state = AsyncData(current.copyWith(
-      loaded: [...current.loaded, ...records.map(MediaDao.toItem)],
-      hasMore: records.length == _pageSize,
+      loaded: [...current.loaded, ...items],
+      hasMore: items.length == _pageSize,
     ));
   }
 
@@ -72,14 +72,14 @@ class TimelineNotifier extends AsyncNotifier<TimelineState> {
     if (!EchoDatabase.isOpen) {
       return const TimelineState(loaded: [], hasMore: false);
     }
-    final records = await MediaDao(EchoDatabase.instance).queryPage(
+    final items = await MediaDao.instance.queryPage(
       offset: offset,
       limit: _pageSize,
       query: query.isEmpty ? null : query,
     );
     return TimelineState(
-      loaded: records.map(MediaDao.toItem).toList(),
-      hasMore: records.length == _pageSize,
+      loaded: items,
+      hasMore: items.length == _pageSize,
       query: query,
     );
   }

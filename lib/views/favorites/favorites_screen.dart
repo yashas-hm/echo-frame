@@ -1,4 +1,3 @@
-import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:echo_frame/views/timeline/components/photo_tile.dart';
@@ -24,11 +23,10 @@ class FavoritesScreen extends ConsumerWidget {
       body: state.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
-        data: (records) {
-          if (records.isEmpty) {
+        data: (items) {
+          if (items.isEmpty) {
             return _buildEmpty(context);
           }
-          final items = records.map(MediaDao.toItem).toList();
           return CustomScrollView(
             slivers: [
               SliverPadding(
@@ -37,7 +35,7 @@ class FavoritesScreen extends ConsumerWidget {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      '${records.length} favourite${records.length == 1 ? '' : 's'}',
+                      '${items.length} favourite${items.length == 1 ? '' : 's'}',
                       style: Theme.of(context)
                           .textTheme
                           .labelSmall

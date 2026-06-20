@@ -2,7 +2,6 @@ import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:echo_frame/database/daos/media_dao.dart';
-import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/import/import.dart' show ImportProgress;
 import 'package:echo_frame/models/metadata.dart';
@@ -48,9 +47,6 @@ abstract class ImportService {
   }) async* {
     if (plan.items.isEmpty) return;
 
-    final db = EchoDatabase.instance;
-    final mediaDao = MediaDao(db);
-
     int imported = 0;
     final applyErrors = <DiscoveryError>[];
 
@@ -83,7 +79,11 @@ abstract class ImportService {
         if (DirUtils.isVideo(item.destPath)) {
           await ThumbnailService.generate(item.destPath);
         }
-        await mediaDao.upsertMeta(item.meta, item.destPath, libraryRoot);
+        await MediaDao.instance.upsertMeta(
+          item.meta,
+          item.destPath,
+          libraryRoot,
+        );
       } catch (e, st) {
         dev.log(
           'Post-copy failed for ${item.destPath}: $e',
