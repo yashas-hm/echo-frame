@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:developer' as dev;
 
+import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/indexing_service.dart';
@@ -129,7 +131,20 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
         children: [
           timelineAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('Error loading library: $e')),
+            error: (e, st) {
+              dev.log(
+                'Failed to load timeline: $e',
+                stackTrace: st,
+                name: 'TimelineScreen._buildTimeline',
+              );
+              return ErrorView(
+                errorMessage: 'Failed to load library',
+                description: 'Something unexpected occurred while loading '
+                    'your library. Please try again.',
+                buttonText: 'Try Again',
+                onButtonPressed: () => ref.invalidate(timelineProvider),
+              );
+            },
             data: (timeline) {
               if (timeline.loaded.isEmpty) {
                 return Center(
@@ -170,7 +185,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                       itemBuilder: (_, i) => PhotoTile(item: month.items[i]),
                     ),
                   ],
-                  if (timeline.hasMore)
+                  if (timeline.isLoadingMore)
                     const SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.all(24),

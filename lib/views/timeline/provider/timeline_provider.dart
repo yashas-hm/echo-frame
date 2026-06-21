@@ -7,11 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class TimelineState {
   final List<MediaItem> loaded;
   final bool hasMore;
+  final bool isLoadingMore;
   final String query;
 
   const TimelineState({
     required this.loaded,
     required this.hasMore,
+    this.isLoadingMore = false,
     this.query = '',
   });
 
@@ -31,11 +33,13 @@ class TimelineState {
   TimelineState copyWith({
     List<MediaItem>? loaded,
     bool? hasMore,
+    bool? isLoadingMore,
     String? query,
   }) =>
       TimelineState(
         loaded: loaded ?? this.loaded,
         hasMore: hasMore ?? this.hasMore,
+        isLoadingMore: isLoadingMore ?? this.isLoadingMore,
         query: query ?? this.query,
       );
 }
@@ -48,7 +52,8 @@ class TimelineNotifier extends AsyncNotifier<TimelineState> {
 
   Future<void> loadNextPage() async {
     final current = state.value;
-    if (current == null || !current.hasMore) return;
+    if (current == null || !current.hasMore || current.isLoadingMore) return;
+    state = AsyncData(current.copyWith(isLoadingMore: true));
     final items = await MediaDao.instance.queryPage(
       offset: current.loaded.length,
       limit: _pageSize,
@@ -57,6 +62,7 @@ class TimelineNotifier extends AsyncNotifier<TimelineState> {
     state = AsyncData(current.copyWith(
       loaded: [...current.loaded, ...items],
       hasMore: items.length == _pageSize,
+      isLoadingMore: false,
     ));
   }
 
