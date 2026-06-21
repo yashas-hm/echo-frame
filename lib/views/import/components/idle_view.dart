@@ -88,7 +88,7 @@ class IdleView extends ConsumerWidget {
             ),
           ),
         ),
-        EFBackButton(
+        EFIconButton.back(
           onPressed: onBackPressed,
         ),
       ],

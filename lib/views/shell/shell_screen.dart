@@ -38,7 +38,7 @@ class ShellScreen extends ConsumerWidget {
                 children: [
                   Positioned.fill(child: child),
                   if (enableNavBar) NavBar(),
-                  if (enableBackButton) EFBackButton(),
+                  if (enableBackButton) EFIconButton.back(),
                 ],
               ),
             ),

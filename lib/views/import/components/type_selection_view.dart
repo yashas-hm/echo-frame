@@ -97,7 +97,7 @@ class TypeSelectionView extends StatelessWidget {
             ),
           ),
         ),
-        const EFBackButton(),
+        EFIconButton.back(),
       ],
     );
   }
