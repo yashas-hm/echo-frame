@@ -1,4 +1,5 @@
 import 'package:echo_frame/components/buttons/buttons.dart';
+import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/models/discovery/discovery.dart' show DiscoveryError;
 import 'package:echo_frame/models/folder_tree.dart' show FolderTree;
@@ -17,7 +18,6 @@ part 'components/applying_view.dart';
 part 'components/discovering_view.dart';
 part 'components/done_view.dart';
 part 'components/error_list.dart';
-part 'components/error_view.dart';
 part 'components/folder_tree_preview.dart';
 part 'components/idle_view.dart';
 part 'components/review_view.dart';
@@ -53,15 +53,20 @@ class _OrganizerScreenState extends ConsumerState<ImportScreen> {
       if (state.destRoot == null) return _destRouteErrorView();
 
       return switch (state.phase) {
-        ImportPhase.review => ReviewView(state, _importType!),
-        ImportPhase.error => ErrorView(state, _importType!),
-        ImportPhase.done => DoneView(state,_importType!),
-        ImportPhase.discovering => DiscoveringView(state),
-        ImportPhase.applying => ApplyingView(state),
         ImportPhase.idle => IdleView(
             state,
             _importType!,
             onBackPressed: () => setState(() => _importType = null),
+          ),
+        ImportPhase.discovering => DiscoveringView(state),
+        ImportPhase.review => ReviewView(state, _importType!),
+        ImportPhase.applying => ApplyingView(state),
+        ImportPhase.done => DoneView(state, _importType!),
+        ImportPhase.error => ErrorView(
+            onButtonPressed:
+                ref.read(importProvider(_importType!).notifier).reset,
+            description: state.error,
+            buttonText: 'Start Over',
           ),
       };
     }
