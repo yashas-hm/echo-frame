@@ -1,15 +1,18 @@
 part of 'buttons.dart';
 
 class EFIconButton extends StatelessWidget {
-  const EFIconButton(
-      {super.key, required this.icon, this.onPressed, this.iconSize,});
+  const EFIconButton({
+    super.key,
+    required this.icon,
+    this.onPressed,
+    this.iconSize,
+  });
 
   final IconData icon;
   final VoidCallback? onPressed;
   final double? iconSize;
 
-  factory EFIconButton.back({VoidCallback? onPressed}) =>
-      EFIconButton(
+  factory EFIconButton.back({VoidCallback? onPressed}) => EFIconButton(
         icon: Icons.arrow_back_rounded,
         onPressed: onPressed,
       );

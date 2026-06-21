@@ -47,7 +47,6 @@ class ErrorView extends StatelessWidget {
             SpacerLarge(),
             EFErrorButton(
               onPressed: onButtonPressed,
-              filled: true,
               text: buttonText ?? 'Retry',
             ),
           ],

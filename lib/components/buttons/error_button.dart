@@ -6,8 +6,14 @@ class EFErrorButton extends StatelessWidget {
     required this.onPressed,
     required this.text,
     this.icon,
-    this.filled = false,
-  });
+  }) : filled = true;
+
+  const EFErrorButton.flat({
+    super.key,
+    required this.onPressed,
+    required this.text,
+    this.icon,
+  }) : filled = false;
 
   final bool filled;
   final VoidCallback onPressed;
@@ -47,17 +53,13 @@ class EFErrorButton extends StatelessWidget {
                 Icon(
                   icon,
                   size: Sizes.iconSizeExtraSmall,
-                  color: colors.onErrorPrimary,
+                  color: filled ? colors.onErrorPrimary : colors.errorPrimary,
                 ),
               Text(
                 text,
-                style: filled
-                    ? Styles.buttonBold(
-                        color: colors.onErrorPrimary,
-                      )
-                    : Styles.button(
-                        color: colors.onErrorPrimary,
-                      ),
+                style: Styles.button(
+                  color: filled ? colors.onErrorPrimary : colors.errorPrimary,
+                ),
               ),
             ],
           ),

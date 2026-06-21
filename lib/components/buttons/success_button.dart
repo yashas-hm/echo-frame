@@ -6,8 +6,14 @@ class EFSuccessButton extends StatelessWidget {
     required this.onPressed,
     required this.text,
     this.icon,
-    this.filled = true,
-  });
+  }) : filled = true;
+
+  const EFSuccessButton.flat({
+    super.key,
+    required this.onPressed,
+    required this.text,
+    this.icon,
+  }) : filled = false;
 
   final bool filled;
   final VoidCallback onPressed;
@@ -48,17 +54,15 @@ class EFSuccessButton extends StatelessWidget {
                 Icon(
                   icon,
                   size: Sizes.iconSizeExtraSmall,
-                  color: colors.onSuccessPrimary,
+                  color:
+                      filled ? colors.onSuccessPrimary : colors.successPrimary,
                 ),
               Text(
                 text,
-                style: filled
-                    ? Styles.buttonBold(
-                        color: colors.onSuccessPrimary,
-                      )
-                    : Styles.button(
-                        color: colors.onSuccessPrimary,
-                      ),
+                style: Styles.button(
+                  color:
+                      filled ? colors.onSuccessPrimary : colors.successPrimary,
+                ),
               ),
             ],
           ),

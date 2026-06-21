@@ -7,10 +7,19 @@ class EFPrimaryButton extends StatelessWidget {
     required this.text,
     this.icon,
     this.disabled = false,
-  });
+  }) : filled = true;
+
+  const EFPrimaryButton.flat({
+    super.key,
+    required this.onPressed,
+    required this.text,
+    this.icon,
+    this.disabled = false,
+  }) : filled = false;
 
   final VoidCallback onPressed;
   final bool disabled;
+  final bool filled;
   final String text;
   final IconData? icon;
 
@@ -21,16 +30,30 @@ class EFPrimaryButton extends StatelessWidget {
     return Material(
       borderRadius: BorderRadius.circular(Sizes.maxFinite),
       clipBehavior: Clip.antiAlias,
-      color: disabled ? colors.surfacePrimary : colors.primaryColor,
+      color: disabled
+          ? colors.surfacePrimary
+          : filled
+              ? colors.primaryColor.hover
+              : KnownColors.transparent,
       child: InkWell(
         onTap: disabled ? null : onPressed,
         mouseCursor: SystemMouseCursors.click,
-        hoverColor: disabled ? KnownColors.transparent : colors.onPrimary.hover,
-        splashColor: colors.onPrimary.splash,
+        hoverColor: disabled
+            ? KnownColors.transparent
+            : filled
+                ? colors.onPrimary.hover
+                : colors.primaryColor.hover,
+        splashColor: colors.primaryColor.splash,
         child: Container(
           padding: EdgeInsets.symmetric(
             vertical: Sizes.spacingExtraExtraSmall,
             horizontal: Sizes.spacingMedium,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(Sizes.maxFinite),
+            border: filled
+                ? Border.all(color: colors.primaryColor, width: 1)
+                : null,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -40,12 +63,20 @@ class EFPrimaryButton extends StatelessWidget {
                 Icon(
                   icon,
                   size: Sizes.iconSizeExtraSmall,
-                  color: disabled ? colors.textSecondary : colors.onPrimary,
+                  color: disabled
+                      ? colors.textSecondary
+                      : filled
+                          ? colors.onPrimary
+                          : colors.onPrimary,
                 ),
               Text(
                 text,
                 style: Styles.button(
-                  color: disabled ? colors.textSecondary : colors.onPrimary,
+                  color: disabled
+                      ? colors.textSecondary
+                      : filled
+                          ? colors.onPrimary
+                          : colors.primaryColor,
                 ),
               ),
             ],

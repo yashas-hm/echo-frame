@@ -1,3 +1,4 @@
+import 'package:echo_frame/utilities/utilities.dart' show ColorExtensions;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';

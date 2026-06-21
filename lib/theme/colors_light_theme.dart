@@ -29,13 +29,13 @@ class LightColors extends AppThemeColors {
   Color get errorPrimary => KnownColors.strawberry500;
 
   @override
-  Color get errorSurface => KnownColors.strawberry100;
+  Color get errorSurface => KnownColors.strawberry500.hover;
 
   @override
   Color get successPrimary => KnownColors.mint400;
 
   @override
-  Color get successSurface => KnownColors.mint100;
+  Color get successSurface => KnownColors.mint400.hover;
 
   @override
   Color get cursorColor => KnownColors.sky200;

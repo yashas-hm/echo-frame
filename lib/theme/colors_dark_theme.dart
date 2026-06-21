@@ -29,13 +29,13 @@ class DarkColors extends AppThemeColors {
   Color get errorPrimary => KnownColors.strawberry400;
 
   @override
-  Color get errorSurface => KnownColors.strawberry300.withValues(alpha: 0.15);
+  Color get errorSurface => KnownColors.strawberry300.hover;
 
   @override
   Color get successPrimary => KnownColors.mint300;
 
   @override
-  Color get successSurface => KnownColors.mint300.withValues(alpha: 0.15);
+  Color get successSurface => KnownColors.mint300.hover;
 
   @override
   Color get cursorColor => KnownColors.sky400;
