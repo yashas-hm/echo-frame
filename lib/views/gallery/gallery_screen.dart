@@ -1,11 +1,10 @@
 import 'package:echo_frame/components/buttons/buttons.dart';
 import 'package:echo_frame/components/error_view.dart';
-import 'package:echo_frame/views/gallery/components/action_bubble.dart';
+import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/components/gallery_info_panel.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
 import 'package:echo_frame/views/gallery/video_view.dart';
-import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,29 +66,6 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     if (_currentIndex > 0) setState(() => _currentIndex--);
   }
 
-  void _togglePlayPause() {
-    final player = _player;
-    if (player == null) return;
-    player.playOrPause();
-    ActionBubble.show(
-      context,
-      icon:
-          player.state.playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-    );
-  }
-
-  void _toggleMute() {
-    final player = _player;
-    if (player == null) return;
-    if (player.state.volume <= 0) {
-      player.setVolume(100);
-      ActionBubble.show(context, icon: Icons.volume_up_rounded);
-    } else {
-      player.setVolume(0);
-      ActionBubble.show(context, icon: Icons.volume_off_rounded);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(timelineProvider).requireValue;
@@ -129,7 +105,10 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                     const SingleActivator(
                       LogicalKeyboardKey.space,
                       includeRepeats: false,
-                    ): _togglePlayPause,
+                    ): () => VideoControlFunctions.togglePlayPause(
+                          context,
+                          _player,
+                        ),
                     const SingleActivator(
                       LogicalKeyboardKey.keyI,
                       includeRepeats: false,
@@ -137,7 +116,10 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                     const SingleActivator(
                       LogicalKeyboardKey.keyM,
                       includeRepeats: false,
-                    ): _toggleMute,
+                    ): () => VideoControlFunctions.toggleMute(
+                          context,
+                          _player,
+                        ),
                   },
                   child: Focus(
                     autofocus: true,

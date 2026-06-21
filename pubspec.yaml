@@ -3,7 +3,7 @@ description: "Your offline sanctuary for memories; Say hello to clutter-free nos
 
 publish_to: 'none'
 
-version: 0.0.1+1
+version: 0.0.1-alpha+1
 
 environment:
   sdk: '>=3.3.3 <4.0.0'

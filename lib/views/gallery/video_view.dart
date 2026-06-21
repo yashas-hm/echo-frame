@@ -2,12 +2,41 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
 
+import 'package:echo_frame/constants/constants.dart'
+    show Sizes, SpacerExtraSmall, SpacerSmall;
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
-import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
+import 'package:echo_frame/utilities/utilities.dart'
+    show ContextExtensions, DurationExtensions;
+import 'package:echo_frame/views/gallery/components/action_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+
+sealed class VideoControlFunctions {
+  VideoControlFunctions._();
+
+  static void togglePlayPause(BuildContext context, Player? player) {
+    if (player == null) return;
+    player.playOrPause();
+    ActionBubble.show(
+      context,
+      icon:
+          player.state.playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+    );
+  }
+
+  static void toggleMute(BuildContext context, Player? player) {
+    if (player == null) return;
+    if (player.state.volume <= 0) {
+      player.setVolume(100);
+      ActionBubble.show(context, icon: Icons.volume_up_rounded);
+    } else {
+      player.setVolume(0);
+      ActionBubble.show(context, icon: Icons.volume_off_rounded);
+    }
+  }
+}
 
 class VideoView extends StatefulWidget {
   const VideoView({
@@ -88,26 +117,28 @@ class _VideoViewState extends State<VideoView> {
           left: 0,
           right: 0,
           bottom: 0,
-          child: _Controls(player: _player),
+          child: _VideoControls(player: _player),
         ),
       ],
     );
   }
 }
 
-class _Controls extends StatefulWidget {
-  const _Controls({required this.player});
+class _VideoControls extends StatefulWidget {
+  const _VideoControls({required this.player});
 
   final Player player;
 
   @override
-  State<_Controls> createState() => _ControlsState();
+  State<_VideoControls> createState() => _VideoControlsState();
 }
 
-class _ControlsState extends State<_Controls> {
+class _VideoControlsState extends State<_VideoControls> {
   late bool _playing;
+  late bool _isMute;
   late Duration _position;
   late Duration _duration;
+
   final List<StreamSubscription<dynamic>> _subs = [];
 
   @override
@@ -116,12 +147,15 @@ class _ControlsState extends State<_Controls> {
     _playing = widget.player.state.playing;
     _position = widget.player.state.position;
     _duration = widget.player.state.duration;
+    _isMute = widget.player.state.volume <= 0;
     _subs.addAll([
       widget.player.stream.playing.listen((v) => setState(() => _playing = v)),
       widget.player.stream.position
           .listen((v) => setState(() => _position = v)),
       widget.player.stream.duration
           .listen((v) => setState(() => _duration = v)),
+      widget.player.stream.volume
+          .listen((v) => setState(() => _isMute = v <= 0)),
     ]);
   }
 
@@ -146,19 +180,10 @@ class _ControlsState extends State<_Controls> {
         : 0.0;
 
     return Container(
-      // decoration: BoxDecoration(
-      //   gradient: LinearGradient(
-      //     begin: Alignment.bottomCenter,
-      //     end: Alignment.topCenter,
-      //     colors: [
-      //       context.colors.background,
-      //       KnownColors.transparent,
-      //     ],
-      //   ),
-      // ),
-      padding: const EdgeInsets.fromLTRB(16, 32, 16, 12),
+      padding: const EdgeInsets.all(Sizes.edgePadding),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        spacing: Sizes.spacingSmall,
         children: [
           SliderTheme(
             data: SliderThemeData(
@@ -172,21 +197,27 @@ class _ControlsState extends State<_Controls> {
             ),
             child: Slider(
               value: progress,
-              onChanged: (v) => widget.player.seek(
-                Duration(milliseconds: (v * _duration.inMilliseconds).round()),
-              ),
+              onChanged: (v) => widget.player
+                  .seek((v * _duration.inMilliseconds).round().milliseconds),
             ),
           ),
           Row(
             children: [
-              IconButton(
-                onPressed: widget.player.playOrPause,
-                icon: Icon(
+              SpacerExtraSmall(),
+              InkWell(
+                onTap: () => VideoControlFunctions.togglePlayPause(
+                  context,
+                  widget.player,
+                ),
+                mouseCursor: SystemMouseCursors.click,
+                customBorder: CircleBorder(),
+                child: Icon(
                   _playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
                   color: context.colors.textPrimary,
+                  size: Sizes.iconSizeRegular,
                 ),
               ),
-              const SizedBox(width: 4),
+              SpacerSmall(),
               Text(
                 '${_fmt(_position)} / ${_fmt(_duration)}',
                 style: TextStyle(
@@ -194,6 +225,21 @@ class _ControlsState extends State<_Controls> {
                   fontSize: 12,
                 ),
               ),
+              Spacer(),
+              InkWell(
+                onTap: () => VideoControlFunctions.toggleMute(
+                  context,
+                  widget.player,
+                ),
+                mouseCursor: SystemMouseCursors.click,
+                customBorder: CircleBorder(),
+                child: Icon(
+                  _isMute ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                  color: context.colors.textPrimary,
+                  size: Sizes.iconSizeSmallRegular,
+                ),
+              ),
+              SpacerExtraSmall(),
             ],
           ),
         ],

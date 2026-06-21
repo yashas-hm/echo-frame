@@ -1,4 +1,6 @@
-import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
+import 'package:echo_frame/theme/theme.dart';
+import 'package:echo_frame/utilities/utilities.dart'
+    show ContextExtensions, ColorExtensions;
 import 'package:flutter/material.dart';
 
 class ActionBubble {
@@ -67,7 +69,7 @@ class _ActionBubbleToastState extends State<_ActionBubbleToast>
           opacity: _controller,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: context.colors.hoverColor,
+              color: KnownColors.basicBlack.hover,
               shape: BoxShape.circle,
             ),
             child: Padding(
