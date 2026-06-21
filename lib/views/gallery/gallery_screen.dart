@@ -1,4 +1,3 @@
-import 'package:echo_frame/components/buttons/buttons.dart';
 import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
