@@ -41,7 +41,9 @@ class _CaretArrowState extends State<CaretArrow> {
             child: Material(
               color: KnownColors.transparent,
               child: InkWell(
+                mouseCursor: SystemMouseCursors.click,
                 onTap: widget.onPressed,
+                hoverColor: KnownColors.transparent,
                 splashColor: context.colors.onPrimary.withValues(alpha: 0.3),
                 child: Container(
                   width: _zoneWidth,
