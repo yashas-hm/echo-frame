@@ -5,8 +5,7 @@ import 'package:echo_frame/views/favorites/favorites_screen.dart';
 import 'package:echo_frame/views/gallery/gallery_screen.dart';
 import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
-import 'package:echo_frame/views/shell/empty_shell.dart';
-import 'package:echo_frame/views/shell/nav_bar_shell.dart';
+import 'package:echo_frame/views/shell/shell_screen.dart';
 import 'package:echo_frame/views/timeline/timeline_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,13 +20,25 @@ final _router = GoRouter(
       routes: [
         TimelineScreen.route,
         FavoritesScreen.route,
-        SettingsScreen.route,
       ],
     ),
     ShellRoute(
-      builder: (_, __, child) => EmptyShell(child: child),
+      builder: (_, __, child) => ShellScreen(
+        enableNavBar: false,
+        enableBackButton: true,
+        child: child,
+      ),
       routes: [
+        SettingsScreen.route,
         GalleryScreen.routeDef,
+      ],
+    ),
+    ShellRoute(
+      builder: (_, __, child) => ShellScreen(
+        enableNavBar: false,
+        child: child,
+      ),
+      routes: [
         ImportScreen.route,
       ],
     ),

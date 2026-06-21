@@ -159,7 +159,6 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             onPressed: _goNext,
             loadingNext: state.isLoadingMore,
           ),
-        const EFBackButton(),
       ],
     );
   }

@@ -1,3 +1,4 @@
+import 'package:echo_frame/components/buttons/buttons.dart';
 import 'package:echo_frame/utilities/utilities.dart' show SearchIntent;
 import 'package:echo_frame/views/shell/components/nav_bar.dart';
 import 'package:echo_frame/views/shell/components/title_bar.dart';
@@ -5,9 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ShellScreen extends ConsumerWidget {
-  const ShellScreen({super.key, required this.child});
+  const ShellScreen({
+    super.key,
+    required this.child,
+    this.enableNavBar = true,
+    this.enableBackButton = false,
+  });
 
   final Widget child;
+  final bool enableNavBar;
+  final bool enableBackButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,13 +30,15 @@ class ShellScreen extends ConsumerWidget {
       },
       child: Scaffold(
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const TitleBar(),
             Expanded(
               child: Stack(
                 children: [
                   Positioned.fill(child: child),
-                  NavBar(),
+                  if (enableNavBar) NavBar(),
+                  if (enableBackButton) EFBackButton(),
                 ],
               ),
             ),

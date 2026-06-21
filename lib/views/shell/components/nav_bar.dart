@@ -188,7 +188,8 @@ class _NavBarState extends State<NavBar> with SingleTickerProviderStateMixin {
     required String currentRoute,
   }) {
     final VoidCallback callback = switch (destination.route) {
-      ImportScreen.path => () => context.push(destination.route),
+      SettingsScreen.path || ImportScreen.path => () =>
+          context.push(destination.route),
       _ => () => context.go(destination.route),
     };
     return Material(
