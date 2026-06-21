@@ -91,14 +91,20 @@ class Styles {
         color: color,
       );
 
+  static TextStyle microBold({Color? color}) => GoogleFonts.robotoMono(
+    fontSize: Sizes.fontSizeExtraSmall,
+    fontWeight: FontWeight.w800,
+    color: color,
+  );
+
   static TextStyle button({Color? color}) => GoogleFonts.robotoMono(
-        fontSize: Sizes.fontSizeRegular,
+        fontSize: Sizes.fontSizeSmall,
         fontWeight: FontWeight.w400,
         color: color ?? KnownColors.basicWhite,
       );
 
   static TextStyle buttonBold({Color? color}) => GoogleFonts.robotoMono(
-        fontSize: Sizes.fontSizeRegular,
+        fontSize: Sizes.fontSizeSmall,
         fontWeight: FontWeight.w700,
         color: color ?? KnownColors.basicWhite,
       );

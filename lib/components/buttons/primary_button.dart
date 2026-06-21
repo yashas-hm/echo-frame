@@ -29,7 +29,7 @@ class EFPrimaryButton extends StatelessWidget {
         splashColor: colors.onPrimary.splash,
         child: Container(
           padding: EdgeInsets.symmetric(
-            vertical: Sizes.spacingSmall,
+            vertical: Sizes.spacingExtraExtraSmall,
             horizontal: Sizes.spacingMedium,
           ),
           child: Row(
@@ -39,7 +39,7 @@ class EFPrimaryButton extends StatelessWidget {
               if (icon != null)
                 Icon(
                   icon,
-                  size: Sizes.iconSizeSmall,
+                  size: Sizes.iconSizeExtraSmall,
                   color: disabled ? colors.textSecondary : colors.onPrimary,
                 ),
               Text(

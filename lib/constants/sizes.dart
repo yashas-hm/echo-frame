@@ -23,6 +23,7 @@ final class Sizes {
   static const double iconSizeLarge = 30.0;
   static const double iconSizeHuge = 50.0;
 
+  static const double spacingExtraExtraSmall = 3.0;
   static const double spacingExtraSmall = 6.0;
   static const double spacingSmall = 8.0;
   static const double spacingSmallRegular = 10.0;

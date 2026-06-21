@@ -30,7 +30,7 @@ class EFErrorButton extends StatelessWidget {
         splashColor: colors.errorPrimary.splash,
         child: Container(
           padding: EdgeInsets.symmetric(
-            vertical: Sizes.spacingSmallRegular,
+            vertical: Sizes.spacingExtraExtraSmall,
             horizontal: Sizes.spacingRegular,
           ),
           decoration: BoxDecoration(
@@ -46,7 +46,7 @@ class EFErrorButton extends StatelessWidget {
               if (icon != null)
                 Icon(
                   icon,
-                  size: Sizes.iconSizeSmall,
+                  size: Sizes.iconSizeExtraSmall,
                   color: colors.onErrorPrimary,
                 ),
               Text(
