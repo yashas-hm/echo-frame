@@ -17,21 +17,36 @@ class Prefs {
   static set themeMode(ThemeMode value) =>
       _prefs.setString(Keys.themeModePrefTag, value.name);
 
-  static String? get libraryRootPath => _prefs.getString(Keys.libraryRootPath);
+  static String? get activeLibraryRoot =>
+      _prefs.getString(Keys.activeLibraryRoot);
 
-  static set libraryRootPath(String? value) {
+  static set activeLibraryRoot(String? value) {
     if (value == null) {
-      _prefs.remove(Keys.libraryRootPath);
+      _prefs.remove(Keys.activeLibraryRoot);
     } else {
-      _prefs.setString(Keys.libraryRootPath, value);
+      _prefs.setString(Keys.activeLibraryRoot, value);
     }
   }
 
-  static bool get sharedPrefExists =>
-      _prefs.getBool(Keys.sharedPrefExists) ?? false;
+  static List<String> get knownLibraryRoots =>
+      _prefs.getStringList(Keys.knownLibraryRoots) ?? [];
 
-  static set sharedPrefExists(bool value) =>
-      _prefs.setBool(Keys.sharedPrefExists, value);
+  static set knownLibraryRoots(List<String> value) =>
+      _prefs.setStringList(Keys.knownLibraryRoots, value);
+
+  /// Adds [path] to known roots (deduplicating) and sets it as the active root.
+  static void addKnownLibrary(String path) {
+    activeLibraryRoot = path;
+    final roots = knownLibraryRoots;
+    if (!roots.contains(path)) {
+      knownLibraryRoots = [...roots, path];
+    }
+  }
+
+  static void removeKnownLibrary(String path) {
+    knownLibraryRoots = knownLibraryRoots.where((r) => r != path).toList();
+    if (activeLibraryRoot == path) activeLibraryRoot = null;
+  }
 
   static bool get showNavLabel => _prefs.getBool(Keys.showNavLabel) ?? true;
 

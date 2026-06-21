@@ -23,7 +23,7 @@ class MediaDao {
     if (records.isEmpty) return [];
 
     final ids = records.map((r) => r.id).toList();
-    final root = Prefs.libraryRootPath!;
+    final root = Prefs.activeLibraryRoot!;
 
     final tagRows = await (_db.select(_db.tagRecords).join([
       innerJoin(
@@ -53,7 +53,7 @@ class MediaDao {
   // ── Queries ───────────────────────────────────────────────────────────────
 
   Future<Set<String>> listFilePaths() async {
-    final root = Prefs.libraryRootPath!;
+    final root = Prefs.activeLibraryRoot!;
     final rows = await (_db.selectOnly(_db.mediaRecords)
           ..addColumns([_db.mediaRecords.relativePath]))
         .get();

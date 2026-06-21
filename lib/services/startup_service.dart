@@ -16,7 +16,7 @@ class StartupService {
 
     await Prefs.init();
 
-    final root = Prefs.libraryRootPath;
+    final root = Prefs.activeLibraryRoot;
     if (root != null) {
       await EchoDatabase.open(root);
     }

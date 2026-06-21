@@ -13,7 +13,7 @@ class ImportNotifier extends Notifier<ImportState> {
   final ImportService _service;
 
   @override
-  ImportState build() => ImportState(destRoot: Prefs.libraryRootPath);
+  ImportState build() => ImportState(destRoot: Prefs.activeLibraryRoot);
 
   void setSourceDir(String path) => state = state.copyWith(sourceDir: path);
 

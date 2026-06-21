@@ -38,7 +38,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   @override
   void initState() {
     super.initState();
-    _hasLibrary = Prefs.libraryRootPath != null;
+    _hasLibrary = Prefs.activeLibraryRoot != null;
     if (!_hasLibrary) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _showSetupDialog());
     }
@@ -100,7 +100,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     }
 
     await EchoDatabase.open(path);
-    Prefs.libraryRootPath = path;
+    Prefs.addKnownLibrary(path);
 
     if (!mounted) return;
     setState(() => _hasLibrary = true);
