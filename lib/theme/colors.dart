@@ -44,7 +44,7 @@ class KnownColors {
   static const Color slate700 = Color(0xFF3D4349);
   static const Color slate800 = Color(0xFF2A2A2A); // dark surface
   static const Color slate900 = Color(0xFF131619);
-  static const Color slate950 = Color(0xFF1C1C1C); // near-black bg (dark)
+  static const Color slate950 = Color(0xFF111111); // near-black bg (dark)
 }
 
 abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
