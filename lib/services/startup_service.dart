@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 
 import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/services/config_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
@@ -20,7 +19,6 @@ class StartupService {
     final root = Prefs.libraryRootPath;
     if (root != null) {
       await EchoDatabase.open(root);
-      await ConfigService.seedPrefsIfNeeded(root);
     }
   }
 
