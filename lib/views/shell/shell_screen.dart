@@ -1,5 +1,6 @@
 import 'package:echo_frame/components/buttons/buttons.dart';
-import 'package:echo_frame/utilities/utilities.dart' show SearchIntent;
+import 'package:echo_frame/utilities/utilities.dart'
+    show SearchIntent, ContextExtensions;
 import 'package:echo_frame/views/shell/components/nav_bar.dart';
 import 'package:echo_frame/views/shell/components/title_bar.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class ShellScreen extends ConsumerWidget {
         ),
       },
       child: Scaffold(
+        backgroundColor: context.colors.background,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [

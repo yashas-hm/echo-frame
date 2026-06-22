@@ -5,12 +5,13 @@ import 'package:echo_frame/theme/provider/theme_provider.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart';
 import 'package:echo_frame/views/settings/provider/settings_provider.dart';
+import 'package:echo_frame/views/settings/shortcut_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class SettingsScreen extends ConsumerStatefulWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   static const String path = '/settings';
@@ -21,12 +22,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
       );
 
   @override
-  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final settings = ref.watch(settingsProvider);
     final themeMode = ref.watch(appThemeProvider).mode;
@@ -46,6 +42,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ..._settingTile(
             title: 'Library Root',
             subtitle: settings.activeLibraryRoot ?? 'No library selected',
+            colors: colors,
             actionChild: settings.knownLibraryRoots.isNotEmpty &&
                     settings.activeLibraryRoot != null
                 ? DropdownButton<String>(
@@ -93,7 +90,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ],
                     onChanged: (path) {
                       if (path == 'NewRoot') {
-                        _addLibrary();
+                        _addLibrary(ref);
                         return;
                       }
 
@@ -104,12 +101,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   )
                 : EFIconButton(
                     icon: Icons.add_rounded,
-                    onPressed: _addLibrary,
+                    onPressed: () => _addLibrary(ref),
                   ),
           ),
           ..._settingTile(
             title: 'Theme',
             subtitle: 'Choose how EchoFrame looks',
+            colors: colors,
             actionChild: DropdownButton<ThemeMode>(
               value: themeMode,
               dropdownColor: colors.surfacePrimary,
@@ -156,6 +154,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ..._settingTile(
             title: 'Navigation bar label',
             subtitle: 'Show text labels below navigation icons',
+            colors: colors,
             actionChild: Switch(
               value: settings.showNavLabel,
               onChanged: ref.read(settingsProvider.notifier).setShowNavLabel,
@@ -170,27 +169,54 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ..._settingTile(
             title: 'Export Settings',
             subtitle: 'Back up current settings to the active library',
+            colors: colors,
             actionChild: EFPrimaryButton(
               text: 'Export',
               icon: Icons.save_rounded,
-              onPressed: _saveSettings,
+              onPressed: () => _saveSettings(context, ref),
             ),
           ),
           ..._settingTile(
             title: 'Import Settings',
             subtitle: 'Restore settings from a saved backup',
+            colors: colors,
             actionChild: EFPrimaryButton(
               text: 'Import',
               icon: Icons.download_rounded,
-              onPressed: _importSettings,
+              onPressed: () => _importSettings(context, ref),
             ),
           ),
           ..._settingTile(
             title: 'Reset Settings',
             subtitle: 'Restore appearance and display defaults',
+            colors: colors,
             actionChild: EFErrorButton.flat(
               text: 'Reset',
-              onPressed: _confirmReset,
+              onPressed: () => _confirmReset(context, ref),
+            ),
+          ),
+          SpacerRegular(),
+          InkWell(
+            onTap: () => context.push(ShortcutScreen.path),
+            mouseCursor: SystemMouseCursors.click,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: Sizes.spacingExtraSmall,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    'Shortcuts',
+                    style: Styles.subTitleBold(color: colors.textPrimary),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.arrow_right_rounded,
+                    size: Sizes.iconSizeRegular,
+                    color: colors.textPrimary,
+                  ),
+                ],
+              ),
             ),
           ),
           const Spacer(),
@@ -245,17 +271,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Future<void> _addLibrary() async {
+  Future<void> _addLibrary(WidgetRef ref) async {
     final path = await FilePicker.getDirectoryPath(
       dialogTitle: 'Select Library Folder',
     );
-    if (path == null || !mounted) return;
+    if (path == null) return;
     await ref.read(settingsProvider.notifier).addLibrary(path);
   }
 
-  Future<void> _saveSettings() async {
+  Future<void> _saveSettings(BuildContext context, WidgetRef ref) async {
     final ok = await ref.read(settingsProvider.notifier).saveSettings();
-    if (!mounted) return;
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -265,9 +291,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Future<void> _importSettings() async {
+  Future<void> _importSettings(BuildContext context, WidgetRef ref) async {
     final result = await ref.read(settingsProvider.notifier).importSettings();
-    if (!mounted) return;
+    if (!context.mounted) return;
     if (result == null) {
       await EFDialog.show(
         context,
@@ -287,7 +313,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Future<void> _confirmReset() async {
+  Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {
     final confirmed = await EFDialog.show(
       context,
       title: 'Reset Settings',
@@ -303,42 +329,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   List<Widget> _settingTile({
     required String title,
+    required AppThemeColors colors,
     String subtitle = '',
     Widget? actionChild,
-  }) {
-    final colors = context.colors;
-
-    return [
-      Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        spacing: Sizes.spacingRegular,
-        children: [
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: Sizes.spacingExtraSmall,
-              children: [
-                Text(
-                  title,
-                  style: Styles.smallRegular(color: colors.textPrimary),
-                ),
-                Text(
-                  subtitle,
-                  style: Styles.small(color: colors.textSecondary),
-                ),
-              ],
+  }) =>
+      [
+        Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: Sizes.spacingRegular,
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: Sizes.spacingExtraSmall,
+                children: [
+                  Text(
+                    title,
+                    style: Styles.smallRegular(color: colors.textPrimary),
+                  ),
+                  Text(
+                    subtitle,
+                    style: Styles.small(color: colors.textSecondary),
+                  ),
+                ],
+              ),
             ),
-          ),
-          if (actionChild != null) ...[
-            actionChild,
+            if (actionChild != null) ...[
+              actionChild,
+            ],
           ],
-        ],
-      ),
-      SpacerSmallRegular(),
-    ];
-  }
+        ),
+        SpacerSmallRegular(),
+      ];
 }
