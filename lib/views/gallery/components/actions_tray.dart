@@ -1,7 +1,7 @@
 import 'package:echo_frame/components/buttons/buttons.dart' show EFIconButton;
 import 'package:echo_frame/constants/constants.dart' show Sizes;
 import 'package:echo_frame/models/media_item.dart';
-import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
+import 'package:echo_frame/views/gallery/provider/gallery_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,6 +19,8 @@ class ActionsTray extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final actions = ref.read(galleryActionsProvider);
+
     return Positioned(
       top: Sizes.spacingRegular,
       right: Sizes.spacingRegular,
@@ -32,9 +34,8 @@ class ActionsTray extends ConsumerWidget {
                 ? Icons.star_rounded
                 : Icons.star_border_rounded,
             iconColor: item.isFavorite ? Colors.amber : null,
-            onPressed: () => ref
-                .read(timelineProvider.notifier)
-                .setFavourite(item.id, value: !item.isFavorite),
+            onPressed: () =>
+                actions.setFavourite(item.id, value: !item.isFavorite),
           ),
           EFIconButton(
             icon: Icons.delete_outline_rounded,
