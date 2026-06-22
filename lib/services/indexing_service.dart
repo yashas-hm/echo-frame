@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/metadata_service.dart';
+import 'package:echo_frame/services/thumbnail_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 
 enum IndexingPhase { scanning, reading, done }
@@ -89,6 +91,10 @@ class IndexingService {
         );
         continue;
       }
+      if (DirUtils.isVideo(paths[i])) {
+        await ThumbnailService.generate(paths[i]);
+      }
+
       try {
         await MediaDao.instance.upsertMeta(m, paths[i], libraryRoot);
       } catch (e, st) {

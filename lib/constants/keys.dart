@@ -11,4 +11,6 @@ final class Keys {
   static const String windowX = 'windowX';
   static const String windowY = 'windowY';
   static const String showNavLabel = 'showNavLabel';
+
+  static const String thumbsFolderName = '.echothumbs';
 }

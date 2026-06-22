@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 import 'dart:io';
 
+import 'package:echo_frame/constants/constants.dart' show Keys;
 import 'package:media_metadata_plus/media_metadata_plus.dart';
 
 class ThumbnailService {
@@ -9,7 +10,7 @@ class ThumbnailService {
   static String pathFor(String videoPath) {
     final dir = videoPath.substring(0, videoPath.lastIndexOf('/'));
     final filename = videoPath.split('/').last;
-    return '$dir/thumbnails/$filename.jpg';
+    return '$dir/${Keys.thumbsFolderName}/$filename.jpg';
   }
 
   /// Generates a JPEG thumbnail for [videoPath] via media_metadata_plus.
