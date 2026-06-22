@@ -190,10 +190,11 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             onPressed: _goNext,
             loadingNext: state.isLoadingMore,
           ),
-        ActionsTray(
-          item: item,
-          onInfoPressed: _showInfoF,
-        ),
+        if (!_showInfo)
+          ActionsTray(
+            item: item,
+            onInfoPressed: _showInfoF,
+          ),
       ],
     );
   }
