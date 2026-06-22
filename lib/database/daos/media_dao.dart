@@ -1,3 +1,7 @@
+// TODO: Wrap every DAO method in try/catch (drive disconnect throws DatabaseException).
+//       Return a result type — e.g. `DbResult<T>` with a `bool success` and `T? data` —
+//       instead of raw futures. Update GalleryActions and UI layers to react to failures
+//       (snackbar / error state) rather than silently swallowing them.
 import 'dart:convert';
 import 'dart:io';
 
@@ -163,19 +167,21 @@ class MediaDao {
       ]);
 
   Future<void> _upsertBatch(List<MediaRecordsCompanion> companions) =>
-      _db.batch((b) {
-        for (final c in companions) {
-          b.insert(
-            _db.mediaRecords,
-            c,
-            onConflict: DoUpdate(
-              // preserve existing id on conflict — only update metadata fields
-              (old) => c.copyWith(id: const Value.absent()),
-              target: [_db.mediaRecords.relativePath],
-            ),
-          );
-        }
-      });
+      _db.batch(
+        (b) {
+          for (final c in companions) {
+            b.insert(
+              _db.mediaRecords,
+              c,
+              onConflict: DoUpdate(
+                // preserve existing id on conflict — only update metadata fields
+                (old) => c.copyWith(id: const Value.absent()),
+                target: [_db.mediaRecords.relativePath],
+              ),
+            );
+          }
+        },
+      );
 
   static String? _existingThumbnail(String filePath) {
     final path = ThumbnailService.pathFor(filePath);

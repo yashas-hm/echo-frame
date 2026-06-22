@@ -27,7 +27,7 @@ class TrashService {
   }
 
   /// Permanently deletes the file and its thumbnail from `.echotrash`.
-  static Future<void> permanentDelete(String trashFilePath) async {
+  static Future<bool> permanentDelete(String trashFilePath) async {
     final file = File(trashFilePath);
     if (await file.exists()) {
       try {
@@ -38,6 +38,7 @@ class TrashService {
           stackTrace: st,
           name: 'TrashService.permanentDelete',
         );
+        return false;
       }
     }
 
@@ -53,6 +54,8 @@ class TrashService {
         );
       }
     }
+
+    return true;
   }
 
   /// Returns true if the move succeeded, false otherwise.

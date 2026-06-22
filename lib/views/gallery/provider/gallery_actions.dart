@@ -12,18 +12,19 @@ class GalleryActions {
 
   final Ref _ref;
 
-  Future<void> setFavourite(String id, {required bool value}) async {
-    if (!EchoDatabase.isOpen) return;
+  Future<bool> setFavourite(String id, {required bool value}) async {
+    if (!EchoDatabase.isOpen) return false;
     await MediaDao.instance.setFavorite(id, value: value);
     _ref.read(timelineProvider.notifier).syncItem(id, isFavorite: value);
     _ref.read(favoritesProvider.notifier).syncItem(id, isFavorite: value);
+    return true;
   }
 
-  Future<void> trash(MediaItem item) async {
-    if (!EchoDatabase.isOpen) return;
+  Future<bool> trash(MediaItem item) async {
+    if (!EchoDatabase.isOpen) return false;
     final root = Prefs.activeLibraryRoot!;
     final newPath = await TrashService.trash(item.filePath, root);
-    if (newPath == null) return;
+    if (newPath == null) return false;
     await MediaDao.instance.setTrashed(
       item.id,
       value: true,
@@ -31,13 +32,14 @@ class GalleryActions {
     );
     _ref.read(timelineProvider.notifier).syncItem(item.id, isTrashed: true);
     _ref.read(favoritesProvider.notifier).syncItem(item.id, isTrashed: true);
+    return true;
   }
 
-  Future<void> restore(MediaItem item) async {
-    if (!EchoDatabase.isOpen) return;
+  Future<bool> restore(MediaItem item) async {
+    if (!EchoDatabase.isOpen) return false;
     final root = Prefs.activeLibraryRoot!;
     final newPath = await TrashService.restore(item.filePath, root);
-    if (newPath == null) return;
+    if (newPath == null) return false;
     await MediaDao.instance.setTrashed(
       item.id,
       value: false,
@@ -45,12 +47,15 @@ class GalleryActions {
     );
     _ref.invalidate(timelineProvider);
     _ref.invalidate(favoritesProvider);
+    return true;
   }
 
-  Future<void> permanentDelete(MediaItem item) async {
-    if (!EchoDatabase.isOpen) return;
-    await TrashService.permanentDelete(item.filePath);
+  Future<bool> permanentDelete(MediaItem item) async {
+    if (!EchoDatabase.isOpen) return false;
+    final success = await TrashService.permanentDelete(item.filePath);
+    if(!success) return false;
     await MediaDao.instance.permanentDelete(item.id);
+    return true;
   }
 }
 
