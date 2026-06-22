@@ -13,6 +13,7 @@ abstract class MediaCollectionNotifier
   /// Filter applied to every query this collection issues.
   /// null = no filter on that column.
   bool? get isFavoriteFilter;
+
   bool get isTrashedFilter;
 
   @override
@@ -41,16 +42,17 @@ abstract class MediaCollectionNotifier
     if (current == null) return;
     final idx = current.loaded.indexWhere((e) => e.id == id);
     if (idx == -1) return;
-    final updated = List<MediaItem>.of(current.loaded);
+
     final shouldRemove = (isFavorite == false && isFavoriteFilter == true) ||
         (isTrashed == true && isTrashedFilter == false) ||
         (isTrashed == false && isTrashedFilter == true);
+
+    final updated = List<MediaItem>.of(current.loaded);
     if (shouldRemove) {
       updated.removeAt(idx);
     } else {
-      var item = current.loaded[idx];
-      if (isFavorite != null) item = item.setFavourite(isFavorite);
-      updated[idx] = item;
+      updated[idx] =
+          updated[idx].copyWith(isFavorite: isFavorite, isTrashed: isTrashed);
     }
     state = AsyncData(current.copyWith(loaded: updated));
   }

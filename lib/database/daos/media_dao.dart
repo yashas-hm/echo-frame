@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
+import 'package:echo_frame/constants/constants.dart' show Keys;
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/models/metadata.dart';
@@ -118,8 +119,10 @@ class MediaDao {
     final records = await (_db.select(_db.mediaRecords)
           ..where((r) => r.isFavorite.equals(true) & r.isTrashed.equals(false))
           ..orderBy([
-            (r) =>
-                OrderingTerm(expression: r.capturedAt, mode: OrderingMode.desc),
+            (r) => OrderingTerm(
+                  expression: r.capturedAt,
+                  mode: OrderingMode.desc,
+                ),
           ]))
         .get();
     return _toItems(records);
@@ -129,9 +132,20 @@ class MediaDao {
       (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))
           .write(MediaRecordsCompanion(isFavorite: Value(value)));
 
-  Future<void> setTrashed(String id, {required bool value}) =>
-      (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))
-          .write(MediaRecordsCompanion(isTrashed: Value(value)));
+  Future<void> setTrashed(
+    String id, {
+    required bool value,
+    required String relativePath,
+  }) =>
+      (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id))).write(
+        MediaRecordsCompanion(
+          isTrashed: Value(value),
+          relativePath: Value(relativePath),
+        ),
+      );
+
+  Future<void> permanentDelete(String id) =>
+      (_db.delete(_db.mediaRecords)..where((r) => r.id.equals(id))).go();
 
   // ── Writes ────────────────────────────────────────────────────────────────
 
@@ -140,7 +154,13 @@ class MediaDao {
     String absolutePath,
     String libraryRoot,
   ) =>
-      _upsertBatch([_toCompanion(meta, absolutePath, libraryRoot)]);
+      _upsertBatch([
+        _toCompanion(
+          meta,
+          absolutePath,
+          libraryRoot,
+        )
+      ]);
 
   Future<void> _upsertBatch(List<MediaRecordsCompanion> companions) =>
       _db.batch((b) {
@@ -163,10 +183,14 @@ class MediaDao {
   }
 
   MediaRecordsCompanion _toCompanion(
-      Metadata meta, String absolutePath, String libraryRoot) {
+    Metadata meta,
+    String absolutePath,
+    String libraryRoot,
+  ) {
     final relativePath = absolutePath.startsWith('$libraryRoot/')
         ? absolutePath.substring(libraryRoot.length + 1)
         : absolutePath.split('/').last;
+    final isTrashed = relativePath.startsWith('${Keys.trashFolderName}/');
     final jsonMap = <String, dynamic>{
       if (meta.modifiedAt != null)
         'modifiedAt': meta.modifiedAt!.toIso8601String(),
@@ -189,6 +213,7 @@ class MediaDao {
       capturedMonth: Value(meta.capturedAt.month),
       cameraMake: Value(meta.cameraMake),
       cameraModel: Value(meta.cameraModel),
+      isTrashed: Value(isTrashed),
       jsonData: Value(jsonMap.isEmpty ? null : jsonEncode(jsonMap)),
     );
   }

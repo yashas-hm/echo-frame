@@ -6,10 +6,15 @@ import 'package:media_metadata_plus/media_metadata_plus.dart';
 
 class ThumbnailService {
   /// Returns the canonical thumbnail path for [videoPath].
-  /// Stored alongside the video in a `thumbnails/` subdirectory.
+  /// Thumbnails always live at the original (non-trash) location — the
+  /// `.echotrash/` segment is stripped so trashed files resolve to the same
+  /// thumb path as before they were trashed.
   static String pathFor(String videoPath) {
-    final dir = videoPath.substring(0, videoPath.lastIndexOf('/'));
-    final filename = videoPath.split('/').last;
+    final effectivePath = videoPath.contains('/${Keys.trashFolderName}/')
+        ? videoPath.replaceFirst('/${Keys.trashFolderName}/', '/')
+        : videoPath;
+    final dir = effectivePath.substring(0, effectivePath.lastIndexOf('/'));
+    final filename = effectivePath.split('/').last;
     return '$dir/${Keys.thumbsFolderName}/$filename.jpg';
   }
 

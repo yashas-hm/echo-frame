@@ -23,7 +23,8 @@ class FavoritesScreen extends ConsumerWidget {
       body: state.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
-        data: (items) {
+        data: (state) {
+          final items = state.flatItems;
           if (items.isEmpty) {
             return _buildEmpty(context);
           }

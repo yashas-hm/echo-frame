@@ -13,4 +13,5 @@ final class Keys {
   static const String showNavLabel = 'showNavLabel';
 
   static const String thumbsFolderName = '.echothumbs';
+  static const String trashFolderName = '.echotrash';
 }

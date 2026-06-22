@@ -64,7 +64,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     }
   }
 
-  void _checkLoadRequired(TimelineState state, List<MediaItem> flat) {
+  void _checkLoadRequired(MediaCollectionState state, List<MediaItem> flat) {
     if (!state.hasMore || state.isLoadingMore) return;
     if (flat.length - 1 - _currentIndex <= 10) {
       WidgetsBinding.instance.addPostFrameCallback(
