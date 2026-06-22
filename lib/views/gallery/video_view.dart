@@ -97,7 +97,7 @@ class _VideoViewState extends State<VideoView> {
     return Stack(
       children: [
         GestureDetector(
-          onTap: _player.playOrPause,
+          onTap: () => VideoControlFunctions.toggleMute(context, _player),
           child: Hero(
             flightShuttleBuilder: (_, __, ___, ____, _____) {
               final thumb = widget.item.thumbnailPath;
@@ -117,7 +117,7 @@ class _VideoViewState extends State<VideoView> {
           left: 0,
           right: 0,
           bottom: 0,
-          child: _VideoControls(player: _player),
+          child: ExcludeFocus(child: _VideoControls(player: _player)),
         ),
       ],
     );

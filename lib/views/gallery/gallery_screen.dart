@@ -34,6 +34,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   bool _showInfo = false;
 
   Player? _player;
+  final _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -42,12 +43,22 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     _currentIndex = flat.indexWhere((item) => item.id == widget.initialMediaId);
   }
 
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   void _goNext() {
     final state = ref.read(timelineProvider).value;
     if (state == null) return;
     _player?.stop();
     if (_currentIndex < state.flatItems.length - 1) {
-      setState(() => _currentIndex++);
+      setState(() {
+        _player = null;
+        _currentIndex++;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
     }
   }
 
@@ -62,7 +73,13 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
 
   void _goPrev() {
     _player?.stop();
-    if (_currentIndex > 0) setState(() => _currentIndex--);
+    if (_currentIndex > 0) {
+      setState(() {
+        _player = null;
+        _currentIndex--;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+    }
   }
 
   @override
@@ -121,6 +138,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                         ),
                   },
                   child: Focus(
+                    focusNode: _focusNode,
                     autofocus: true,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -134,7 +152,13 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                               child: item.isVideo
                                   ? VideoView(
                                       item: item,
-                                      onPlayerReady: (p) => _player = p,
+                                      onPlayerReady: (p) {
+                                        if (p == null) return;
+                                        WidgetsBinding.instance
+                                            .addPostFrameCallback(
+                                          (_) => setState(() => _player = p),
+                                        );
+                                      },
                                     )
                                   : ImageView(item: item),
                             ),
