@@ -80,4 +80,13 @@ class MediaItem {
   MediaType get mediaType => _meta.mediaType;
 
   bool get isVideo => _meta.mediaType == MediaType.video;
+
+  MediaItem setFavourite(bool? isFavorite) => MediaItem(
+        id: id,
+        isFavorite: isFavorite ?? this.isFavorite,
+        filePath: filePath,
+        meta: _meta,
+        thumbnailPath: thumbnailPath,
+        tags: tags,
+      );
 }

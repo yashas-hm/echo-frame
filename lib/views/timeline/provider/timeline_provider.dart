@@ -2,6 +2,7 @@ import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/models/month_data.dart';
+import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TimelineState {
@@ -64,6 +65,20 @@ class TimelineNotifier extends AsyncNotifier<TimelineState> {
       hasMore: items.length == _pageSize,
       isLoadingMore: false,
     ));
+  }
+
+  Future<void> setFavourite(String id, {required bool value}) async {
+    final current = state.value;
+    if (current == null || !EchoDatabase.isOpen) return;
+    final idx = current.loaded.indexWhere((e) => e.id == id);
+    if (idx == -1) return;
+    final updated = List<MediaItem>.of(current.loaded);
+    updated[idx] = current.loaded[idx].setFavourite(value);
+    state = AsyncData(current.copyWith(loaded: updated));
+    await MediaDao.instance.setFavorite(id, value: value);
+    ref
+        .read(favoritesProvider.notifier)
+        .setFavourite(updated[idx], value: value);
   }
 
   Future<void> setQuery(String query) async {

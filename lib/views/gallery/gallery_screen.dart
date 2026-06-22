@@ -1,5 +1,6 @@
 import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/models/media_item.dart';
+import 'package:echo_frame/views/gallery/components/actions_tray.dart';
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/components/gallery_info_panel.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
@@ -58,7 +59,8 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
         _player = null;
         _currentIndex++;
       });
-      WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _focusNode.requestFocus());
     }
   }
 
@@ -78,9 +80,12 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
         _player = null;
         _currentIndex--;
       });
-      WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _focusNode.requestFocus());
     }
   }
+
+  void _showInfoF() => setState(() => _showInfo = !_showInfo);
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +133,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                     const SingleActivator(
                       LogicalKeyboardKey.keyI,
                       includeRepeats: false,
-                    ): () => setState(() => _showInfo = !_showInfo),
+                    ): _showInfoF,
                     const SingleActivator(
                       LogicalKeyboardKey.keyM,
                       includeRepeats: false,
@@ -167,7 +172,10 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                         AnimatedSize(
                           duration: Durations.short4,
                           child: _showInfo
-                              ? GalleryInfoPanel(item: item)
+                              ? GalleryInfoPanel(
+                                  item: item,
+                                  onClosePressed: _showInfoF,
+                                )
                               : SizedBox.shrink(),
                         ),
                       ],
@@ -182,6 +190,10 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             onPressed: _goNext,
             loadingNext: state.isLoadingMore,
           ),
+        ActionsTray(
+          item: item,
+          onInfoPressed: _showInfoF,
+        ),
       ],
     );
   }

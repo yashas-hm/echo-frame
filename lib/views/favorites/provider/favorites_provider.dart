@@ -12,6 +12,17 @@ class FavoritesNotifier extends AsyncNotifier<List<MediaItem>> {
     state = await AsyncValue.guard(_load);
   }
 
+  void setFavourite(MediaItem item, {required bool value}) {
+    final current = state.value;
+    if (current == null) return;
+    if (value) {
+      if (current.any((e) => e.id == item.id)) return;
+      state = AsyncData([...current, item.setFavourite(true)]);
+    } else {
+      state = AsyncData(current.where((e) => e.id != item.id).toList());
+    }
+  }
+
   Future<List<MediaItem>> _load() async {
     if (!EchoDatabase.isOpen) return [];
     return MediaDao.instance.listFavorites();

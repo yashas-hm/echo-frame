@@ -1,156 +1,104 @@
-import 'package:echo_frame/database/daos/media_dao.dart';
-import 'package:echo_frame/database/database.dart';
+import 'package:echo_frame/components/buttons/buttons.dart';
+import 'package:echo_frame/constants/constants.dart'
+    show Styles, Sizes, SpacerRegular, SpacerSmall;
 import 'package:echo_frame/models/media_item.dart';
+import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
-import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class GalleryInfoPanel extends ConsumerStatefulWidget {
-  const GalleryInfoPanel({super.key, required this.item});
+class GalleryInfoPanel extends StatelessWidget {
+  const GalleryInfoPanel({
+    super.key,
+    required this.item,
+    required this.onClosePressed,
+  });
 
   final MediaItem item;
-
-  @override
-  ConsumerState<GalleryInfoPanel> createState() => _PhotoDetailPanelState();
-}
-
-class _PhotoDetailPanelState extends ConsumerState<GalleryInfoPanel> {
-  late bool _isFavorite;
-  bool _toggling = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _isFavorite = widget.item.isFavorite;
-  }
-
-  @override
-  void didUpdateWidget(GalleryInfoPanel old) {
-    super.didUpdateWidget(old);
-    if (old.item.id != widget.item.id) {
-      _isFavorite = widget.item.isFavorite;
-    }
-  }
-
-  Future<void> _toggleFavorite() async {
-    if (_toggling || !EchoDatabase.isOpen) return;
-    setState(() {
-      _toggling = true;
-      _isFavorite = !_isFavorite;
-    });
-    await MediaDao.instance.setFavorite(widget.item.id, value: _isFavorite);
-    ref.invalidate(favoritesProvider);
-    if (mounted) setState(() => _toggling = false);
-  }
+  final VoidCallback onClosePressed;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colors = context.colors;
 
     return Container(
       width: 260,
-      color: context.colors.surfacePrimary,
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+      color: colors.surfacePrimary,
+      padding: EdgeInsets.all(Sizes.cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Favourite toggle ─────────────────────────────────────────
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: _toggling ? null : _toggleFavorite,
-              icon: Icon(
-                _isFavorite
-                    ? Icons.favorite_rounded
-                    : Icons.favorite_outline_rounded,
-                color: _isFavorite ? context.colors.errorPrimary : null,
-                size: 18,
-              ),
-              label: Text(_isFavorite ? 'Favourited' : 'Add to favourites'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: _isFavorite
-                    ? context.colors.errorPrimary
-                    : context.colors.textPrimary,
-              ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: EFIconButton(
+              icon: Icons.clear_rounded,
+              onPressed: onClosePressed,
             ),
           ),
-          const SizedBox(height: 20),
-
-          // ── Metadata ─────────────────────────────────────────────────
-          Text('Info', style: theme.textTheme.labelLarge),
-          const SizedBox(height: 12),
-          _Row(
+          Text(
+            'Info',
+            style: Styles.regularBold(),
+          ),
+          SpacerRegular(),
+          _row(
             Icons.calendar_today_outlined,
-            _formatDate(
-              widget.item.capturedAt,
-            ),
+            _formatDate(item.capturedAt),
+            colors,
           ),
-          if (widget.item.modifiedAt != null)
-            _Row(
+          if (item.modifiedAt != null)
+            _row(
               Icons.edit_calendar_outlined,
-              _formatDate(widget.item.modifiedAt),
+              _formatDate(item.modifiedAt),
+              colors,
             ),
-          if (widget.item.width != null && widget.item.height != null)
-            _Row(
+          if (item.width != null && item.height != null)
+            _row(
               Icons.photo_size_select_actual_outlined,
-              '${widget.item.width} × ${widget.item.height}',
+              '${item.width} × ${item.height}',
+              colors,
             ),
-          if (widget.item.cameraMake != null || widget.item.cameraModel != null)
-            _Row(
+          if (item.cameraMake != null || item.cameraModel != null)
+            _row(
               Icons.camera_outlined,
-              [widget.item.cameraMake, widget.item.cameraModel]
-                  .nonNulls
-                  .join(' '),
+              [item.cameraMake, item.cameraModel].nonNulls.join(' '),
+              colors,
             ),
-          if (widget.item.latitude != null && widget.item.longitude != null)
-            _Row(
+          if (item.latitude != null && item.longitude != null)
+            _row(
               Icons.location_on_outlined,
-              '${widget.item.latitude!.toStringAsFixed(4)}, '
-              '${widget.item.longitude!.toStringAsFixed(4)}',
+              '${item.latitude!.toStringAsFixed(4)}, '
+              '${item.longitude!.toStringAsFixed(4)}',
+              colors,
             ),
-          _Row(
+          _row(
             Icons.insert_drive_file_outlined,
-            widget.item.filePath.split('/').last,
+            item.filePath.split('/').last,
+            colors,
           ),
         ],
       ),
     );
   }
 
-  static String _formatDate(DateTime? dt) {
+  Widget _row(IconData icon, String text, AppThemeColors colors) => Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: Sizes.iconSizeSmall, color: colors.textSecondary),
+            SpacerSmall(),
+            Expanded(
+              child: Text(
+                text,
+                style: Styles.small(color: colors.textPrimary),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  String _formatDate(DateTime? dt) {
     if (dt == null) return 'Unknown date';
     return DateFormat('d MMM yyyy  HH:mm').format(dt);
-  }
-}
-
-class _Row extends StatelessWidget {
-  const _Row(this.icon, this.text);
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 15, color: context.colors.textSecondary),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: context.colors.textPrimary),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
