@@ -88,8 +88,12 @@ class IdleView extends ConsumerWidget {
             ),
           ),
         ),
-        EFIconButton.back(
-          onPressed: onBackPressed,
+        Positioned(
+          top: Sizes.spacingRegular,
+          left: Sizes.spacingRegular,
+          child: EFIconButton.back(
+            onPressed: onBackPressed,
+          ),
         ),
       ],
     );

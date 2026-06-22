@@ -97,7 +97,11 @@ class TypeSelectionView extends StatelessWidget {
             ),
           ),
         ),
-        EFIconButton.back(),
+        Positioned(
+          top: Sizes.spacingRegular,
+          left: Sizes.spacingRegular,
+          child: EFIconButton.back(),
+        ),
       ],
     );
   }

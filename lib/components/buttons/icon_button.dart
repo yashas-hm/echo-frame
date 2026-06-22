@@ -19,22 +19,18 @@ class EFIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: Sizes.spacingRegular,
-      left: Sizes.spacingRegular,
-      child: InkWell(
-        mouseCursor: SystemMouseCursors.click,
-        customBorder: const CircleBorder(),
-        hoverColor: context.colors.textPrimary.hover,
-        splashColor: context.colors.textPrimary.splash,
-        onTap: onPressed ?? context.pop,
-        child: Padding(
-          padding: EdgeInsets.all(Sizes.iconPadding),
-          child: Icon(
-            icon,
-            color: context.colors.textPrimary,
-            size: iconSize ?? Sizes.iconSizeRegular,
-          ),
+    return InkWell(
+      mouseCursor: SystemMouseCursors.click,
+      customBorder: const CircleBorder(),
+      hoverColor: context.colors.textPrimary.hover,
+      splashColor: context.colors.textPrimary.splash,
+      onTap: onPressed ?? context.pop,
+      child: Padding(
+        padding: EdgeInsets.all(Sizes.iconPadding),
+        child: Icon(
+          icon,
+          color: context.colors.textPrimary,
+          size: iconSize ?? Sizes.iconSizeRegular,
         ),
       ),
     );

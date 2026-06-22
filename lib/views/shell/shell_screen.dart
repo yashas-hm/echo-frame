@@ -1,4 +1,5 @@
 import 'package:echo_frame/components/buttons/buttons.dart';
+import 'package:echo_frame/constants/constants.dart' show Sizes;
 import 'package:echo_frame/utilities/utilities.dart'
     show SearchIntent, ContextExtensions;
 import 'package:echo_frame/views/shell/components/nav_bar.dart';
@@ -40,7 +41,12 @@ class ShellScreen extends ConsumerWidget {
                 children: [
                   Positioned.fill(child: child),
                   if (enableNavBar) NavBar(),
-                  if (enableBackButton) EFIconButton.back(),
+                  if (enableBackButton)
+                    Positioned(
+                      top: Sizes.spacingRegular,
+                      left: Sizes.spacingRegular,
+                      child: EFIconButton.back(),
+                    ),
                 ],
               ),
             ),
