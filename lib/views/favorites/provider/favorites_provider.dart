@@ -1,34 +1,17 @@
-import 'package:echo_frame/database/daos/media_dao.dart';
-import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/media_item.dart';
+import 'package:echo_frame/views/collection/provider/media_collection_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FavoritesNotifier extends AsyncNotifier<List<MediaItem>> {
+export 'package:echo_frame/views/collection/provider/media_collection_notifier.dart'
+    show MediaCollectionState;
+
+class FavoritesNotifier extends MediaCollectionNotifier {
   @override
-  Future<List<MediaItem>> build() => _load();
+  bool? get isFavoriteFilter => true;
 
-  Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(_load);
-  }
-
-  void setFavourite(MediaItem item, {required bool value}) {
-    final current = state.value;
-    if (current == null) return;
-    if (value) {
-      if (current.any((e) => e.id == item.id)) return;
-      state = AsyncData([...current, item.setFavourite(true)]);
-    } else {
-      state = AsyncData(current.where((e) => e.id != item.id).toList());
-    }
-  }
-
-  Future<List<MediaItem>> _load() async {
-    if (!EchoDatabase.isOpen) return [];
-    return MediaDao.instance.listFavorites();
-  }
+  @override
+  bool get isTrashedFilter => false;
 }
 
 final favoritesProvider =
-    AsyncNotifierProvider<FavoritesNotifier, List<MediaItem>>(
+    AsyncNotifierProvider<FavoritesNotifier, MediaCollectionState>(
         FavoritesNotifier.new);
