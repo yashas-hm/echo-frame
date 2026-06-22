@@ -53,6 +53,8 @@ abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
   // Primary brand color (sky blue)
   Color get primaryColor;
 
+  Color get primarySurface;
+
   Color get onPrimary => KnownColors.basicWhite;
 
   // Secondary brand color
@@ -115,6 +117,7 @@ abstract class AppThemeColors extends ThemeExtension<AppThemeColors> {
   AppThemeColors lerp(AppThemeColors b, double t) => _LerpedColors(
         brightness: t < 0.5 ? brightness : b.brightness,
         primaryColor: Color.lerp(primaryColor, b.primaryColor, t)!,
+        primarySurface: Color.lerp(primarySurface, b.primarySurface, t)!,
         secondaryColor: Color.lerp(secondaryColor, b.secondaryColor, t)!,
         surfacePrimary: Color.lerp(surfacePrimary, b.surfacePrimary, t)!,
         background: Color.lerp(background, b.background, t)!,
@@ -139,6 +142,7 @@ final class _LerpedColors extends AppThemeColors {
   _LerpedColors({
     required this.brightness,
     required this.primaryColor,
+    required this.primarySurface,
     required this.secondaryColor,
     required this.surfacePrimary,
     required this.background,
@@ -161,6 +165,8 @@ final class _LerpedColors extends AppThemeColors {
   final Brightness brightness;
   @override
   final Color primaryColor;
+  @override
+  final Color primarySurface;
   @override
   final Color secondaryColor;
   @override

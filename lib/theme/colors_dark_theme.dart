@@ -8,6 +8,9 @@ class DarkColors extends AppThemeColors {
   Color get primaryColor => KnownColors.sky300;
 
   @override
+  Color get primarySurface => primaryColor.hover;
+
+  @override
   Color get secondaryColor => KnownColors.sky400;
 
   @override

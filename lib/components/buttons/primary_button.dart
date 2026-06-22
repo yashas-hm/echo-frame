@@ -33,7 +33,7 @@ class EFPrimaryButton extends StatelessWidget {
       color: disabled
           ? colors.surfacePrimary
           : filled
-              ? colors.primaryColor.hover
+              ? colors.primarySurface
               : KnownColors.transparent,
       child: InkWell(
         onTap: disabled ? null : onPressed,

@@ -8,6 +8,9 @@ class LightColors extends AppThemeColors {
   Color get primaryColor => KnownColors.sky400;
 
   @override
+  Color get primarySurface => primaryColor.withValues(alpha: 0.5);
+
+  @override
   Color get secondaryColor => KnownColors.sky500;
 
   @override
@@ -29,13 +32,13 @@ class LightColors extends AppThemeColors {
   Color get errorPrimary => KnownColors.strawberry500;
 
   @override
-  Color get errorSurface => KnownColors.strawberry500.hover;
+  Color get errorSurface => KnownColors.strawberry500.withValues(alpha: 0.5);
 
   @override
   Color get successPrimary => KnownColors.mint400;
 
   @override
-  Color get successSurface => KnownColors.mint400.hover;
+  Color get successSurface => KnownColors.mint400.withValues(alpha: 0.5);
 
   @override
   Color get cursorColor => KnownColors.sky200;
