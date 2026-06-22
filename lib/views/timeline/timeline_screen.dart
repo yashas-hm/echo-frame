@@ -39,10 +39,25 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   void initState() {
     super.initState();
     _hasLibrary = Prefs.activeLibraryRoot != null;
-    if (!_hasLibrary) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _showSetupDialog());
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_hasLibrary) {
+        _startupIndex();
+      } else {
+        _showSetupDialog();
+      }
+    });
     _scrollController.addListener(_onScroll);
+  }
+
+  Future<void> _startupIndex() async {
+    final path = Prefs.activeLibraryRoot;
+    if (path == null || !mounted) return;
+    final stream = IndexingService.autoIndex(libraryRoot: path);
+    await for (final progress in stream) {
+      if (!mounted) return;
+      setState(() => _progress = progress.isDone ? null : progress);
+    }
+    if (mounted) ref.invalidate(timelineProvider);
   }
 
   @override
