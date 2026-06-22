@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/models/tag.dart';
+import 'package:flutter/foundation.dart';
 
 class MediaItem {
   final String id;
   final bool isFavorite;
+  final bool isTrashed;
   final String filePath;
   final String? thumbnailPath;
   final List<Tag> tags;
@@ -15,6 +17,7 @@ class MediaItem {
   const MediaItem({
     required this.id,
     required this.isFavorite,
+    required this.isTrashed,
     required this.filePath,
     required Metadata meta,
     this.thumbnailPath,
@@ -32,6 +35,7 @@ class MediaItem {
     return MediaItem(
       id: r.id,
       isFavorite: r.isFavorite,
+      isTrashed: r.isTrashed,
       filePath: filePath,
       thumbnailPath: j['thumbnailPath'] as String?,
       tags: tags,
@@ -81,12 +85,22 @@ class MediaItem {
 
   bool get isVideo => _meta.mediaType == MediaType.video;
 
-  MediaItem setFavourite(bool? isFavorite) => MediaItem(
+  MediaItem copyWith({
+    bool? isFavorite,
+    bool? isTrashed,
+    String? filePath,
+    ValueGetter<String?>? thumbnailPath,
+    List<Tag>? tags,
+    Metadata? meta,
+  }) =>
+      MediaItem(
         id: id,
         isFavorite: isFavorite ?? this.isFavorite,
-        filePath: filePath,
-        meta: _meta,
-        thumbnailPath: thumbnailPath,
-        tags: tags,
+        isTrashed: isTrashed ?? this.isTrashed,
+        filePath: filePath ?? this.filePath,
+        thumbnailPath:
+            thumbnailPath != null ? thumbnailPath() : this.thumbnailPath,
+        tags: tags ?? this.tags,
+        meta: meta ?? _meta,
       );
 }

@@ -66,10 +66,15 @@ class MediaDao {
     int offset = 0,
     int limit = 100,
     String? query,
+    bool? isFavorite,
+    bool isTrashed = false,
   }) async {
     final records = await (_db.select(_db.mediaRecords)
           ..where((r) {
-            var cond = r.isTrashed.equals(false);
+            var cond = r.isTrashed.equals(isTrashed);
+            if (isFavorite != null) {
+              cond = cond & r.isFavorite.equals(isFavorite);
+            }
             if (query != null && query.isNotEmpty) {
               final like = '%$query%';
               cond = cond &
@@ -123,6 +128,10 @@ class MediaDao {
   Future<void> setFavorite(String id, {required bool value}) =>
       (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))
           .write(MediaRecordsCompanion(isFavorite: Value(value)));
+
+  Future<void> setTrashed(String id, {required bool value}) =>
+      (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))
+          .write(MediaRecordsCompanion(isTrashed: Value(value)));
 
   // ── Writes ────────────────────────────────────────────────────────────────
 
