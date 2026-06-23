@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/theme/provider/theme_provider.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
-import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
+import 'package:echo_frame/views/media/provider/timeline_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

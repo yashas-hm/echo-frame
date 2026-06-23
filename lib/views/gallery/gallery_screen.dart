@@ -5,7 +5,7 @@ import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/components/gallery_info_panel.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
 import 'package:echo_frame/views/gallery/video_view.dart';
-import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
+import 'package:echo_frame/views/media/provider/timeline_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -5,23 +5,18 @@ import 'package:echo_frame/components/buttons/buttons.dart'
     show EFPrimaryButton;
 import 'package:echo_frame/components/dialog.dart';
 import 'package:echo_frame/components/error_view.dart';
-import 'package:echo_frame/constants/constants.dart'
-    show
-        Sizes,
-        Styles,
-        SpacerRegular,
-        SpacerExtraSmall,
-        SpacerExtraLarge,
-        SpacerMedium;
+import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtensions, Prefs;
-import 'package:echo_frame/views/timeline/components/photo_tile.dart';
-import 'package:echo_frame/views/timeline/components/search_bar.dart';
-import 'package:echo_frame/views/timeline/provider/search_focus_provider.dart';
-import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
+import 'package:echo_frame/views/media/components/empty_view.dart';
+import 'package:echo_frame/views/media/components/loading_view.dart';
+import 'package:echo_frame/views/media/components/photo_tile.dart';
+import 'package:echo_frame/views/media/components/search_bar.dart';
+import 'package:echo_frame/views/media/provider/search_focus_provider.dart';
+import 'package:echo_frame/views/media/provider/timeline_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -133,8 +128,10 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   Widget build(BuildContext context) {
     if (_progress != null) return _buildIndexing();
     if (!_hasLibrary) {
-      return _buildEmptyState(
-        message: 'No library selected',
+      return EmptyView(
+        icon: Icons.photo_library_outlined,
+        title: 'No library selected',
+        message: 'Choose a folder to get started',
         button: EFPrimaryButton(
           onPressed: _showSetupDialog,
           text: 'Add Frame Path',
@@ -151,7 +148,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     return Stack(
       children: [
         timelineAsync.when(
-          loading: _buildLoading,
+          loading: () => const LoadingView(text: 'Loading library'),
           error: (e, st) {
             dev.log(
               'Failed to load timeline: $e',
@@ -168,10 +165,14 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
           },
           data: (timeline) {
             if (timeline.loaded.isEmpty) {
-              return _buildEmptyState(
+              return EmptyView(
+                icon: Icons.photo_library_outlined,
+                title: timeline.query.isEmpty
+                    ? 'No media available'
+                    : 'No results for "${timeline.query}"',
                 message: timeline.query.isEmpty
-                    ? 'No media available.'
-                    : 'No results for "${timeline.query}".',
+                    ? 'Import some photos to see them here'
+                    : 'Try a different search term',
               );
             }
             return CustomScrollView(
@@ -243,30 +244,6 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     );
   }
 
-  Widget _buildLoading() {
-    final colors = context.colors;
-
-    return Center(
-      child: SizedBox(
-        width: Sizes.viewBoxWidth,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Loading library…',
-              style: Styles.subtitle(
-                color: colors.textPrimary,
-              ),
-            ),
-            const SpacerMedium(),
-            const LinearProgressIndicator(),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildIndexing() {
     final p = _progress!;
     final colors = context.colors;
@@ -306,37 +283,6 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState({
-    required String message,
-    Widget? button,
-  }) {
-    final colors = context.colors;
-
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.photo_library_outlined,
-            size: Sizes.iconSizeHuge,
-            color: colors.textSecondary,
-          ),
-          const SpacerMedium(),
-          Text(
-            message,
-            style: Styles.regular(
-              color: colors.textPrimary,
-            ),
-          ),
-          if (button != null) ...[
-            const SpacerExtraLarge(),
-            button,
-          ]
-        ],
       ),
     );
   }

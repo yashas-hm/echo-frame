@@ -1,6 +1,11 @@
+import 'dart:developer' as dev;
+
+import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
-import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
-import 'package:echo_frame/views/timeline/components/photo_tile.dart';
+import 'package:echo_frame/views/media/components/empty_view.dart';
+import 'package:echo_frame/views/media/components/loading_view.dart';
+import 'package:echo_frame/views/media/components/photo_tile.dart';
+import 'package:echo_frame/views/media/provider/favorites_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,12 +26,28 @@ class FavoritesScreen extends ConsumerWidget {
 
     return Scaffold(
       body: state.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => const LoadingView(text: 'Loading favourites'),
+        error: (e, st) {
+          dev.log(
+            'Failed to load favourites: $e',
+            stackTrace: st,
+            name: 'FavoritesScreen.build',
+          );
+          return ErrorView(
+            errorMessage: 'Failed to load favourites',
+            description: 'Something unexpected occurred. Please try again.',
+            buttonText: 'Try Again',
+            onButtonPressed: () => ref.invalidate(favoritesProvider),
+          );
+        },
         data: (state) {
           final items = state.flatItems;
           if (items.isEmpty) {
-            return _buildEmpty(context);
+            return const EmptyView(
+              icon: Icons.favorite_outline_rounded,
+              title: 'No media starred yet',
+              message: 'Open a photo and tap the star to save it here',
+            );
           }
           return CustomScrollView(
             slivers: [
@@ -61,31 +82,6 @@ class FavoritesScreen extends ConsumerWidget {
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildEmpty(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.favorite_outline_rounded,
-              size: 56, color: context.colors.borderPrimary),
-          const SizedBox(height: 16),
-          Text(
-            'No favourites yet',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Open a photo and tap the heart to save it here',
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: context.colors.textSecondary),
-          ),
-        ],
       ),
     );
   }

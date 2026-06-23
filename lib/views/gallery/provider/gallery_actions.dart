@@ -3,8 +3,8 @@ import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/services/trash_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
-import 'package:echo_frame/views/favorites/provider/favorites_provider.dart';
-import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
+import 'package:echo_frame/views/media/provider/favorites_provider.dart';
+import 'package:echo_frame/views/media/provider/timeline_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GalleryActions {
