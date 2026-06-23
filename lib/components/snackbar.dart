@@ -1,6 +1,7 @@
 import 'package:echo_frame/constants/constants.dart' show Styles, Sizes;
 import 'package:echo_frame/theme/theme.dart';
-import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
+import 'package:echo_frame/utilities/utilities.dart'
+    show ContextExtensions;
 import 'package:flutter/material.dart';
 
 class EFSnackbar {

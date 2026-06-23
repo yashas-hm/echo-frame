@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 class EFDialog {
   const EFDialog._();
 
-  static Future<bool?> show(
-    BuildContext context, {
+  static Future<bool?> show(BuildContext context, {
     required String title,
     required String description,
     String confirmText = 'Confirm',

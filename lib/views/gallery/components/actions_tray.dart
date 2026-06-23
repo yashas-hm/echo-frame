@@ -12,10 +12,12 @@ class ActionsTray extends ConsumerWidget {
     super.key,
     required this.item,
     this.onInfoPressed,
+    this.onItemRestored,
   });
 
   final MediaItem item;
   final VoidCallback? onInfoPressed;
+  final void Function(String itemId)? onItemRestored;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -121,15 +123,14 @@ class ActionsTray extends ConsumerWidget {
     MediaItem? target,
     bool? undo,
   ]) async {
-    final success = await actions.restore(target ?? item);
+    final targetItem = target ?? item;
+    final success = await actions.restore(targetItem, undo: undo ?? false);
+    if (success && undo == true) onItemRestored?.call(targetItem.id);
     if (!context.mounted) return;
     if (success) {
       EFSnackbar.showSuccess(context, message: 'Item restored');
     } else {
-      EFSnackbar.showError(
-        context,
-        message: 'Failed to restore item',
-      );
+      EFSnackbar.showError(context, message: 'Failed to restore item');
     }
   }
 }

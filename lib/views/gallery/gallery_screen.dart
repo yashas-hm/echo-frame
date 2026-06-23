@@ -1,4 +1,3 @@
-import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/views/gallery/components/actions_tray.dart';
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
@@ -103,6 +102,13 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
 
   void _showInfoF() => setState(() => _showInfo = !_showInfo);
 
+  void _onItemRestored(String itemId) {
+    if (!mounted) return;
+    final flat = ref.read(_provider).value?.flatItems ?? [];
+    final idx = flat.indexWhere((i) => i.id == itemId);
+    if (idx != -1) setState(() => _currentIndex = idx);
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(_provider).requireValue;
@@ -115,29 +121,17 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
       return const SizedBox.shrink();
     }
 
-    final validIndex = _currentIndex >= 0 && _currentIndex < flat.length;
-    if (validIndex) _checkLoadRequired(state, flat);
-    final canPrev = validIndex && _currentIndex > 0;
-    final canNext =
-        validIndex && (_currentIndex < flat.length - 1 || state.hasMore);
+    if (_currentIndex >= flat.length) _currentIndex = flat.length - 1;
+    _checkLoadRequired(state, flat);
+    final canPrev = _currentIndex > 0;
+    final canNext = _currentIndex < flat.length - 1 || state.hasMore;
     final item = flat[_currentIndex];
 
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
-            child: !validIndex
-                ? ErrorView(
-                    errorMessage: 'Something went wrong',
-                    description: 'This photo could not be found. '
-                        'It may have been removed or the library reloaded.',
-                    buttonText: 'Reload',
-                    onButtonPressed: () => setState(
-                      () => _currentIndex =
-                          _currentIndex.clamp(0, flat.length - 1).toInt(),
-                    ),
-                  )
-                : CallbackShortcuts(
+            child: CallbackShortcuts(
                     bindings: {
                       const SingleActivator(LogicalKeyboardKey.arrowRight):
                           _goNext,
@@ -218,6 +212,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             ActionsTray(
               item: item,
               onInfoPressed: _showInfoF,
+              onItemRestored: _onItemRestored,
             ),
         ],
       ),
