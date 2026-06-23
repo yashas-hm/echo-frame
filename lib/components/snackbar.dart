@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class EFSnackbar {
   const EFSnackbar._();
 
-  static void showSuccess(BuildContext context, {
+  static void showSuccess(
+    BuildContext context, {
     required String message,
     Widget? icon,
     String? actionText,
@@ -22,7 +23,8 @@ class EFSnackbar {
         onActionPressed: onActionPressed,
       );
 
-  static void showError(BuildContext context, {
+  static void showError(
+    BuildContext context, {
     required String message,
     Widget? icon,
     String? actionText,
@@ -38,7 +40,8 @@ class EFSnackbar {
         onActionPressed: onActionPressed,
       );
 
-  static void showInfo(BuildContext context, {
+  static void showInfo(
+    BuildContext context, {
     required String message,
     Widget? icon,
     String? actionText,
@@ -54,7 +57,8 @@ class EFSnackbar {
         onActionPressed: onActionPressed,
       );
 
-  static void _show(BuildContext context, {
+  static void _show(
+    BuildContext context, {
     required String message,
     required Color color,
     required Color textColor,
@@ -62,7 +66,10 @@ class EFSnackbar {
     String? actionText,
     VoidCallback? onActionPressed,
   }) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    final messenger = ScaffoldMessenger.of(context);
+    final contentStyle = Styles.smallRegular(color: context.colors.textPrimary);
+    final actionStyle = Styles.microBold(color: context.colors.textPrimary);
+    messenger.showSnackBar(
       SnackBar(
         backgroundColor: color,
         content: Row(
@@ -72,7 +79,7 @@ class EFSnackbar {
               child: Text(
                 message,
                 softWrap: true,
-                style: Styles.smallRegular(color: context.colors.textPrimary),
+                style: contentStyle,
               ),
             ),
             Material(
@@ -81,7 +88,7 @@ class EFSnackbar {
               clipBehavior: Clip.antiAlias,
               child: InkWell(
                 onTap: () {
-                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  messenger.removeCurrentSnackBar();
                   onActionPressed?.call();
                 },
                 child: Padding(
@@ -91,9 +98,7 @@ class EFSnackbar {
                   ),
                   child: Text(
                     actionText ?? 'Dismiss',
-                    style: Styles.microBold(
-                      color: context.colors.textPrimary,
-                    ),
+                    style: actionStyle,
                   ),
                 ),
               ),
