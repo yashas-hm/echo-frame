@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:echo_frame/components/buttons/buttons.dart'
     show EFPrimaryButton;
 import 'package:echo_frame/components/dialog.dart';
+import 'package:echo_frame/components/empty_view.dart';
 import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/database/database.dart';
@@ -11,9 +12,8 @@ import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtensions, Prefs;
-import 'package:echo_frame/views/media/components/empty_view.dart';
 import 'package:echo_frame/views/media/components/loading_view.dart';
-import 'package:echo_frame/views/media/components/photo_tile.dart';
+import 'package:echo_frame/views/media/components/media_list_view.dart';
 import 'package:echo_frame/views/media/components/search_bar.dart';
 import 'package:echo_frame/views/media/provider/search_focus_provider.dart';
 import 'package:echo_frame/views/media/provider/timeline_provider.dart';
@@ -21,7 +21,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 class TimelineScreen extends ConsumerStatefulWidget {
   const TimelineScreen({super.key});
@@ -128,14 +127,16 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   Widget build(BuildContext context) {
     if (_progress != null) return _buildIndexing();
     if (!_hasLibrary) {
-      return EmptyView(
-        icon: Icons.photo_library_outlined,
-        title: 'No library selected',
-        message: 'Choose a folder to get started',
-        button: EFPrimaryButton(
-          onPressed: _showSetupDialog,
-          text: 'Add Frame Path',
-          icon: Icons.add_rounded,
+      return Scaffold(
+        body: EmptyView(
+          icon: Icons.photo_library_outlined,
+          title: 'No library selected',
+          message: 'Choose a folder to get started',
+          button: EFPrimaryButton(
+            onPressed: _showSetupDialog,
+            text: 'Add Frame Path',
+            icon: Icons.add_rounded,
+          ),
         ),
       );
     }
@@ -145,102 +146,56 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   Widget _buildTimeline() {
     final timelineAsync = ref.watch(timelineProvider);
 
-    return Stack(
-      children: [
-        timelineAsync.when(
-          loading: () => const LoadingView(text: 'Loading library'),
-          error: (e, st) {
-            dev.log(
-              'Failed to load timeline: $e',
-              stackTrace: st,
-              name: 'TimelineScreen._buildTimeline',
-            );
-            return ErrorView(
-              errorMessage: 'Failed to load library',
-              description: 'Something unexpected occurred while loading '
-                  'your library. Please try again.',
-              buttonText: 'Try Again',
-              onButtonPressed: () => ref.invalidate(timelineProvider),
-            );
-          },
-          data: (timeline) {
-            if (timeline.loaded.isEmpty) {
-              return EmptyView(
-                icon: Icons.photo_library_outlined,
-                title: timeline.query.isEmpty
-                    ? 'No media available'
-                    : 'No results for "${timeline.query}"',
-                message: timeline.query.isEmpty
-                    ? 'Import some photos to see them here'
-                    : 'Try a different search term',
+    return Scaffold(
+      body: Stack(
+        children: [
+          timelineAsync.when(
+            loading: () => const LoadingView(text: 'Loading library'),
+            error: (e, st) {
+              dev.log(
+                'Failed to load timeline: $e',
+                stackTrace: st,
+                name: 'TimelineScreen._buildTimeline',
               );
-            }
-            return CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                const SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: Sizes.inputHeight + Sizes.edgePadding,
-                  ),
-                ),
-                for (final month in timeline.byMonth) ...[
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Sizes.spacingMediumLarge,
-                      vertical: Sizes.spacingMedium,
-                    ),
-                    sliver: SliverToBoxAdapter(
-                      child: Text(
-                        DateFormat('MMMM yyyy')
-                            .format(DateTime(month.year, month.month)),
-                        style: Styles.subTitleBold(
-                          color: context.colors.textPrimary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SliverGrid.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 180,
-                      crossAxisSpacing: 2,
-                      mainAxisSpacing: 2,
-                    ),
-                    itemCount: month.items.length,
-                    itemBuilder: (_, i) => PhotoTile(item: month.items[i]),
-                  ),
-                ],
-                if (timeline.isLoadingMore)
-                  const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.all(Sizes.edgePadding),
-                      child: Center(
-                        child: SizedBox(
-                          width: Sizes.spacingExtraLarge,
-                          height: Sizes.spacingExtraLarge,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          },
-        ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: EFSearchBar(
-            focusNode: ref.read(searchFocusProvider),
-            initialQuery: timelineAsync.value?.query ?? '',
-            onTextChanged: (q) =>
-                ref.read(timelineProvider.notifier).setQuery(q),
+              return ErrorView(
+                errorMessage: 'Failed to load library',
+                description: 'Something unexpected occurred while loading '
+                    'your library. Please try again.',
+                buttonText: 'Try Again',
+                onButtonPressed: () => ref.invalidate(timelineProvider),
+              );
+            },
+            data: (timeline) {
+              if (timeline.loaded.isEmpty) {
+                return EmptyView(
+                  icon: Icons.photo_library_outlined,
+                  title: timeline.query.isEmpty
+                      ? 'No media available'
+                      : 'No results for "${timeline.query}"',
+                  message: timeline.query.isEmpty
+                      ? 'Import some photos to see them here'
+                      : 'Try a different search term',
+                );
+              }
+              return MediaListView(
+                state: timeline,
+                scrollController: _scrollController,
+              );
+            },
           ),
-        ),
-      ],
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: EFSearchBar(
+              focusNode: ref.read(searchFocusProvider),
+              initialQuery: timelineAsync.value?.query ?? '',
+              onTextChanged: (q) =>
+                  ref.read(timelineProvider.notifier).setQuery(q),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -248,40 +203,42 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     final p = _progress!;
     final colors = context.colors;
 
-    return Center(
-      child: SizedBox(
-        width: Sizes.viewBoxWidth,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Indexing library…',
-              style: Styles.subtitle(
-                color: colors.textPrimary,
-              ),
-            ),
-            const SpacerMedium(),
-            const LinearProgressIndicator(),
-            const SpacerRegular(),
-            Text(
-              p.phase == IndexingPhase.reading
-                  ? 'Reading metadata for ${p.newFiles} files…'
-                  : '${p.filesFound} files found',
-              style: Styles.regular(
-                color: colors.textPrimary,
-              ),
-            ),
-            if (p.currentDir != null) ...[
-              const SpacerExtraSmall(),
+    return Scaffold(
+      body: Center(
+        child: SizedBox(
+          width: Sizes.viewBoxWidth,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                p.currentDir!,
-                style: Styles.small(
-                  color: colors.textSecondary,
+                'Indexing library',
+                style: Styles.subtitle(
+                  color: colors.textPrimary,
                 ),
               ),
+              const SpacerMedium(),
+              const LinearProgressIndicator(),
+              const SpacerRegular(),
+              Text(
+                p.phase == IndexingPhase.reading
+                    ? 'Reading metadata for ${p.newFiles} files…'
+                    : '${p.filesFound} files found',
+                style: Styles.regular(
+                  color: colors.textPrimary,
+                ),
+              ),
+              if (p.currentDir != null) ...[
+                const SpacerExtraSmall(),
+                Text(
+                  p.currentDir!,
+                  style: Styles.small(
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
