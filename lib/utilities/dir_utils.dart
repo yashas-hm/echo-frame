@@ -46,8 +46,7 @@ class DirUtils {
       );
 
       for (final e in entries) {
-        if (e is Directory &&
-            e.path.split('/').last != Keys.thumbsFolderName) {
+        if (e is Directory && e.path.split('/').last != Keys.thumbsFolderName) {
           queue.add(e);
         }
       }

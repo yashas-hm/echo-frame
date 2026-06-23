@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'media_collection_state.dart';
 
-
 abstract class MediaCollectionNotifier
     extends AsyncNotifier<MediaCollectionState> {
   static const _pageSize = 100;
@@ -14,6 +13,7 @@ abstract class MediaCollectionNotifier
   MediaCollectionSource get source;
 
   bool? get isFavoriteFilter => source.isFavoriteFilter;
+
   bool get isTrashedFilter => source.isTrashedFilter;
 
   @override

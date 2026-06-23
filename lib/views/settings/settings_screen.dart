@@ -51,8 +51,8 @@ class SettingsScreen extends ConsumerWidget {
                       dropdownColor: colors.surfacePrimary,
                       borderRadius:
                           BorderRadius.circular(Sizes.inputBorderRadius),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: Sizes.spacingRegular),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: Sizes.spacingRegular),
                       focusColor: KnownColors.transparent,
                       mouseCursor: SystemMouseCursors.click,
                       icon: Icon(
@@ -95,8 +95,11 @@ class SettingsScreen extends ConsumerWidget {
                           return;
                         }
 
-                        if (path != null && path != settings.activeLibraryRoot) {
-                          ref.read(settingsProvider.notifier).switchLibrary(path);
+                        if (path != null &&
+                            path != settings.activeLibraryRoot) {
+                          ref
+                              .read(settingsProvider.notifier)
+                              .switchLibrary(path);
                         }
                       },
                     )

@@ -122,7 +122,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
     final file = File(_settingsFilePath(root));
     if (!await file.exists()) return null;
     try {
-      final data = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      final data =
+          jsonDecode(await file.readAsString()) as Map<String, dynamic>;
       final themeName = data['themeMode'] as String?;
       if (themeName != null) {
         final mode = ThemeMode.values.firstWhere(

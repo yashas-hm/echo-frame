@@ -6,9 +6,9 @@ enum MediaCollectionSource {
   trash;
 
   bool? get isFavoriteFilter => switch (this) {
-    favorites => true,
-    _ => null,
-  };
+        favorites => true,
+        _ => null,
+      };
 
   bool get isTrashedFilter => this == trash;
 }

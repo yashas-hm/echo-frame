@@ -50,7 +50,7 @@ class GalleryActions {
       value: false,
       relativePath: newPath.substring(root.length + 1),
     );
-    if(undo){
+    if (undo) {
       final restoredItem = item.copyWith(filePath: newPath, isTrashed: false);
       _ref.read(timelineProvider.notifier).syncItem(restoredItem);
       _ref.read(favoritesProvider.notifier).syncItem(restoredItem);

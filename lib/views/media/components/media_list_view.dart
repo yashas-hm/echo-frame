@@ -53,7 +53,10 @@ class MediaListView extends StatelessWidget {
               mainAxisSpacing: 2,
             ),
             itemCount: month.items.length,
-            itemBuilder: (_, i) => PhotoTile(item: month.items[i], source: source,),
+            itemBuilder: (_, i) => PhotoTile(
+              item: month.items[i],
+              source: source,
+            ),
           ),
         ],
         if (state.isLoadingMore)
