@@ -6,10 +6,7 @@ export 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
 
 class FavoritesNotifier extends MediaCollectionNotifier {
   @override
-  bool? get isFavoriteFilter => true;
-
-  @override
-  bool get isTrashedFilter => false;
+  MediaCollectionSource get source => MediaCollectionSource.favorites;
 }
 
 final favoritesProvider =

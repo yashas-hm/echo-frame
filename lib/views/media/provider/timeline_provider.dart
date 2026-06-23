@@ -6,10 +6,7 @@ export 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
 
 class TimelineNotifier extends MediaCollectionNotifier {
   @override
-  bool? get isFavoriteFilter => null;
-
-  @override
-  bool get isTrashedFilter => false;
+  MediaCollectionSource get source => MediaCollectionSource.timeline;
 }
 
 final timelineProvider =

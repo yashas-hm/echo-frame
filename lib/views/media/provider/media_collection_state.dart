@@ -1,5 +1,18 @@
 part of 'media_collection_notifier.dart';
 
+enum MediaCollectionSource {
+  timeline,
+  favorites,
+  trash;
+
+  bool? get isFavoriteFilter => switch (this) {
+    favorites => true,
+    _ => null,
+  };
+
+  bool get isTrashedFilter => this == trash;
+}
+
 class MediaCollectionState {
   const MediaCollectionState({
     required this.loaded,

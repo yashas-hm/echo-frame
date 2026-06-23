@@ -6,15 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'media_collection_state.dart';
 
+
 abstract class MediaCollectionNotifier
     extends AsyncNotifier<MediaCollectionState> {
   static const _pageSize = 100;
 
-  /// Filter applied to every query this collection issues.
-  /// null = no filter on that column.
-  bool? get isFavoriteFilter;
+  MediaCollectionSource get source;
 
-  bool get isTrashedFilter;
+  bool? get isFavoriteFilter => source.isFavoriteFilter;
+  bool get isTrashedFilter => source.isTrashedFilter;
 
   @override
   Future<MediaCollectionState> build() => _fetch(offset: 0, query: '');
