@@ -15,6 +15,8 @@ import 'package:echo_frame/utilities/utilities.dart'
 import 'package:echo_frame/views/media/components/loading_view.dart';
 import 'package:echo_frame/views/media/components/media_list_view.dart';
 import 'package:echo_frame/views/media/components/search_bar.dart';
+import 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
+    show MediaCollectionSource;
 import 'package:echo_frame/views/media/provider/search_focus_provider.dart';
 import 'package:echo_frame/views/media/provider/timeline_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -180,6 +182,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
               return MediaListView(
                 state: timeline,
                 scrollController: _scrollController,
+                source: MediaCollectionSource.timeline,
               );
             },
           ),

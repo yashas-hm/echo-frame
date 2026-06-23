@@ -5,7 +5,10 @@ import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/components/gallery_info_panel.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
 import 'package:echo_frame/views/gallery/video_view.dart';
+import 'package:echo_frame/views/media/provider/favorites_provider.dart';
+import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
 import 'package:echo_frame/views/media/provider/timeline_provider.dart';
+import 'package:echo_frame/views/media/provider/trash_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,17 +16,23 @@ import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart' show Player;
 
 class GalleryScreen extends ConsumerStatefulWidget {
-  const GalleryScreen({super.key, required this.initialMediaId});
+  const GalleryScreen({
+    super.key,
+    required this.initialMediaId,
+    required this.source,
+  });
 
   final String initialMediaId;
+  final MediaCollectionSource source;
 
   static const String path = '/gallery';
 
   static GoRoute get routeDef => GoRoute(
         path: path,
-        builder: (_, state) => GalleryScreen(
-          initialMediaId: state.extra as String,
-        ),
+        builder: (_, state) {
+          final (id, source) = state.extra as (String, MediaCollectionSource);
+          return GalleryScreen(initialMediaId: id, source: source);
+        },
       );
 
   @override
@@ -31,6 +40,13 @@ class GalleryScreen extends ConsumerStatefulWidget {
 }
 
 class _GalleryScreenState extends ConsumerState<GalleryScreen> {
+  AsyncNotifierProvider<MediaCollectionNotifier, MediaCollectionState>
+      get _provider => switch (widget.source) {
+            MediaCollectionSource.favorites => favoritesProvider,
+            MediaCollectionSource.trash => trashProvider,
+            MediaCollectionSource.timeline => timelineProvider,
+          };
+
   int _currentIndex = 0;
   bool _showInfo = false;
 
@@ -40,7 +56,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   @override
   void initState() {
     super.initState();
-    final flat = ref.read(timelineProvider).value?.flatItems ?? const [];
+    final flat = ref.read(_provider).value?.flatItems ?? const [];
     _currentIndex = flat.indexWhere((item) => item.id == widget.initialMediaId);
   }
 
@@ -51,7 +67,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   }
 
   void _goNext() {
-    final state = ref.read(timelineProvider).value;
+    final state = ref.read(_provider).value;
     if (state == null) return;
     _player?.stop();
     if (_currentIndex < state.flatItems.length - 1) {
@@ -68,7 +84,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     if (!state.hasMore || state.isLoadingMore) return;
     if (flat.length - 1 - _currentIndex <= 10) {
       WidgetsBinding.instance.addPostFrameCallback(
-        (_) => ref.read(timelineProvider.notifier).loadNextPage(),
+        (_) => ref.read(_provider.notifier).loadNextPage(),
       );
     }
   }
@@ -89,10 +105,15 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(timelineProvider).requireValue;
+    final state = ref.watch(_provider).requireValue;
     final flat = state.flatItems;
 
-    if(flat.isEmpty) context.pop();
+    if (flat.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.pop();
+      });
+      return const SizedBox.shrink();
+    }
 
     final validIndex = _currentIndex >= 0 && _currentIndex < flat.length;
     if (validIndex) _checkLoadRequired(state, flat);
@@ -111,8 +132,8 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                       'It may have been removed or the library reloaded.',
                   buttonText: 'Reload',
                   onButtonPressed: () => setState(
-                    () =>
-                        _currentIndex = _currentIndex.clamp(0, flat.length - 1),
+                    () => _currentIndex =
+                        _currentIndex.clamp(0, flat.length - 1).toInt(),
                   ),
                 )
               : CallbackShortcuts(

@@ -4,20 +4,22 @@ import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:echo_frame/views/gallery/gallery_screen.dart';
+import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class PhotoTile extends StatelessWidget {
-  const PhotoTile({super.key, required this.item});
+  const PhotoTile({super.key, required this.item, required this.source});
 
   final MediaItem item;
+  final MediaCollectionSource source;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push(
         GalleryScreen.path,
-        extra: item.id,
+        extra: (item.id, source),
       ),
       child: SizedBox.expand(
         child: item.isVideo

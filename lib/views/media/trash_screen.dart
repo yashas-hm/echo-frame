@@ -4,6 +4,8 @@ import 'package:echo_frame/components/empty_view.dart';
 import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/views/media/components/loading_view.dart';
 import 'package:echo_frame/views/media/components/media_list_view.dart';
+import 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
+    show MediaCollectionSource;
 import 'package:echo_frame/views/media/provider/trash_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,6 +79,7 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
           return MediaListView(
             state: trash,
             scrollController: _scrollController,
+            source: MediaCollectionSource.trash,
             searchEnabled: false,
           );
         },

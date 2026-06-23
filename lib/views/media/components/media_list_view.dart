@@ -1,8 +1,7 @@
 import 'package:echo_frame/constants/constants.dart' show Sizes, Styles;
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:echo_frame/views/media/components/photo_tile.dart';
-import 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
-    show MediaCollectionState;
+import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
@@ -11,11 +10,13 @@ class MediaListView extends StatelessWidget {
     super.key,
     required this.state,
     required this.scrollController,
+    required this.source,
     this.searchEnabled = true,
   });
 
   final MediaCollectionState state;
   final ScrollController scrollController;
+  final MediaCollectionSource source;
   final bool searchEnabled;
 
   @override
@@ -52,7 +53,7 @@ class MediaListView extends StatelessWidget {
               mainAxisSpacing: 2,
             ),
             itemCount: month.items.length,
-            itemBuilder: (_, i) => PhotoTile(item: month.items[i]),
+            itemBuilder: (_, i) => PhotoTile(item: month.items[i], source: source,),
           ),
         ],
         if (state.isLoadingMore)
