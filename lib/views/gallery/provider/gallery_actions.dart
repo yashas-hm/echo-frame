@@ -20,11 +20,11 @@ class GalleryActions {
     return true;
   }
 
-  Future<bool> trash(MediaItem item) async {
-    if (!EchoDatabase.isOpen) return false;
+  Future<MediaItem?> trash(MediaItem item) async {
+    if (!EchoDatabase.isOpen) return null;
     final root = Prefs.activeLibraryRoot!;
     final newPath = await TrashService.trash(item.filePath, root);
-    if (newPath == null) return false;
+    if (newPath == null) return null;
     await MediaDao.instance.setTrashed(
       item.id,
       value: true,
@@ -32,7 +32,7 @@ class GalleryActions {
     );
     _ref.read(timelineProvider.notifier).syncItem(item.id, isTrashed: true);
     _ref.read(favoritesProvider.notifier).syncItem(item.id, isTrashed: true);
-    return true;
+    return item.copyWith(filePath: newPath, isTrashed: true);
   }
 
   Future<bool> restore(MediaItem item) async {

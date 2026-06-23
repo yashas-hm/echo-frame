@@ -17,7 +17,9 @@ class TrashService {
   /// Moves [trashFilePath] back to its original location under [libraryRoot].
   /// Returns the restored absolute path on success, null if the move failed.
   static Future<String?> restore(
-      String trashFilePath, String libraryRoot) async {
+    String trashFilePath,
+    String libraryRoot,
+  ) async {
     final relativeInTrash = trashFilePath.substring(libraryRoot.length + 1);
     final originalRelative =
         relativeInTrash.substring('${Keys.trashFolderName}/'.length);

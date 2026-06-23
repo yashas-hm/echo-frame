@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 class EFSnackbar {
   const EFSnackbar._();
 
-  static void showSuccess(
-    BuildContext context, {
+  static void showSuccess(BuildContext context, {
     required String message,
     Widget? icon,
-    bool showDismiss = true,
+    String? actionText,
+    VoidCallback? onActionPressed,
   }) =>
       _show(
         context,
@@ -18,14 +18,15 @@ class EFSnackbar {
         icon: icon,
         color: context.colors.successSurface.withValues(alpha: 0.8),
         textColor: context.colors.onSuccessPrimary,
-        showDismiss: showDismiss,
+        actionText: actionText,
+        onActionPressed: onActionPressed,
       );
 
-  static void showError(
-    BuildContext context, {
+  static void showError(BuildContext context, {
     required String message,
     Widget? icon,
-    bool showDismiss = true,
+    String? actionText,
+    VoidCallback? onActionPressed,
   }) =>
       _show(
         context,
@@ -33,14 +34,15 @@ class EFSnackbar {
         icon: icon,
         color: context.colors.errorPrimary.withValues(alpha: 0.8),
         textColor: context.colors.onErrorPrimary,
-        showDismiss: showDismiss,
+        actionText: actionText,
+        onActionPressed: onActionPressed,
       );
 
-  static void showInfo(
-    BuildContext context, {
+  static void showInfo(BuildContext context, {
     required String message,
     Widget? icon,
-    bool showDismiss = true,
+    String? actionText,
+    VoidCallback? onActionPressed,
   }) =>
       _show(
         context,
@@ -48,16 +50,17 @@ class EFSnackbar {
         icon: icon,
         color: context.colors.surfacePrimary,
         textColor: context.colors.textPrimary,
-        showDismiss: showDismiss,
+        actionText: actionText,
+        onActionPressed: onActionPressed,
       );
 
-  static void _show(
-    BuildContext context, {
+  static void _show(BuildContext context, {
     required String message,
     required Color color,
     required Color textColor,
-    required bool showDismiss,
     Widget? icon,
+    String? actionText,
+    VoidCallback? onActionPressed,
   }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -72,28 +75,29 @@ class EFSnackbar {
                 style: Styles.smallRegular(color: context.colors.textPrimary),
               ),
             ),
-            if (showDismiss)
-              Material(
-                color: KnownColors.transparent,
-                borderRadius: BorderRadius.circular(Sizes.maxFinite),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  onTap: () =>
-                      ScaffoldMessenger.of(context).removeCurrentSnackBar(),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: Sizes.spacingSmallRegular,
-                      vertical: Sizes.spacingSmall,
-                    ),
-                    child: Text(
-                      'Dismiss',
-                      style: Styles.microBold(
-                        color: context.colors.textPrimary,
-                      ),
+            Material(
+              color: KnownColors.transparent,
+              borderRadius: BorderRadius.circular(Sizes.maxFinite),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  onActionPressed?.call();
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Sizes.spacingSmallRegular,
+                    vertical: Sizes.spacingSmall,
+                  ),
+                  child: Text(
+                    actionText ?? 'Dismiss',
+                    style: Styles.microBold(
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
               ),
+            ),
           ],
         ),
       ),

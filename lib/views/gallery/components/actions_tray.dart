@@ -12,12 +12,10 @@ class ActionsTray extends ConsumerWidget {
     super.key,
     required this.item,
     this.onInfoPressed,
-    this.onRemoveItem,
   });
 
   final MediaItem item;
   final VoidCallback? onInfoPressed;
-  final VoidCallback? onRemoveItem;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,18 +51,7 @@ class ActionsTray extends ConsumerWidget {
           if (item.isTrashed) ...[
             EFIconButton(
               icon: Icons.restore_rounded,
-              onPressed: () async {
-                final success = await actions.restore(item);
-                if (!context.mounted) return;
-                if (success) {
-                  onRemoveItem?.call();
-                } else {
-                  EFSnackbar.showError(
-                    context,
-                    message: 'Failed to restore item',
-                  );
-                }
-              },
+              onPressed: () => _restore(context, actions),
             ),
             EFIconButton(
               icon: Icons.delete_forever_outlined,
@@ -80,7 +67,10 @@ class ActionsTray extends ConsumerWidget {
                 final success = await actions.permanentDelete(item);
                 if (!context.mounted) return;
                 if (success) {
-                  onRemoveItem?.call();
+                  EFSnackbar.showSuccess(
+                    context,
+                    message: 'Item permanently deleted',
+                  );
                 } else {
                   EFSnackbar.showError(
                     context,
@@ -94,10 +84,19 @@ class ActionsTray extends ConsumerWidget {
             EFIconButton(
               icon: Icons.delete_outline_rounded,
               onPressed: () async {
-                final success = await actions.trash(item);
+                final trashedItem = await actions.trash(item);
                 if (!context.mounted) return;
-                if (success) {
-                  onRemoveItem?.call();
+                if (trashedItem != null) {
+                  EFSnackbar.showSuccess(
+                    context,
+                    message: 'Moved to trash',
+                    actionText: 'Undo',
+                    onActionPressed: () => _restore(
+                      context,
+                      actions,
+                      trashedItem,
+                    ),
+                  );
                 } else {
                   EFSnackbar.showError(
                     context,
@@ -113,5 +112,22 @@ class ActionsTray extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _restore(
+    BuildContext context,
+    GalleryActions actions, [
+    MediaItem? target,
+  ]) async {
+    final success = await actions.restore(target ?? item);
+    if (!context.mounted) return;
+    if (success) {
+      EFSnackbar.showSuccess(context, message: 'Item restored');
+    } else {
+      EFSnackbar.showError(
+        context,
+        message: 'Failed to restore item',
+      );
+    }
   }
 }
