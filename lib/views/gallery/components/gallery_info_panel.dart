@@ -4,6 +4,7 @@ import 'package:echo_frame/constants/constants.dart'
 import 'package:echo_frame/models/media_item.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
+import 'package:echo_frame/views/gallery/components/tag_row.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -28,16 +29,18 @@ class GalleryInfoPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: EFIconButton(
-              icon: Icons.clear_rounded,
-              onPressed: onClosePressed,
-            ),
-          ),
-          Text(
-            'Info',
-            style: Styles.regularBold(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Info',
+                style: Styles.regularBold(color: colors.textPrimary),
+              ),
+              EFIconButton(
+                icon: Icons.clear_rounded,
+                onPressed: onClosePressed,
+              ),
+            ],
           ),
           SpacerRegular(),
           _row(
@@ -75,6 +78,7 @@ class GalleryInfoPanel extends StatelessWidget {
             item.filePath.split('/').last,
             colors,
           ),
+          TagRow(item: item),
         ],
       ),
     );

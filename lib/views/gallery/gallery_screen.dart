@@ -55,6 +55,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   @override
   void initState() {
     super.initState();
+    // TODO: O(n) scan — consider an id→index map on MediaCollectionState
     final flat = ref.read(_provider).value?.flatItems ?? const [];
     _currentIndex = flat.indexWhere((item) => item.id == widget.initialMediaId);
   }
@@ -100,10 +101,14 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     }
   }
 
-  void _showInfoF() => setState(() => _showInfo = !_showInfo);
+  void _toggleInfoPanel() {
+    setState(() => _showInfo = !_showInfo);
+    if (!_showInfo) _focusNode.requestFocus();
+  }
 
   void _onItemRestored(String itemId) {
     if (!mounted) return;
+    // TODO: O(n) scan — consider an id→index map on MediaCollectionState
     final flat = ref.read(_provider).value?.flatItems ?? [];
     final idx = flat.indexWhere((i) => i.id == itemId);
     if (idx != -1) setState(() => _currentIndex = idx);
@@ -132,77 +137,78 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
         children: [
           Positioned.fill(
             child: CallbackShortcuts(
-                    bindings: {
-                      const SingleActivator(LogicalKeyboardKey.arrowRight):
-                          _goNext,
-                      const SingleActivator(LogicalKeyboardKey.arrowLeft):
-                          _goPrev,
-                      const SingleActivator(
-                        LogicalKeyboardKey.escape,
-                        includeRepeats: false,
-                      ): context.pop,
-                      const SingleActivator(
-                        LogicalKeyboardKey.space,
-                        includeRepeats: false,
-                      ): () => VideoControlFunctions.togglePlayPause(
-                            context,
-                            _player,
-                          ),
-                      const SingleActivator(
-                        LogicalKeyboardKey.keyI,
-                        includeRepeats: false,
-                      ): _showInfoF,
-                      const SingleActivator(
-                        LogicalKeyboardKey.keyM,
-                        includeRepeats: false,
-                      ): () => VideoControlFunctions.toggleMute(
-                            context,
-                            _player,
-                          ),
-                    },
-                    child: Focus(
-                      focusNode: _focusNode,
-                      autofocus: true,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: AnimatedSwitcher(
-                              duration: Durations.medium2,
-                              child: KeyedSubtree(
-                                key: ValueKey(_currentIndex),
-                                child: item.isVideo
-                                    ? VideoView(
-                                        item: item,
-                                        onPlayerReady: (p) {
-                                          if (p == null) return;
-                                          WidgetsBinding.instance
-                                              .addPostFrameCallback(
-                                            (_) => setState(() => _player = p),
-                                          );
-                                        },
-                                      )
-                                    : ImageView(item: item),
-                              ),
-                            ),
-                          ),
-                          AnimatedSize(
-                            duration: Durations.short4,
-                            child: _showInfo
-                                ? GalleryInfoPanel(
-                                    item: item,
-                                    onClosePressed: _showInfoF,
-                                  )
-                                : SizedBox.shrink(),
-                          ),
-                        ],
+              bindings: {
+                if (!_showInfo)
+                  const SingleActivator(LogicalKeyboardKey.arrowRight): _goNext,
+                if (!_showInfo)
+                  const SingleActivator(LogicalKeyboardKey.arrowLeft): _goPrev,
+                const SingleActivator(
+                  LogicalKeyboardKey.escape,
+                  includeRepeats: false,
+                ): _showInfo ? _toggleInfoPanel : context.pop,
+                if (!_showInfo)
+                  const SingleActivator(
+                    LogicalKeyboardKey.space,
+                    includeRepeats: false,
+                  ): () => VideoControlFunctions.togglePlayPause(
+                        context,
+                        _player,
+                      ),
+                const SingleActivator(
+                  LogicalKeyboardKey.keyI,
+                  includeRepeats: false,
+                ): _toggleInfoPanel,
+                const SingleActivator(
+                  LogicalKeyboardKey.keyM,
+                  includeRepeats: false,
+                ): () => VideoControlFunctions.toggleMute(
+                      context,
+                      _player,
+                    ),
+              },
+              child: Focus(
+                focusNode: _focusNode,
+                autofocus: true,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: Durations.medium2,
+                        child: KeyedSubtree(
+                          key: ValueKey(_currentIndex),
+                          child: item.isVideo
+                              ? VideoView(
+                                  item: item,
+                                  onPlayerReady: (p) {
+                                    if (p == null) return;
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback(
+                                      (_) => setState(() => _player = p),
+                                    );
+                                  },
+                                )
+                              : ImageView(item: item),
+                        ),
                       ),
                     ),
-                  ),
+                    AnimatedSize(
+                      duration: Durations.short4,
+                      child: _showInfo
+                          ? GalleryInfoPanel(
+                              item: item,
+                              onClosePressed: _toggleInfoPanel,
+                            )
+                          : SizedBox.shrink(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
           if (canPrev) CaretArrow(left: true, onPressed: _goPrev),
-          if (canNext)
+          if (canNext && !_showInfo)
             CaretArrow(
               left: false,
               onPressed: _goNext,
@@ -211,7 +217,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
           if (!_showInfo)
             ActionsTray(
               item: item,
-              onInfoPressed: _showInfoF,
+              onInfoPressed: _toggleInfoPanel,
               onItemRestored: _onItemRestored,
             ),
         ],

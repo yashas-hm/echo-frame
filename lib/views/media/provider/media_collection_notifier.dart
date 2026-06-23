@@ -40,6 +40,7 @@ abstract class MediaCollectionNotifier
   void syncItem(MediaItem item) {
     final current = state.value;
     if (current == null) return;
+    // TODO: O(n) scan — consider maintaining an id→index map alongside `loaded`
     final idx = current.loaded.indexWhere((e) => e.id == item.id);
 
     final shouldRemove =
