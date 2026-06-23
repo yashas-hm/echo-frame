@@ -82,10 +82,20 @@ class MediaDao {
             }
             if (query != null && query.isNotEmpty) {
               final like = '%$query%';
+              final tagSubquery = _db.selectOnly(_db.mediaTagRecords)
+                ..addColumns([_db.mediaTagRecords.mediaId])
+                ..join([
+                  innerJoin(
+                    _db.tagRecords,
+                    _db.tagRecords.id.equalsExp(_db.mediaTagRecords.tagId),
+                  ),
+                ])
+                ..where(_db.tagRecords.value.like(like));
               cond = cond &
                   (r.filename.like(like) |
                       r.cameraMake.like(like) |
-                      r.cameraModel.like(like));
+                      r.cameraModel.like(like) |
+                      r.id.isInQuery(tagSubquery));
             }
             return cond;
           })
