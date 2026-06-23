@@ -91,8 +91,10 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(timelineProvider).requireValue;
     final flat = state.flatItems;
-    final validIndex = _currentIndex >= 0 && _currentIndex < flat.length;
 
+    if(flat.isEmpty) context.pop();
+
+    final validIndex = _currentIndex >= 0 && _currentIndex < flat.length;
     if (validIndex) _checkLoadRequired(state, flat);
     final canPrev = validIndex && _currentIndex > 0;
     final canNext =

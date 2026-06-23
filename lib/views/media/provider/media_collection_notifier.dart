@@ -37,22 +37,32 @@ abstract class MediaCollectionNotifier
     ));
   }
 
-  void syncItem(String id, {bool? isFavorite, bool? isTrashed}) {
+  void syncItem(MediaItem item) {
     final current = state.value;
     if (current == null) return;
-    final idx = current.loaded.indexWhere((e) => e.id == id);
-    if (idx == -1) return;
+    final idx = current.loaded.indexWhere((e) => e.id == item.id);
 
-    final shouldRemove = (isFavorite == false && isFavoriteFilter == true) ||
-        (isTrashed == true && isTrashedFilter == false) ||
-        (isTrashed == false && isTrashedFilter == true);
+    final shouldRemove =
+        (item.isFavorite == false && isFavoriteFilter == true) ||
+            (item.isTrashed == true && isTrashedFilter == false) ||
+            (item.isTrashed == false && isTrashedFilter == true);
+
+    if (idx == -1 && shouldRemove) return;
 
     final updated = List<MediaItem>.of(current.loaded);
-    if (shouldRemove) {
+    if (idx == -1) {
+      final insertAt = updated.indexWhere(
+        (e) => e.capturedAt.isBefore(item.capturedAt),
+      );
+      if (insertAt == -1) {
+        updated.add(item);
+      } else {
+        updated.insert(insertAt, item);
+      }
+    } else if (shouldRemove) {
       updated.removeAt(idx);
     } else {
-      updated[idx] =
-          updated[idx].copyWith(isFavorite: isFavorite, isTrashed: isTrashed);
+      updated[idx] = item;
     }
     state = AsyncData(current.copyWith(loaded: updated));
   }

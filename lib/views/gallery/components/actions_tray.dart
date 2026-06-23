@@ -36,7 +36,7 @@ class ActionsTray extends ConsumerWidget {
             iconColor: item.isFavorite ? Colors.amber : null,
             onPressed: () async {
               final success = await actions.setFavourite(
-                item.id,
+                item,
                 value: !item.isFavorite,
               );
               if (!context.mounted) return;
@@ -95,6 +95,7 @@ class ActionsTray extends ConsumerWidget {
                       context,
                       actions,
                       trashedItem,
+                      true,
                     ),
                   );
                 } else {
@@ -118,6 +119,7 @@ class ActionsTray extends ConsumerWidget {
     BuildContext context,
     GalleryActions actions, [
     MediaItem? target,
+    bool? undo,
   ]) async {
     final success = await actions.restore(target ?? item);
     if (!context.mounted) return;

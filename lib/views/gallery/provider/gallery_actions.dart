@@ -12,11 +12,12 @@ class GalleryActions {
 
   final Ref _ref;
 
-  Future<bool> setFavourite(String id, {required bool value}) async {
+  Future<bool> setFavourite(MediaItem item, {required bool value}) async {
     if (!EchoDatabase.isOpen) return false;
-    await MediaDao.instance.setFavorite(id, value: value);
-    _ref.read(timelineProvider.notifier).syncItem(id, isFavorite: value);
-    _ref.read(favoritesProvider.notifier).syncItem(id, isFavorite: value);
+    await MediaDao.instance.setFavorite(item.id, value: value);
+    final updated = item.copyWith(isFavorite: value);
+    _ref.read(timelineProvider.notifier).syncItem(updated);
+    _ref.read(favoritesProvider.notifier).syncItem(updated);
     return true;
   }
 
@@ -30,12 +31,13 @@ class GalleryActions {
       value: true,
       relativePath: newPath.substring(root.length + 1),
     );
-    _ref.read(timelineProvider.notifier).syncItem(item.id, isTrashed: true);
-    _ref.read(favoritesProvider.notifier).syncItem(item.id, isTrashed: true);
-    return item.copyWith(filePath: newPath, isTrashed: true);
+    final trashedItem = item.copyWith(filePath: newPath, isTrashed: true);
+    _ref.read(timelineProvider.notifier).syncItem(trashedItem);
+    _ref.read(favoritesProvider.notifier).syncItem(trashedItem);
+    return trashedItem;
   }
 
-  Future<bool> restore(MediaItem item) async {
+  Future<bool> restore(MediaItem item, {bool undo = false}) async {
     if (!EchoDatabase.isOpen) return false;
     final root = Prefs.activeLibraryRoot!;
     final newPath = await TrashService.restore(item.filePath, root);
@@ -45,15 +47,21 @@ class GalleryActions {
       value: false,
       relativePath: newPath.substring(root.length + 1),
     );
-    _ref.invalidate(timelineProvider);
-    _ref.invalidate(favoritesProvider);
+    if(undo){
+      final restoredItem = item.copyWith(filePath: newPath, isTrashed: false);
+      _ref.read(timelineProvider.notifier).syncItem(restoredItem);
+      _ref.read(favoritesProvider.notifier).syncItem(restoredItem);
+    }else{
+      _ref.invalidate(timelineProvider);
+      _ref.invalidate(favoritesProvider);
+    }
     return true;
   }
 
   Future<bool> permanentDelete(MediaItem item) async {
     if (!EchoDatabase.isOpen) return false;
     final success = await TrashService.permanentDelete(item.filePath);
-    if(!success) return false;
+    if (!success) return false;
     await MediaDao.instance.permanentDelete(item.id);
     return true;
   }

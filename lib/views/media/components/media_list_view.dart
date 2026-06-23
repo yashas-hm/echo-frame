@@ -11,21 +11,24 @@ class MediaListView extends StatelessWidget {
     super.key,
     required this.state,
     required this.scrollController,
+    this.searchEnabled = true,
   });
 
   final MediaCollectionState state;
   final ScrollController scrollController;
+  final bool searchEnabled;
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       controller: scrollController,
       slivers: [
-        const SliverToBoxAdapter(
-          child: SizedBox(
-            height: Sizes.inputHeight + Sizes.edgePadding,
+        if (searchEnabled)
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: Sizes.inputHeight + Sizes.edgePadding,
+            ),
           ),
-        ),
         for (final month in state.byMonth) ...[
           SliverPadding(
             padding: const EdgeInsets.symmetric(
