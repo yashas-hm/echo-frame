@@ -3,10 +3,11 @@ import 'dart:ui';
 import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart';
-import 'package:echo_frame/views/media/favorites_screen.dart';
 import 'package:echo_frame/views/import/import_screen.dart';
-import 'package:echo_frame/views/settings/settings_screen.dart';
+import 'package:echo_frame/views/media/favorites_screen.dart';
 import 'package:echo_frame/views/media/timeline_screen.dart';
+import 'package:echo_frame/views/media/trash_screen.dart';
+import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -39,6 +40,11 @@ class _NavBarState extends State<NavBar> {
       route: FavoritesScreen.path,
       icon: Icons.star_border_rounded,
       label: 'Starred'
+    ),
+    (
+      route: TrashScreen.path,
+      icon: Icons.delete_outline_rounded,
+      label: 'Trash',
     ),
     (
       route: ImportScreen.path,

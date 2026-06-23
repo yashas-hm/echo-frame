@@ -6,6 +6,7 @@ import 'package:echo_frame/utilities/utilities.dart' show SearchIntent;
 import 'package:echo_frame/views/media/favorites_screen.dart';
 import 'package:echo_frame/views/gallery/gallery_screen.dart';
 import 'package:echo_frame/views/import/import_screen.dart';
+import 'package:echo_frame/views/media/trash_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:echo_frame/views/settings/shortcut_screen.dart';
 import 'package:echo_frame/views/shell/shell_screen.dart';
@@ -23,6 +24,7 @@ final _router = GoRouter(
       routes: [
         TimelineScreen.route,
         FavoritesScreen.route,
+        TrashScreen.route,
       ],
     ),
     ShellRoute(
