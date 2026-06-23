@@ -122,103 +122,105 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
         validIndex && (_currentIndex < flat.length - 1 || state.hasMore);
     final item = flat[_currentIndex];
 
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: !validIndex
-              ? ErrorView(
-                  errorMessage: 'Something went wrong',
-                  description: 'This photo could not be found. '
-                      'It may have been removed or the library reloaded.',
-                  buttonText: 'Reload',
-                  onButtonPressed: () => setState(
-                    () => _currentIndex =
-                        _currentIndex.clamp(0, flat.length - 1).toInt(),
-                  ),
-                )
-              : CallbackShortcuts(
-                  bindings: {
-                    const SingleActivator(LogicalKeyboardKey.arrowRight):
-                        _goNext,
-                    const SingleActivator(LogicalKeyboardKey.arrowLeft):
-                        _goPrev,
-                    const SingleActivator(
-                      LogicalKeyboardKey.escape,
-                      includeRepeats: false,
-                    ): context.pop,
-                    const SingleActivator(
-                      LogicalKeyboardKey.space,
-                      includeRepeats: false,
-                    ): () => VideoControlFunctions.togglePlayPause(
-                          context,
-                          _player,
-                        ),
-                    const SingleActivator(
-                      LogicalKeyboardKey.keyI,
-                      includeRepeats: false,
-                    ): _showInfoF,
-                    const SingleActivator(
-                      LogicalKeyboardKey.keyM,
-                      includeRepeats: false,
-                    ): () => VideoControlFunctions.toggleMute(
-                          context,
-                          _player,
-                        ),
-                  },
-                  child: Focus(
-                    focusNode: _focusNode,
-                    autofocus: true,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: AnimatedSwitcher(
-                            duration: Durations.medium2,
-                            child: KeyedSubtree(
-                              key: ValueKey(_currentIndex),
-                              child: item.isVideo
-                                  ? VideoView(
-                                      item: item,
-                                      onPlayerReady: (p) {
-                                        if (p == null) return;
-                                        WidgetsBinding.instance
-                                            .addPostFrameCallback(
-                                          (_) => setState(() => _player = p),
-                                        );
-                                      },
-                                    )
-                                  : ImageView(item: item),
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: !validIndex
+                ? ErrorView(
+                    errorMessage: 'Something went wrong',
+                    description: 'This photo could not be found. '
+                        'It may have been removed or the library reloaded.',
+                    buttonText: 'Reload',
+                    onButtonPressed: () => setState(
+                      () => _currentIndex =
+                          _currentIndex.clamp(0, flat.length - 1).toInt(),
+                    ),
+                  )
+                : CallbackShortcuts(
+                    bindings: {
+                      const SingleActivator(LogicalKeyboardKey.arrowRight):
+                          _goNext,
+                      const SingleActivator(LogicalKeyboardKey.arrowLeft):
+                          _goPrev,
+                      const SingleActivator(
+                        LogicalKeyboardKey.escape,
+                        includeRepeats: false,
+                      ): context.pop,
+                      const SingleActivator(
+                        LogicalKeyboardKey.space,
+                        includeRepeats: false,
+                      ): () => VideoControlFunctions.togglePlayPause(
+                            context,
+                            _player,
+                          ),
+                      const SingleActivator(
+                        LogicalKeyboardKey.keyI,
+                        includeRepeats: false,
+                      ): _showInfoF,
+                      const SingleActivator(
+                        LogicalKeyboardKey.keyM,
+                        includeRepeats: false,
+                      ): () => VideoControlFunctions.toggleMute(
+                            context,
+                            _player,
+                          ),
+                    },
+                    child: Focus(
+                      focusNode: _focusNode,
+                      autofocus: true,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: AnimatedSwitcher(
+                              duration: Durations.medium2,
+                              child: KeyedSubtree(
+                                key: ValueKey(_currentIndex),
+                                child: item.isVideo
+                                    ? VideoView(
+                                        item: item,
+                                        onPlayerReady: (p) {
+                                          if (p == null) return;
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback(
+                                            (_) => setState(() => _player = p),
+                                          );
+                                        },
+                                      )
+                                    : ImageView(item: item),
+                              ),
                             ),
                           ),
-                        ),
-                        AnimatedSize(
-                          duration: Durations.short4,
-                          child: _showInfo
-                              ? GalleryInfoPanel(
-                                  item: item,
-                                  onClosePressed: _showInfoF,
-                                )
-                              : SizedBox.shrink(),
-                        ),
-                      ],
+                          AnimatedSize(
+                            duration: Durations.short4,
+                            child: _showInfo
+                                ? GalleryInfoPanel(
+                                    item: item,
+                                    onClosePressed: _showInfoF,
+                                  )
+                                : SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-        ),
-        if (canPrev) CaretArrow(left: true, onPressed: _goPrev),
-        if (canNext)
-          CaretArrow(
-            left: false,
-            onPressed: _goNext,
-            loadingNext: state.isLoadingMore,
           ),
-        if (!_showInfo)
-          ActionsTray(
-            item: item,
-            onInfoPressed: _showInfoF,
-          ),
-      ],
+          if (canPrev) CaretArrow(left: true, onPressed: _goPrev),
+          if (canNext)
+            CaretArrow(
+              left: false,
+              onPressed: _goNext,
+              loadingNext: state.isLoadingMore,
+            ),
+          if (!_showInfo)
+            ActionsTray(
+              item: item,
+              onInfoPressed: _showInfoF,
+            ),
+        ],
+      ),
     );
   }
 }
