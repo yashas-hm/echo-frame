@@ -7,7 +7,7 @@ final class Sizes {
   static const double kWindowAspectRatio = 1.5;
   static const double kInitWindowWidth = 1200.0;
   static const double kInitWindowHeight = 800.0;
-  static const double navBarWidth = 125;
+  static const double navBarWidth = 125.0;
 
   static const double edgePadding = spacingMedium;
   static const double cardPadding = spacingRegular;
@@ -46,6 +46,7 @@ final class Sizes {
   static const double inputBorderRadius = 8.0;
   static const double inputBorderWidth = 1.0;
   static const double inputBorderFocusedWidth = 1.5;
+  static const double inputHeight = 45.0;
 
   static const double maxFinite = 999999;
   static const double viewBoxWidth = 480;

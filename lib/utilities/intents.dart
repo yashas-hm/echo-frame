@@ -12,10 +12,10 @@ class SearchIntent extends Intent {
     if (location != TimelineScreen.path) {
       context.go(TimelineScreen.path);
       WidgetsBinding.instance.addPostFrameCallback(
-        (_) => ref.read(timelineSearchFocusProvider).requestFocus(),
+        (_) => ref.read(searchFocusProvider).requestFocus(),
       );
     } else {
-      ref.read(timelineSearchFocusProvider).requestFocus();
+      ref.read(searchFocusProvider).requestFocus();
     }
   }
 }

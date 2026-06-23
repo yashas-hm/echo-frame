@@ -7,12 +7,14 @@ class EFIconButton extends StatelessWidget {
     this.onPressed,
     this.iconSize,
     this.iconColor,
+    this.iconPadding,
   });
 
   final IconData icon;
   final VoidCallback? onPressed;
   final double? iconSize;
   final Color? iconColor;
+  final EdgeInsets? iconPadding;
 
   factory EFIconButton.back({VoidCallback? onPressed}) => EFIconButton(
         icon: Icons.arrow_back_rounded,
@@ -30,12 +32,15 @@ class EFIconButton extends StatelessWidget {
         hoverColor: context.colors.textPrimary.hover,
         splashColor: context.colors.textPrimary.splash,
         onTap: onPressed ?? context.pop,
-        child: Padding(
-          padding: EdgeInsets.all(Sizes.iconPadding),
-          child: Icon(
-            icon,
-            color: iconColor ?? context.colors.textPrimary,
-            size: iconSize ?? Sizes.iconSizeRegular,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(
+            padding: iconPadding ?? EdgeInsets.all(Sizes.iconPadding),
+            child: Icon(
+              icon,
+              color: iconColor ?? context.colors.textPrimary,
+              size: iconSize ?? Sizes.iconSizeRegular,
+            ),
           ),
         ),
       ),

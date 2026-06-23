@@ -92,10 +92,10 @@ class Styles {
       );
 
   static TextStyle microBold({Color? color}) => GoogleFonts.robotoMono(
-    fontSize: Sizes.fontSizeExtraSmall,
-    fontWeight: FontWeight.w800,
-    color: color,
-  );
+        fontSize: Sizes.fontSizeExtraSmall,
+        fontWeight: FontWeight.w800,
+        color: color,
+      );
 
   static TextStyle button({Color? color}) => GoogleFonts.robotoMono(
         fontSize: Sizes.fontSizeSmall,
@@ -108,6 +108,11 @@ class Styles {
         fontWeight: FontWeight.w700,
         color: color ?? KnownColors.basicWhite,
       );
+
+  static OutlineInputBorder borderNone = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(Sizes.maxFinite),
+    borderSide: BorderSide.none,
+  );
 
 // static BoxShadow get cardShadow => BoxShadow(
 //   color: KnownColors.basicBlack.withValues(alpha: 0.08),
