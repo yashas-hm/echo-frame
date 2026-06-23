@@ -1,4 +1,5 @@
 import 'package:echo_frame/components/buttons/buttons.dart';
+import 'package:echo_frame/components/empty_view.dart';
 import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/models/discovery/discovery.dart' show DiscoveryError;
@@ -50,44 +51,39 @@ class _OrganizerScreenState extends ConsumerState<ImportScreen> {
     if (_importType != null) {
       final state = ref.watch(importProvider(_importType!));
 
-      if (state.destRoot == null) return _destRouteErrorView();
+      if (state.destRoot == null) {
+        return Scaffold(
+          body: const EmptyView(
+            icon: Icons.folder_off_outlined,
+            title: 'No library selected',
+            message: 'Set up a library before importing',
+          ),
+        );
+      }
 
-      return switch (state.phase) {
-        ImportPhase.idle => IdleView(
-            state,
-            _importType!,
-            onBackPressed: () => setState(() => _importType = null),
-          ),
-        ImportPhase.discovering => DiscoveringView(state),
-        ImportPhase.review => ReviewView(state, _importType!),
-        ImportPhase.applying => ApplyingView(state),
-        ImportPhase.done => DoneView(state, _importType!),
-        ImportPhase.error => ErrorView(
-            onButtonPressed:
-                ref.read(importProvider(_importType!).notifier).reset,
-            description: state.error,
-            buttonText: 'Start Over',
-          ),
-      };
+      return Scaffold(
+        body: switch (state.phase) {
+          ImportPhase.idle => IdleView(
+              state,
+              _importType!,
+              onBackPressed: () => setState(() => _importType = null),
+            ),
+          ImportPhase.discovering => DiscoveringView(state),
+          ImportPhase.review => ReviewView(state, _importType!),
+          ImportPhase.applying => ApplyingView(state),
+          ImportPhase.done => DoneView(state, _importType!),
+          ImportPhase.error => ErrorView(
+              onButtonPressed:
+                  ref.read(importProvider(_importType!).notifier).reset,
+              description: state.error,
+              buttonText: 'Start Over',
+            ),
+        },
+      );
     }
 
     return TypeSelectionView(
       onSelectType: (type) => setState(() => _importType = type),
     );
   }
-
-  Widget _destRouteErrorView() => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.folder_off_outlined,
-              size: 56,
-              color: context.colors.borderPrimary,
-            ),
-            const SizedBox(height: 16),
-            Text('No library selected, set up a library first'),
-          ],
-        ),
-      );
 }

@@ -51,7 +51,7 @@ class EFPrimaryButton extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(Sizes.maxFinite),
-            border: filled
+            border: filled && !disabled
                 ? Border.all(color: colors.primaryColor, width: 1)
                 : null,
           ),

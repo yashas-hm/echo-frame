@@ -1,7 +1,7 @@
 import 'package:echo_frame/components/buttons/buttons.dart';
 import 'package:echo_frame/constants/constants.dart' show Sizes;
 import 'package:echo_frame/utilities/utilities.dart'
-    show SearchIntent, ContextExtensions;
+    show SearchIntent;
 import 'package:echo_frame/views/shell/components/nav_bar.dart';
 import 'package:echo_frame/views/shell/components/title_bar.dart';
 import 'package:flutter/material.dart';
@@ -30,28 +30,25 @@ class ShellScreen extends ConsumerWidget {
           },
         ),
       },
-      child: Scaffold(
-        backgroundColor: context.colors.background,
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const TitleBar(),
-            Expanded(
-              child: Stack(
-                children: [
-                  Positioned.fill(child: child),
-                  if (enableNavBar) NavBar(),
-                  if (enableBackButton)
-                    Positioned(
-                      top: Sizes.spacingRegular,
-                      left: Sizes.spacingRegular,
-                      child: EFIconButton.back(),
-                    ),
-                ],
-              ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const TitleBar(),
+          Expanded(
+            child: Stack(
+              children: [
+                Positioned.fill(child: child),
+                if (enableNavBar) NavBar(),
+                if (enableBackButton)
+                  Positioned(
+                    top: Sizes.spacingRegular,
+                    left: Sizes.spacingRegular,
+                    child: EFIconButton.back(),
+                  ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

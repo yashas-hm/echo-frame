@@ -27,218 +27,239 @@ class SettingsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final themeMode = ref.watch(appThemeProvider).mode;
 
-    return Padding(
-      padding: EdgeInsets.all(Sizes.edgePadding),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SpacerExtraExtraLarge(),
-          Text(
-            'General',
-            style: Styles.subTitleBold(color: colors.textPrimary),
-          ),
-          SpacerRegular(),
-          ..._settingTile(
-            title: 'Library Root',
-            subtitle: settings.activeLibraryRoot ?? 'No library selected',
-            colors: colors,
-            actionChild: settings.knownLibraryRoots.isNotEmpty &&
-                    settings.activeLibraryRoot != null
-                ? DropdownButton<String>(
-                    value: settings.activeLibraryRoot,
-                    dropdownColor: colors.surfacePrimary,
-                    borderRadius:
-                        BorderRadius.circular(Sizes.inputBorderRadius),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: Sizes.spacingRegular),
-                    focusColor: KnownColors.transparent,
-                    mouseCursor: SystemMouseCursors.click,
-                    icon: Icon(
-                      Icons.arrow_drop_down_rounded,
-                      size: Sizes.iconSizeSmall,
-                      color: colors.textPrimary,
-                    ),
-                    underline: const SizedBox.shrink(),
-                    items: [
-                      DropdownMenuItem(
-                        value: 'NewRoot',
-                        child: Row(
-                          spacing: Sizes.spacingExtraSmall,
-                          children: [
-                            Text(
-                              'New Library Root',
+    return Scaffold(
+      body: Padding(
+        padding: EdgeInsets.all(Sizes.edgePadding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SpacerExtraExtraLarge(),
+            Text(
+              'General',
+              style: Styles.subTitleBold(color: colors.textPrimary),
+            ),
+            SpacerRegular(),
+            ..._settingTile(
+              title: 'Library Root',
+              subtitle: settings.activeLibraryRoot ?? 'No library selected',
+              colors: colors,
+              actionChild: settings.knownLibraryRoots.isNotEmpty &&
+                      settings.activeLibraryRoot != null
+                  ? DropdownButton<String>(
+                      value: settings.activeLibraryRoot,
+                      dropdownColor: colors.surfacePrimary,
+                      borderRadius:
+                          BorderRadius.circular(Sizes.inputBorderRadius),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: Sizes.spacingRegular),
+                      focusColor: KnownColors.transparent,
+                      mouseCursor: SystemMouseCursors.click,
+                      icon: Icon(
+                        Icons.arrow_drop_down_rounded,
+                        size: Sizes.iconSizeSmall,
+                        color: colors.textPrimary,
+                      ),
+                      underline: const SizedBox.shrink(),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'NewRoot',
+                          child: Row(
+                            spacing: Sizes.spacingExtraSmall,
+                            children: [
+                              Text(
+                                'New Library Root',
+                                style: Styles.micro(color: colors.textPrimary),
+                              ),
+                              Icon(
+                                Icons.add_rounded,
+                                size: Sizes.iconSizeExtraSmall,
+                                color: colors.textPrimary,
+                              ),
+                            ],
+                          ),
+                        ),
+                        ...settings.knownLibraryRoots.map(
+                          (path) => DropdownMenuItem(
+                            value: path,
+                            child: Text(
+                              path,
                               style: Styles.micro(color: colors.textPrimary),
                             ),
-                            Icon(
-                              Icons.add_rounded,
-                              size: Sizes.iconSizeExtraSmall,
-                              color: colors.textPrimary,
-                            ),
-                          ],
-                        ),
-                      ),
-                      ...settings.knownLibraryRoots.map(
-                        (path) => DropdownMenuItem(
-                          value: path,
-                          child: Text(
-                            path,
-                            style: Styles.micro(color: colors.textPrimary),
                           ),
+                        ),
+                      ],
+                      onChanged: (path) {
+                        if (path == 'NewRoot') {
+                          _addLibrary(ref);
+                          return;
+                        }
+
+                        if (path != null && path != settings.activeLibraryRoot) {
+                          ref.read(settingsProvider.notifier).switchLibrary(path);
+                        }
+                      },
+                    )
+                  : EFIconButton(
+                      icon: Icons.add_rounded,
+                      onPressed: () => _addLibrary(ref),
+                    ),
+            ),
+            ..._settingTile(
+              title: 'Theme',
+              subtitle: 'Choose how EchoFrame looks',
+              colors: colors,
+              actionChild: DropdownButton<ThemeMode>(
+                value: themeMode,
+                dropdownColor: colors.surfacePrimary,
+                borderRadius: BorderRadius.circular(Sizes.inputBorderRadius),
+                padding: EdgeInsets.symmetric(horizontal: Sizes.spacingRegular),
+                focusColor: KnownColors.transparent,
+                mouseCursor: SystemMouseCursors.click,
+                icon: Icon(
+                  Icons.arrow_drop_down_rounded,
+                  size: Sizes.iconSizeSmall,
+                  color: colors.textPrimary,
+                ),
+                underline: const SizedBox.shrink(),
+                items: [
+                  DropdownMenuItem(
+                    value: ThemeMode.system,
+                    child: Text(
+                      'System',
+                      style: Styles.small(color: colors.textPrimary),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.light,
+                    child: Text(
+                      'Light',
+                      style: Styles.small(color: colors.textPrimary),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.dark,
+                    child: Text(
+                      'Dark',
+                      style: Styles.small(color: colors.textPrimary),
+                    ),
+                  ),
+                ],
+                onChanged: (mode) {
+                  if (mode != null) {
+                    ref.read(appThemeProvider.notifier).setMode(mode);
+                  }
+                },
+              ),
+            ),
+            ..._settingTile(
+              title: 'Navigation bar label',
+              subtitle: 'Show text labels below navigation icons',
+              colors: colors,
+              actionChild: Switch(
+                value: settings.showNavLabel,
+                onChanged: ref.read(settingsProvider.notifier).setShowNavLabel,
+              ),
+            ),
+            SpacerRegular(),
+            Text(
+              'Sync Settings',
+              style: Styles.subTitleBold(color: colors.textPrimary),
+            ),
+            SpacerRegular(),
+            ..._settingTile(
+              title: 'Export Settings',
+              subtitle: 'Back up current settings to the active library',
+              colors: colors,
+              actionChild: EFPrimaryButton(
+                text: 'Export',
+                icon: Icons.save_rounded,
+                onPressed: () => _saveSettings(context, ref),
+              ),
+            ),
+            ..._settingTile(
+              title: 'Import Settings',
+              subtitle: 'Restore settings from a saved backup',
+              colors: colors,
+              actionChild: EFPrimaryButton(
+                text: 'Import',
+                icon: Icons.download_rounded,
+                onPressed: () => _importSettings(context, ref),
+              ),
+            ),
+            ..._settingTile(
+              title: 'Reset Settings',
+              subtitle: 'Restore appearance and display defaults',
+              colors: colors,
+              actionChild: EFErrorButton.flat(
+                text: 'Reset',
+                onPressed: () => _confirmReset(context, ref),
+              ),
+            ),
+            SpacerRegular(),
+            InkWell(
+              onTap: () => context.push(ShortcutScreen.path),
+              mouseCursor: SystemMouseCursors.click,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: Sizes.spacingExtraSmall,
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'Shortcuts',
+                      style: Styles.subTitleBold(color: colors.textPrimary),
+                    ),
+                    const Spacer(),
+                    Icon(
+                      Icons.arrow_right_rounded,
+                      size: Sizes.iconSizeRegular,
+                      color: colors.textPrimary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Spacer(),
+            Center(
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    // TODO: add Privacy Policy link
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: Sizes.spacingExtraSmall,
+                    children: [
+                      Icon(
+                        Icons.privacy_tip_outlined,
+                        size: Sizes.iconSizeExtraSmall,
+                        color: colors.textSecondary.withValues(alpha: 0.5),
+                      ),
+                      Text(
+                        'Privacy Policy',
+                        style: Styles.micro(
+                          color: colors.textSecondary.withValues(alpha: 0.5),
                         ),
                       ),
                     ],
-                    onChanged: (path) {
-                      if (path == 'NewRoot') {
-                        _addLibrary(ref);
-                        return;
-                      }
-
-                      if (path != null && path != settings.activeLibraryRoot) {
-                        ref.read(settingsProvider.notifier).switchLibrary(path);
-                      }
-                    },
-                  )
-                : EFIconButton(
-                    icon: Icons.add_rounded,
-                    onPressed: () => _addLibrary(ref),
-                  ),
-          ),
-          ..._settingTile(
-            title: 'Theme',
-            subtitle: 'Choose how EchoFrame looks',
-            colors: colors,
-            actionChild: DropdownButton<ThemeMode>(
-              value: themeMode,
-              dropdownColor: colors.surfacePrimary,
-              borderRadius: BorderRadius.circular(Sizes.inputBorderRadius),
-              padding: EdgeInsets.symmetric(horizontal: Sizes.spacingRegular),
-              focusColor: KnownColors.transparent,
-              mouseCursor: SystemMouseCursors.click,
-              icon: Icon(
-                Icons.arrow_drop_down_rounded,
-                size: Sizes.iconSizeSmall,
-                color: colors.textPrimary,
-              ),
-              underline: const SizedBox.shrink(),
-              items: [
-                DropdownMenuItem(
-                  value: ThemeMode.system,
-                  child: Text(
-                    'System',
-                    style: Styles.small(color: colors.textPrimary),
                   ),
                 ),
-                DropdownMenuItem(
-                  value: ThemeMode.light,
-                  child: Text(
-                    'Light',
-                    style: Styles.small(color: colors.textPrimary),
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: ThemeMode.dark,
-                  child: Text(
-                    'Dark',
-                    style: Styles.small(color: colors.textPrimary),
-                  ),
-                ),
-              ],
-              onChanged: (mode) {
-                if (mode != null) {
-                  ref.read(appThemeProvider.notifier).setMode(mode);
-                }
-              },
-            ),
-          ),
-          ..._settingTile(
-            title: 'Navigation bar label',
-            subtitle: 'Show text labels below navigation icons',
-            colors: colors,
-            actionChild: Switch(
-              value: settings.showNavLabel,
-              onChanged: ref.read(settingsProvider.notifier).setShowNavLabel,
-            ),
-          ),
-          SpacerRegular(),
-          Text(
-            'Sync Settings',
-            style: Styles.subTitleBold(color: colors.textPrimary),
-          ),
-          SpacerRegular(),
-          ..._settingTile(
-            title: 'Export Settings',
-            subtitle: 'Back up current settings to the active library',
-            colors: colors,
-            actionChild: EFPrimaryButton(
-              text: 'Export',
-              icon: Icons.save_rounded,
-              onPressed: () => _saveSettings(context, ref),
-            ),
-          ),
-          ..._settingTile(
-            title: 'Import Settings',
-            subtitle: 'Restore settings from a saved backup',
-            colors: colors,
-            actionChild: EFPrimaryButton(
-              text: 'Import',
-              icon: Icons.download_rounded,
-              onPressed: () => _importSettings(context, ref),
-            ),
-          ),
-          ..._settingTile(
-            title: 'Reset Settings',
-            subtitle: 'Restore appearance and display defaults',
-            colors: colors,
-            actionChild: EFErrorButton.flat(
-              text: 'Reset',
-              onPressed: () => _confirmReset(context, ref),
-            ),
-          ),
-          SpacerRegular(),
-          InkWell(
-            onTap: () => context.push(ShortcutScreen.path),
-            mouseCursor: SystemMouseCursors.click,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: Sizes.spacingExtraSmall,
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    'Shortcuts',
-                    style: Styles.subTitleBold(color: colors.textPrimary),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    Icons.arrow_right_rounded,
-                    size: Sizes.iconSizeRegular,
-                    color: colors.textPrimary,
-                  ),
-                ],
               ),
             ),
-          ),
-          const Spacer(),
-          Center(
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () {
-                  // TODO: add Privacy Policy link
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: Sizes.spacingExtraSmall,
+            SpacerSmall(),
+            Center(
+              child: Text.rich(
+                TextSpan(
+                  text: 'Version: ',
+                  style: Styles.micro(
+                    color: colors.textSecondary.withValues(alpha: 0.5),
+                  ),
                   children: [
-                    Icon(
-                      Icons.privacy_tip_outlined,
-                      size: Sizes.iconSizeExtraSmall,
-                      color: colors.textSecondary.withValues(alpha: 0.5),
-                    ),
-                    Text(
-                      'Privacy Policy',
-                      style: Styles.micro(
+                    TextSpan(
+                      text: 'v0.0.1-alpha+1',
+                      style: Styles.microBold(
                         color: colors.textSecondary.withValues(alpha: 0.5),
                       ),
                     ),
@@ -246,27 +267,8 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
             ),
-          ),
-          SpacerSmall(),
-          Center(
-            child: Text.rich(
-              TextSpan(
-                text: 'Version: ',
-                style: Styles.micro(
-                  color: colors.textSecondary.withValues(alpha: 0.5),
-                ),
-                children: [
-                  TextSpan(
-                    text: 'v0.0.1-alpha+1',
-                    style: Styles.microBold(
-                      color: colors.textSecondary.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -29,58 +29,58 @@ class ShortcutScreen extends StatelessWidget {
       ('Show/Hide Info', ['I']),
     ];
 
-    return Container(
-      color: colors.background,
-      height: context.height,
-      margin: EdgeInsets.only(top: Sizes.spacingExtraExtraLarge),
-      padding: EdgeInsets.all(Sizes.edgePadding),
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: Sizes.spacingMedium,
-          children: [
-            Text(
-              'Shortcuts',
-              style: Styles.subTitleBold(color: colors.textPrimary),
-            ),
-            ...[
-              for (final shortcut in shortcuts)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      shortcut.$1,
-                      style: Styles.smallRegular(color: colors.textPrimary),
-                    ),
-                    const Spacer(),
-                    ...[
-                      for (int keyIndex = 0;
-                          keyIndex < shortcut.$2.length;
-                          keyIndex++) ...[
-                        if (keyIndex != 0)
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                              horizontal: Sizes.spacingSmall,
-                            ),
-                            child: Text(
-                              '+',
-                              style: Styles.smallBold(
-                                color: colors.textPrimary,
+    return Scaffold(
+      body: Container(
+        margin: EdgeInsets.only(top: Sizes.spacingExtraExtraLarge),
+        padding: EdgeInsets.all(Sizes.edgePadding),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: Sizes.spacingMedium,
+            children: [
+              Text(
+                'Shortcuts',
+                style: Styles.subTitleBold(color: colors.textPrimary),
+              ),
+              ...[
+                for (final shortcut in shortcuts)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        shortcut.$1,
+                        style: Styles.smallRegular(color: colors.textPrimary),
+                      ),
+                      const Spacer(),
+                      ...[
+                        for (int keyIndex = 0;
+                            keyIndex < shortcut.$2.length;
+                            keyIndex++) ...[
+                          if (keyIndex != 0)
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: Sizes.spacingSmall,
+                              ),
+                              child: Text(
+                                '+',
+                                style: Styles.smallBold(
+                                  color: colors.textPrimary,
+                                ),
                               ),
                             ),
-                          ),
-                        _shortcutButton(context, shortcut.$2[keyIndex]),
+                          _shortcutButton(context, shortcut.$2[keyIndex]),
+                        ]
                       ]
-                    ]
-                  ],
-                ),
+                    ],
+                  ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

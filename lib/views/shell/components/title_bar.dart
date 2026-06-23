@@ -9,36 +9,39 @@ class TitleBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DragToMoveArea(
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: context.colors.borderPrimary,
+    return Material(
+      color: context.colors.background,
+      child: DragToMoveArea(
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: context.colors.borderPrimary,
+              ),
             ),
           ),
-        ),
-        padding: EdgeInsets.symmetric(
-          vertical: Sizes.spacingExtraSmall,
-          horizontal: 80,
-        ),
-        alignment: Alignment.center,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: Sizes.spacingSmall,
-          children: [
-            SvgPicture.asset(
-              Assets.logoAsset,
-              height: Sizes.iconSizeSmallRegular,
-              width: Sizes.iconSizeSmallRegular,
-              fit: BoxFit.contain,
-            ),
-            Text(
-              'Echo Frame',
-              style: Styles.small(color: context.colors.textSecondary),
-            )
-          ],
+          padding: EdgeInsets.symmetric(
+            vertical: Sizes.spacingExtraSmall,
+            horizontal: 80,
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: Sizes.spacingSmall,
+            children: [
+              SvgPicture.asset(
+                Assets.logoAsset,
+                height: Sizes.iconSizeSmallRegular,
+                width: Sizes.iconSizeSmallRegular,
+                fit: BoxFit.contain,
+              ),
+              Text(
+                'Echo Frame',
+                style: Styles.small(color: context.colors.textSecondary),
+              )
+            ],
+          ),
         ),
       ),
     );
