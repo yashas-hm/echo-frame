@@ -1,14 +1,26 @@
-import 'dart:io';
 import 'dart:developer' as dev;
+import 'dart:io';
 
+import 'package:echo_frame/components/buttons/buttons.dart'
+    show EFPrimaryButton;
+import 'package:echo_frame/components/dialog.dart';
 import 'package:echo_frame/components/error_view.dart';
+import 'package:echo_frame/constants/constants.dart'
+    show
+        Sizes,
+        Styles,
+        SpacerRegular,
+        SpacerExtraSmall,
+        SpacerExtraLarge,
+        SpacerMedium;
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtensions, Prefs;
 import 'package:echo_frame/views/timeline/components/photo_tile.dart';
-import 'package:echo_frame/views/timeline/components/timeline_search_bar.dart';
+import 'package:echo_frame/views/timeline/components/search_bar.dart';
+import 'package:echo_frame/views/timeline/provider/search_focus_provider.dart';
 import 'package:echo_frame/views/timeline/provider/timeline_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -74,31 +86,16 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   }
 
   Future<void> _showSetupDialog() async {
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Choose your photo library'),
-        content: const Text(
-          'EchoFrame keeps your photos organised in a YYYY/MonthName folder '
-          'structure on your drive. Select the root folder where your photos '
-          'are stored — or where you\'d like them organised.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Not now'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await _pickLibraryFolder();
-            },
-            child: const Text('Choose Folder'),
-          ),
-        ],
-      ),
+    final confirmed = await EFDialog.show(
+      context,
+      title: 'Choose your photo library',
+      description: 'EchoFrame keeps your photos organised in a YYYY/MonthName '
+          'folder structure on your drive. Select the root folder where your '
+          'photos are stored — or where you\'d like them organised.',
+      confirmText: 'Choose Folder',
+      cancelText: 'Not now',
     );
+    if (confirmed == true) await _pickLibraryFolder();
   }
 
   Future<void> _pickLibraryFolder() async {
@@ -134,120 +131,176 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_progress != null) return _buildIndexing(context);
-    if (!_hasLibrary) return _buildEmptyState(context);
-    return _buildTimeline(context);
+    if (_progress != null) return _buildIndexing();
+    if (!_hasLibrary) {
+      return _buildEmptyState(
+        message: 'No library selected',
+        button: EFPrimaryButton(
+          onPressed: _showSetupDialog,
+          text: 'Add Frame Path',
+          icon: Icons.add_rounded,
+        ),
+      );
+    }
+    return _buildTimeline();
   }
 
-  Widget _buildTimeline(BuildContext context) {
+  Widget _buildTimeline() {
     final timelineAsync = ref.watch(timelineProvider);
-    return Scaffold(
-      body: Stack(
-        children: [
-          timelineAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, st) {
-              dev.log(
-                'Failed to load timeline: $e',
-                stackTrace: st,
-                name: 'TimelineScreen._buildTimeline',
+
+    return Stack(
+      children: [
+        timelineAsync.when(
+          loading: _buildLoading,
+          error: (e, st) {
+            dev.log(
+              'Failed to load timeline: $e',
+              stackTrace: st,
+              name: 'TimelineScreen._buildTimeline',
+            );
+            return ErrorView(
+              errorMessage: 'Failed to load library',
+              description: 'Something unexpected occurred while loading '
+                  'your library. Please try again.',
+              buttonText: 'Try Again',
+              onButtonPressed: () => ref.invalidate(timelineProvider),
+            );
+          },
+          data: (timeline) {
+            if (timeline.loaded.isEmpty) {
+              return _buildEmptyState(
+                message: timeline.query.isEmpty
+                    ? 'No media available.'
+                    : 'No results for "${timeline.query}".',
               );
-              return ErrorView(
-                errorMessage: 'Failed to load library',
-                description: 'Something unexpected occurred while loading '
-                    'your library. Please try again.',
-                buttonText: 'Try Again',
-                onButtonPressed: () => ref.invalidate(timelineProvider),
-              );
-            },
-            data: (timeline) {
-              if (timeline.loaded.isEmpty) {
-                return Center(
-                  child: Text(timeline.query.isEmpty
-                      ? 'No photos indexed yet.'
-                      : 'No results for "${timeline.query}".'),
-                );
-              }
-              return CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: TimelineSearchBar.height),
+            }
+            return CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                const SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: Sizes.inputHeight + Sizes.edgePadding,
                   ),
-                  for (final month in timeline.byMonth) ...[
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 17),
-                        child: Text(
-                          DateFormat('MMMM yyyy')
-                              .format(DateTime(month.year, month.month)),
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                for (final month in timeline.byMonth) ...[
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Sizes.spacingMediumLarge,
+                      vertical: Sizes.spacingMedium,
+                    ),
+                    sliver: SliverToBoxAdapter(
+                      child: Text(
+                        DateFormat('MMMM yyyy')
+                            .format(DateTime(month.year, month.month)),
+                        style: Styles.subTitleBold(
+                          color: context.colors.textPrimary,
                         ),
                       ),
                     ),
-                    SliverGrid.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 180,
-                        crossAxisSpacing: 2,
-                        mainAxisSpacing: 2,
-                      ),
-                      itemCount: month.items.length,
-                      itemBuilder: (_, i) => PhotoTile(item: month.items[i]),
+                  ),
+                  SliverGrid.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 180,
+                      crossAxisSpacing: 2,
+                      mainAxisSpacing: 2,
                     ),
-                  ],
-                  if (timeline.isLoadingMore)
-                    const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.all(24),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ),
+                    itemCount: month.items.length,
+                    itemBuilder: (_, i) => PhotoTile(item: month.items[i]),
+                  ),
                 ],
-              );
-            },
+                if (timeline.isLoadingMore)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(Sizes.edgePadding),
+                      child: Center(
+                        child: SizedBox(
+                          width: Sizes.spacingExtraLarge,
+                          height: Sizes.spacingExtraLarge,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: EFSearchBar(
+            focusNode: ref.read(searchFocusProvider),
+            initialQuery: timelineAsync.value?.query ?? '',
+            onTextChanged: (q) =>
+                ref.read(timelineProvider.notifier).setQuery(q),
           ),
-          const Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: TimelineSearchBar(),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildIndexing(BuildContext context) {
-    final p = _progress!;
+  Widget _buildLoading() {
+    final colors = context.colors;
+
     return Center(
       child: SizedBox(
-        width: 320,
+        width: Sizes.viewBoxWidth,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Indexing library…',
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 16),
-            LinearProgressIndicator(),
-            const SizedBox(height: 8),
-            Text(p.phase == IndexingPhase.reading
-                ? 'Reading metadata for ${p.newFiles} files…'
-                : '${p.filesFound} files found'),
+            Text(
+              'Loading library…',
+              style: Styles.subtitle(
+                color: colors.textPrimary,
+              ),
+            ),
+            const SpacerMedium(),
+            const LinearProgressIndicator(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIndexing() {
+    final p = _progress!;
+    final colors = context.colors;
+
+    return Center(
+      child: SizedBox(
+        width: Sizes.viewBoxWidth,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Indexing library…',
+              style: Styles.subtitle(
+                color: colors.textPrimary,
+              ),
+            ),
+            const SpacerMedium(),
+            const LinearProgressIndicator(),
+            const SpacerRegular(),
+            Text(
+              p.phase == IndexingPhase.reading
+                  ? 'Reading metadata for ${p.newFiles} files…'
+                  : '${p.filesFound} files found',
+              style: Styles.regular(
+                color: colors.textPrimary,
+              ),
+            ),
             if (p.currentDir != null) ...[
-              const SizedBox(height: 4),
+              const SpacerExtraSmall(),
               Text(
                 p.currentDir!,
-                style: TextStyle(
-                  color: context.colors.textSecondary,
-                  fontSize: 12,
+                style: Styles.small(
+                  color: colors.textSecondary,
                 ),
               ),
             ],
@@ -257,22 +310,32 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState({
+    required String message,
+    Widget? button,
+  }) {
+    final colors = context.colors;
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.photo_library_outlined,
-              size: 72, color: context.colors.borderPrimary),
-          const SizedBox(height: 20),
-          Text('No library selected',
-              style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 24),
-          FilledButton.icon(
-            onPressed: _showSetupDialog,
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('Add Frame Path'),
+          Icon(
+            Icons.photo_library_outlined,
+            size: Sizes.iconSizeHuge,
+            color: colors.textSecondary,
           ),
+          const SpacerMedium(),
+          Text(
+            message,
+            style: Styles.regular(
+              color: colors.textPrimary,
+            ),
+          ),
+          if (button != null) ...[
+            const SpacerExtraLarge(),
+            button,
+          ]
         ],
       ),
     );
