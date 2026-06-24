@@ -86,11 +86,8 @@ class PhotoTile extends StatelessWidget {
     AppThemeColors colors, {
     IconData icon = Icons.hide_image_outlined,
   }) =>
-      Hero(
-        tag: item.id,
-        child: ColoredBox(
-          color: colors.surfacePrimary,
-          child: Icon(icon, color: colors.borderPrimary),
-        ),
+      ColoredBox(
+        color: colors.surfacePrimary,
+        child: Icon(icon, color: colors.borderPrimary),
       );
 }

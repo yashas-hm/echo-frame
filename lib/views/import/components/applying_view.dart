@@ -98,7 +98,7 @@ class _ApplyingViewState extends State<ApplyingView>
                 if (errorCount > 0) ...[
                   const SpacerRegular(),
                   Text(
-                    '($errorCount skipped)',
+                    '($errorCount error)',
                     style: Styles.small(color: colors.errorPrimary),
                   ),
                 ],

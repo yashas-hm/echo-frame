@@ -12,6 +12,8 @@ class ImportState {
     this.total = 0,
     this.scanningDir,
     this.filesFound = 0,
+    this.metaFilesRead = 0,
+    this.metaFilesTotal = 0,
     this.applyErrors = const [],
     this.error,
   });
@@ -24,6 +26,8 @@ class ImportState {
   final int total;
   final String? scanningDir;
   final int filesFound;
+  final int metaFilesRead;
+  final int metaFilesTotal;
   final List<DiscoveryError> applyErrors;
   final String? error;
 
@@ -36,6 +40,8 @@ class ImportState {
     int? total,
     String? scanningDir,
     int? filesFound,
+    int? metaFilesRead,
+    int? metaFilesTotal,
     List<DiscoveryError>? applyErrors,
     String? error,
   }) =>
@@ -48,6 +54,8 @@ class ImportState {
         total: total ?? this.total,
         scanningDir: scanningDir ?? this.scanningDir,
         filesFound: filesFound ?? this.filesFound,
+        metaFilesRead: metaFilesRead ?? this.metaFilesRead,
+        metaFilesTotal: metaFilesTotal ?? this.metaFilesTotal,
         applyErrors: applyErrors ?? this.applyErrors,
         error: error ?? this.error,
       );

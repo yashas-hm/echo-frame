@@ -36,47 +36,79 @@ class _DiscoveringViewState extends State<DiscoveringView>
 
   @override
   Widget build(BuildContext context) {
-    final dir = widget.state.scanningDir;
-    final label = dir ?? widget.state.destRoot ?? '';
     final colors = context.colors;
+    final state = widget.state;
+
+    if (state.metaFilesTotal > 0) {
+      return Center(
+        child: SizedBox(
+          width: Sizes.viewBoxWidth,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Reading metadata',
+                style: Styles.subtitle(color: colors.textPrimary),
+              ),
+              const SpacerMedium(),
+              LinearProgressIndicator(
+                value: state.metaFilesRead / state.metaFilesTotal,
+              ),
+              const SpacerRegular(),
+              Text(
+                '${state.metaFilesRead} / ${state.metaFilesTotal} ${'file'.plural(state.metaFilesTotal)}',
+                style: Styles.regular(color: colors.textPrimary),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final dir = state.scanningDir;
 
     return Center(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedBuilder(
-            animation: _animCtr,
-            builder: (_, child) => Transform.translate(
-              offset: _offsetAnim.value,
-              child: child,
+      child: SizedBox(
+        width: Sizes.viewBoxWidth,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedBuilder(
+              animation: _animCtr,
+              builder: (_, child) => Transform.translate(
+                offset: _offsetAnim.value,
+                child: child,
+              ),
+              child: Icon(
+                Icons.search_rounded,
+                size: Sizes.iconSizeHuge,
+                color: colors.primaryColor,
+              ),
             ),
-            child: Icon(
-              Icons.search_rounded,
-              size: Sizes.iconSizeHuge,
-              color: colors.primaryColor,
-            ),
-          ),
-          const SpacerMedium(),
-          RichText(
-            text: TextSpan(
-              text: 'Scanning ',
-              style: Styles.subtitle(color: colors.textPrimary),
-              children: [
-                TextSpan(
-                  text: label,
-                  style: Styles.subTitleBold(color: colors.textPrimary),
-                ),
-              ],
-            ),
-          ),
-          const SpacerSmall(),
-          if (widget.state.filesFound > 0)
+            const SpacerMedium(),
             Text(
-              '${widget.state.filesFound} ${'file'.plural(widget.state.filesFound)} found',
-              style: Styles.smallRegular(color: colors.textSecondary),
+              'Finding media',
+              style: Styles.subtitle(color: colors.textPrimary),
             ),
-        ],
+            const SpacerSmall(),
+            const LinearProgressIndicator(),
+            const SpacerSmall(),
+            if (state.filesFound > 0)
+              Text(
+                '${state.filesFound} ${'file'.plural(state.filesFound)} found',
+                style: Styles.smallRegular(color: colors.textSecondary),
+              ),
+            if (dir != null) ...[
+              const SpacerExtraSmall(),
+              Text(
+                dir,
+                style: Styles.small(color: colors.textSecondary),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

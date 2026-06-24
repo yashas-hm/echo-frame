@@ -26,6 +26,8 @@ class ImportNotifier extends Notifier<ImportState> {
       sourceDir: sourceDir,
       filesFound: 0,
       scanningDir: null,
+      metaFilesRead: 0,
+      metaFilesTotal: 0,
     );
 
     try {
@@ -35,8 +37,9 @@ class ImportNotifier extends Notifier<ImportState> {
       )) {
         switch (event) {
           case DiscoverScanning(:final dirName, :final filesFound):
-            state =
-                state.copyWith(scanningDir: dirName, filesFound: filesFound);
+            state = state.copyWith(scanningDir: dirName, filesFound: filesFound);
+          case DiscoverReading(:final done, :final total):
+            state = state.copyWith(metaFilesRead: done, metaFilesTotal: total);
           case DiscoverDone(:final plan):
             state = state.copyWith(phase: ImportPhase.review, plan: plan);
         }

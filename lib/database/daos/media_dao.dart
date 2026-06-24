@@ -176,6 +176,16 @@ class MediaDao {
         )
       ]);
 
+  /// Single SQLite transaction for a bulk import. Prefer over calling
+  /// [upsertMeta] in a loop — 12k individual transactions vs one is the
+  /// difference between seconds and minutes.
+  Future<void> upsertBulk(
+    List<(Metadata, String, String)> items,
+  ) =>
+      _upsertBatch(
+        items.map((t) => _toCompanion(t.$1, t.$2, t.$3)).toList(),
+      );
+
   Future<void> _upsertBatch(List<MediaRecordsCompanion> companions) =>
       _db.batch(
         (b) {

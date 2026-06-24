@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/folder_tree.dart';
+import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/services/importing/import_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
 import 'package:intl/intl.dart';
@@ -22,7 +23,11 @@ class OrganizerService extends ImportService {
       );
     }
 
-    final mmpByPath = await fetchMetadata(allMediaPaths);
+    var mmpByPath = <String, Metadata>{};
+    await for (final reading in fetchMetadata(allMediaPaths)) {
+      yield reading;
+      if (reading.result != null) mmpByPath = reading.result!;
+    }
 
     final planned = <DiscoveryData>[];
     final discoveryErrors = <DiscoveryError>[];

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:echo_frame/models/discovery/discovery.dart';
 import 'package:echo_frame/models/discovery/takeout_sidecar.dart';
+import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/models/folder_tree.dart';
 import 'package:echo_frame/services/importing/import_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
@@ -16,43 +17,60 @@ class TakeoutService extends ImportService {
     required String destRoot,
   }) async* {
     final allMediaPaths = <String>[];
-    final sidecarMap = <String, TakeoutSidecar>{};
+    // mediaFilename → all sidecar full paths across the entire tree.
+    // Keyed by media name (e.g. "photo.jpg") not sidecar name ("photo.jpg.json")
+    // so matching is O(1) per media file instead of a linear scan.
+    final jsonByMediaName = <String, List<String>>{};
 
     await for (final scan in DirUtils.walk(sourceDir)) {
       allMediaPaths.addAll(scan.mediaPaths);
-
+      for (final entry in scan.jsonByName.entries) {
+        final jsonName = entry.key;
+        if (!jsonName.endsWith('.json')) continue;
+        final mediaName = jsonName.substring(0, jsonName.length - 5);
+        jsonByMediaName.putIfAbsent(mediaName, () => []).add(entry.value);
+      }
       yield DiscoverScanning(
         dirName: scan.dirName,
         filesFound: allMediaPaths.length,
       );
+    }
 
-      for (final mediaPath in scan.mediaPaths) {
-        final filename = mediaPath.split('/').last;
-        final sidecarEntry = scan.jsonByName.entries
-            .where((j) =>
-                j.key.startsWith('$filename.') && j.key.endsWith('.json'))
-            .firstOrNull;
+    // O(N) matching: prefer same-directory sidecar, fall back to any match.
+    final sidecarPaths = <String, String>{};
+    for (final mediaPath in allMediaPaths) {
+      final filename = mediaPath.split('/').last;
+      final candidates = jsonByMediaName[filename];
+      if (candidates == null || candidates.isEmpty) continue;
+      final mediaDir = mediaPath.substring(0, mediaPath.lastIndexOf('/'));
+      sidecarPaths[mediaPath] = candidates.firstWhere(
+        (p) => p.startsWith('$mediaDir/'),
+        orElse: () => candidates.first,
+      );
+    }
 
-        if (sidecarEntry != null) {
-          try {
-            final raw = File(sidecarEntry.value).readAsStringSync();
-            final json = jsonDecode(raw) as Map<String, dynamic>;
-            if (json['photoTakenTime'] != null ||
-                json['creationTime'] != null) {
-              sidecarMap[mediaPath] = TakeoutSidecar.fromJson(json);
-            }
-          } catch (e, st) {
-            dev.log(
-              'Failed to parse sidecar ${sidecarEntry.value}: $e',
-              stackTrace: st,
-              name: 'TakeoutService.discover',
-            );
-          }
+    final sidecarMap = <String, TakeoutSidecar>{};
+    for (final entry in sidecarPaths.entries) {
+      try {
+        final raw = await File(entry.value).readAsString();
+        final json = jsonDecode(raw) as Map<String, dynamic>;
+        if (json['photoTakenTime'] != null || json['creationTime'] != null) {
+          sidecarMap[entry.key] = TakeoutSidecar.fromJson(json);
         }
+      } catch (e, st) {
+        dev.log(
+          'Failed to parse sidecar ${entry.value}: $e',
+          stackTrace: st,
+          name: 'TakeoutService.discover',
+        );
       }
     }
 
-    final mmpByPath = await fetchMetadata(allMediaPaths);
+    var mmpByPath = <String, Metadata>{};
+    await for (final reading in fetchMetadata(allMediaPaths)) {
+      yield reading;
+      if (reading.result != null) mmpByPath = reading.result!;
+    }
 
     final planned = <DiscoveryData>[];
     final discoveryErrors = <DiscoveryError>[];

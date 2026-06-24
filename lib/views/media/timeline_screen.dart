@@ -12,6 +12,7 @@ import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtensions, Prefs;
+import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/media/components/loading_view.dart';
 import 'package:echo_frame/views/media/components/media_list_view.dart';
 import 'package:echo_frame/views/media/components/search_bar.dart';
@@ -177,6 +178,13 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                   message: timeline.query.isEmpty
                       ? 'Import some photos to see them here'
                       : 'Try a different search term',
+                  button: timeline.query.isEmpty
+                      ? EFPrimaryButton(
+                          onPressed: ()=>context.push(ImportScreen.path),
+                          text: 'Import Media',
+                          icon: Icons.add_rounded,
+                        )
+                      : null,
                 );
               }
               return MediaListView(

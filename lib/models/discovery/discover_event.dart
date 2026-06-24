@@ -9,6 +9,16 @@ class DiscoverScanning extends DiscoverEvent {
   final int filesFound;
 }
 
+class DiscoverReading extends DiscoverEvent {
+  DiscoverReading({required this.done, required this.total, this.result});
+
+  final int done;
+  final int total;
+
+  /// Null on intermediate progress events; the completed map on the final event.
+  final Map<String, Metadata>? result;
+}
+
 class DiscoverDone extends DiscoverEvent {
   DiscoverDone({required this.plan});
 

@@ -17,7 +17,7 @@ class DirUtils {
 
       List<FileSystemEntity> entries;
       try {
-        entries = dir.listSync();
+        entries = await dir.list().toList();
       } catch (e, st) {
         dev.log(
           'Failed to list ${dir.path}: $e',
