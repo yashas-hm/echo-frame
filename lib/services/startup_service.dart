@@ -18,7 +18,16 @@ class StartupService {
 
     final root = Prefs.activeLibraryRoot;
     if (root != null) {
-      await EchoDatabase.open(root);
+      try {
+        await EchoDatabase.open(root);
+      } catch (e, st) {
+        Prefs.activeLibraryRoot = null;
+        dev.log(
+          'Library root inaccessible at startup — drive may be unmounted: $e',
+          stackTrace: st,
+          name: 'StartupService.initialize',
+        );
+      }
     }
   }
 
