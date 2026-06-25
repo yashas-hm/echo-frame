@@ -14,4 +14,5 @@ final class Keys {
 
   static const String thumbsFolderName = '.echothumbs';
   static const String trashFolderName = '.echotrash';
+  static const String dbFileName = 'echo.db';
 }

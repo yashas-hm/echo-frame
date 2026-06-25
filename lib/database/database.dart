@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/database/schemas/media_schema.dart';
 import 'package:echo_frame/database/schemas/media_tag_schema.dart';
 import 'package:echo_frame/database/schemas/tag_schema.dart';
@@ -46,7 +47,7 @@ class EchoDatabase extends _$EchoDatabase {
   static Future<void> open(String libraryRoot) async {
     final dir = Directory(echoframeDir(libraryRoot));
     await dir.create(recursive: true);
-    final file = File('${dir.path}/echo.db');
+    final file = File('${dir.path}/${Keys.dbFileName}');
     _instance = EchoDatabase(NativeDatabase.createInBackground(file));
   }
 

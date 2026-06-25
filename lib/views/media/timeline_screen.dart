@@ -88,7 +88,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
       title: 'Choose your photo library',
       description: 'EchoFrame keeps your photos organised in a YYYY/MonthName '
           'folder structure on your drive. Select the root folder where your '
-          'photos are stored — or where you\'d like them organised.',
+          'photos are stored or where you\'d like them organised.',
       confirmText: 'Choose Folder',
       cancelText: 'Not now',
     );
@@ -102,7 +102,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     if (path == null || !mounted) return;
 
     final echoframeDir = EchoDatabase.echoframeDir(path);
-    final isExisting = File('$echoframeDir/echo.db').existsSync();
+    final isExisting = File('$echoframeDir/${Keys.dbFileName}').existsSync();
 
     if (!isExisting) {
       await Directory(echoframeDir).create(recursive: true);
