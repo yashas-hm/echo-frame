@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class TrashScreen extends ConsumerStatefulWidget {
+class TrashScreen extends ConsumerWidget {
   const TrashScreen({super.key});
 
   static const String path = '/trash';
@@ -22,33 +22,7 @@ class TrashScreen extends ConsumerStatefulWidget {
       );
 
   @override
-  ConsumerState<TrashScreen> createState() => _TrashScreenState();
-}
-
-class _TrashScreenState extends ConsumerState<TrashScreen> {
-  final _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 300) {
-      ref.read(trashProvider.notifier).loadNextPage();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final trashAsync = ref.watch(trashProvider);
 
     return Scaffold(
@@ -78,7 +52,6 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
           }
           return MediaListView(
             state: trash,
-            scrollController: _scrollController,
             source: MediaCollectionSource.trash,
             searchEnabled: false,
           );

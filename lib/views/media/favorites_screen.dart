@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class FavoritesScreen extends ConsumerStatefulWidget {
+class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
 
   static const String path = '/favorites';
@@ -24,33 +24,7 @@ class FavoritesScreen extends ConsumerStatefulWidget {
       );
 
   @override
-  ConsumerState<FavoritesScreen> createState() => _FavoritesScreenState();
-}
-
-class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
-  final _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 300) {
-      ref.read(favoritesProvider.notifier).loadNextPage();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final favoriteAsync = ref.watch(favoritesProvider);
 
     return Scaffold(
@@ -82,7 +56,6 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               }
               return MediaListView(
                 state: favorite,
-                scrollController: _scrollController,
                 source: MediaCollectionSource.favorites,
               );
             },

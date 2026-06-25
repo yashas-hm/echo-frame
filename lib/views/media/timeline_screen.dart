@@ -42,7 +42,6 @@ class TimelineScreen extends ConsumerStatefulWidget {
 class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   bool _hasLibrary = false;
   IndexingProgress? _progress;
-  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -55,7 +54,6 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
         _showSetupDialog();
       }
     });
-    _scrollController.addListener(_onScroll);
   }
 
   Future<void> _startupIndex() async {
@@ -67,19 +65,6 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
       setState(() => _progress = progress.isDone ? null : progress);
     }
     if (mounted) ref.invalidate(timelineProvider);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 300) {
-      ref.read(timelineProvider.notifier).loadNextPage();
-    }
   }
 
   Future<void> _showSetupDialog() async {
@@ -180,7 +165,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                       : 'Try a different search term',
                   button: timeline.query.isEmpty
                       ? EFPrimaryButton(
-                          onPressed: ()=>context.push(ImportScreen.path),
+                          onPressed: () => context.push(ImportScreen.path),
                           text: 'Import Media',
                           icon: Icons.add_rounded,
                         )
@@ -189,7 +174,6 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
               }
               return MediaListView(
                 state: timeline,
-                scrollController: _scrollController,
                 source: MediaCollectionSource.timeline,
               );
             },
