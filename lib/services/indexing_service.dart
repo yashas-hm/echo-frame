@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
+import 'package:echo_frame/models/metadata.dart';
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
@@ -82,28 +83,29 @@ class IndexingService {
     String libraryRoot,
   ) async {
     final metas = await MetadataService.readAll(paths);
+    final toUpsert = <(Metadata, String, String)>[];
+
     for (int i = 0; i < paths.length; i++) {
       final m = metas[i];
       if (m == null) {
-        dev.log(
-          'No metadata for ${paths[i]}',
-          name: 'IndexingService',
-        );
+        dev.log('No metadata for ${paths[i]}', name: 'IndexingService');
         continue;
       }
       if (DirUtils.isVideo(paths[i])) {
         await ThumbnailService.generate(paths[i]);
       }
+      toUpsert.add((m, paths[i], libraryRoot));
+    }
 
-      try {
-        await MediaDao.instance.upsertMeta(m, paths[i], libraryRoot);
-      } catch (e, st) {
-        dev.log(
-          'upsertMeta failed for ${paths[i]}: $e',
-          stackTrace: st,
-          name: 'IndexingService',
-        );
-      }
+    if (toUpsert.isEmpty) return;
+    try {
+      await MediaDao.instance.upsertBulk(toUpsert);
+    } catch (e, st) {
+      dev.log(
+        'Bulk upsert failed: $e',
+        stackTrace: st,
+        name: 'IndexingService._fetchAndUpsert',
+      );
     }
   }
 }

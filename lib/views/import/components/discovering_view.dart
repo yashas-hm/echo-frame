@@ -39,33 +39,6 @@ class _DiscoveringViewState extends State<DiscoveringView>
     final colors = context.colors;
     final state = widget.state;
 
-    if (state.metaFilesTotal > 0) {
-      return Center(
-        child: SizedBox(
-          width: Sizes.viewBoxWidth,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Reading metadata',
-                style: Styles.subtitle(color: colors.textPrimary),
-              ),
-              const SpacerMedium(),
-              LinearProgressIndicator(
-                value: state.metaFilesRead / state.metaFilesTotal,
-              ),
-              const SpacerRegular(),
-              Text(
-                '${state.metaFilesRead} / ${state.metaFilesTotal} ${'file'.plural(state.metaFilesTotal)}',
-                style: Styles.regular(color: colors.textPrimary),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     final dir = state.scanningDir;
 
     return Center(

@@ -54,35 +54,16 @@ abstract class ImportService {
     required String destRoot,
   });
 
-  Future<List<bool>> _copyBatch(List<DiscoveryData> items) =>
-      Future.wait(items.map((item) async {
-        try {
-          await File(item.mediaPath).copy(item.destPath);
-          return true;
-        } catch (e, st) {
-          dev.log(
-            'Copy failed for ${item.mediaPath}: $e',
-            stackTrace: st,
-            name: '$runtimeType._copyBatch',
-          );
-          return false;
-        }
-      }));
-
   /// Shared apply — copies files, writes DB records, generates thumbnails.
   /// Copy is the only fatal step; DB/thumbnail failures are logged and skipped.
-  ///
-  /// Copies run [kCopyConcurrency] at a time. The next batch's copies are fired
-  /// immediately after the current batch's results arrive, so file I/O overlaps
-  /// with sequential FFmpeg thumbnail generation. DB writes are batched into a
-  /// single transaction at the end to avoid 12k individual SQLite commits.
+  /// DB writes are flushed in a single transaction every [kDbBatchSize] files.
   Stream<ImportProgress> apply({
     required DiscoveryResult plan,
     required String libraryRoot,
   }) async* {
     if (plan.items.isEmpty) return;
 
-    const kCopyConcurrency = 8;
+    const kDbBatchSize = 100;
     int imported = 0;
     final applyErrors = <DiscoveryError>[];
     final dbItems = <(Metadata, String)>[];
@@ -106,72 +87,63 @@ abstract class ImportService {
       ),
     );
 
-    // Pipeline: kick off the first batch before the loop so the next batch's
-    // copies always run concurrently with thumbnail generation (FFmpeg stays
-    // single-threaded within the sequential inner loop).
-    var batchStart = 0;
-    var pendingCopy = _copyBatch(items.sublist(0, kCopyConcurrency.clamp(0, total)));
-
-    while (batchStart < total) {
-      final batchEnd = (batchStart + kCopyConcurrency).clamp(0, total);
-      final batch = items.sublist(batchStart, batchEnd);
-      final copyOk = await pendingCopy;
-
-      // Fire next batch immediately before processing thumbnails.
-      final nextStart = batchEnd;
-      if (nextStart < total) {
-        final nextEnd = (nextStart + kCopyConcurrency).clamp(0, total);
-        pendingCopy = _copyBatch(items.sublist(nextStart, nextEnd));
+    for (final item in items) {
+      try {
+        await File(item.mediaPath).copy(item.destPath);
+      } catch (e, st) {
+        dev.log(
+          'Copy failed for ${item.mediaPath}: $e',
+          stackTrace: st,
+          name: '$runtimeType.apply',
+        );
+        applyErrors.add(DiscoveryError(
+          sourcePath: item.mediaPath,
+          reason: 'File Copy Error',
+        ));
+        continue;
       }
 
-      for (int i = 0; i < batch.length; i++) {
-        final item = batch[i];
-        if (!copyOk[i]) {
+      imported++;
+
+      if (DirUtils.isVideo(item.destPath)) {
+        final thumb = await ThumbnailService.generate(item.destPath);
+        if (thumb == null) {
           applyErrors.add(DiscoveryError(
-            sourcePath: item.mediaPath,
-            reason: 'File Copy Error',
+            sourcePath: item.destPath,
+            reason: 'Thumbnail Generation Failed',
           ));
-          continue;
         }
+      }
 
-        imported++;
+      dbItems.add((item.meta, item.destPath));
 
-        if (DirUtils.isVideo(item.destPath)) {
-          final thumb = await ThumbnailService.generate(item.destPath);
-          if (thumb == null) {
-            applyErrors.add(DiscoveryError(
-              sourcePath: item.destPath,
-              reason: 'Thumbnail Generation Failed',
-            ));
-          }
-        }
-
-        dbItems.add((item.meta, item.destPath));
+      if (dbItems.length >= kDbBatchSize) {
+        await _upsertDb(dbItems, libraryRoot);
+        dbItems.clear();
       }
 
       yield ImportProgress(
         imported: imported,
         total: total,
-        currentFile: batch.last.filename,
+        currentFile: item.filename,
         errors: List.unmodifiable(applyErrors),
       );
-
-      batchStart = nextStart;
     }
 
-    // Single SQLite transaction for all successful copies.
-    if (dbItems.isNotEmpty) {
-      try {
-        await MediaDao.instance.upsertBulk(
-          dbItems.map((t) => (t.$1, t.$2, libraryRoot)).toList(),
-        );
-      } catch (e, st) {
-        dev.log(
-          'Bulk DB write failed: $e',
-          stackTrace: st,
-          name: '$runtimeType.apply',
-        );
-      }
+    if (dbItems.isNotEmpty) await _upsertDb(dbItems, libraryRoot);
+  }
+
+  Future<void> _upsertDb(List<(Metadata, String)> items, String libraryRoot) async {
+    try {
+      await MediaDao.instance.upsertBulk(
+        items.map((t) => (t.$1, t.$2, libraryRoot)).toList(),
+      );
+    } catch (e, st) {
+      dev.log(
+        'Bulk DB write failed: $e',
+        stackTrace: st,
+        name: '$runtimeType._flushDb',
+      );
     }
   }
 }

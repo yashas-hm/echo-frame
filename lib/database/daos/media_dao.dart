@@ -163,19 +163,6 @@ class MediaDao {
 
   // ── Writes ────────────────────────────────────────────────────────────────
 
-  Future<void> upsertMeta(
-    Metadata meta,
-    String absolutePath,
-    String libraryRoot,
-  ) =>
-      _upsertBatch([
-        _toCompanion(
-          meta,
-          absolutePath,
-          libraryRoot,
-        )
-      ]);
-
   /// Single SQLite transaction for a bulk import. Prefer over calling
   /// [upsertMeta] in a loop — 12k individual transactions vs one is the
   /// difference between seconds and minutes.
