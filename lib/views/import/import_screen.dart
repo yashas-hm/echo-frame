@@ -21,6 +21,7 @@ part 'components/done_view.dart';
 part 'components/error_list.dart';
 part 'components/folder_tree_preview.dart';
 part 'components/idle_view.dart';
+part 'components/meta_read_view.dart';
 part 'components/review_view.dart';
 part 'components/type_selection_view.dart';
 
@@ -69,6 +70,7 @@ class _OrganizerScreenState extends ConsumerState<ImportScreen> {
               onBackPressed: () => setState(() => _importType = null),
             ),
           ImportPhase.discovering => DiscoveringView(state),
+          ImportPhase.metaRead => MetaReadView(state),
           ImportPhase.review => ReviewView(state, _importType!),
           ImportPhase.applying => ApplyingView(state),
           ImportPhase.done => DoneView(state, _importType!),
