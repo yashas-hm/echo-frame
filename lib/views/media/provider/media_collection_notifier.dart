@@ -17,80 +17,73 @@ abstract class MediaCollectionNotifier
   bool get isTrashedFilter => source.isTrashedFilter;
 
   @override
-  Future<MediaCollectionState> build() => _fetch(offset: 0, query: '');
+  Future<MediaCollectionState> build() =>
+      loadNextPage(MediaCollectionState.initialize());
 
-  Future<void> loadNextPage() async {
-    final current = state.value;
-    if (current == null || !current.hasMore || current.isLoadingMore) return;
-    state = AsyncData(current.copyWith(isLoadingMore: true));
-    final items = await MediaDao.instance.queryPage(
-      offset: current.loaded.length,
-      limit: _pageSize,
-      query: current.query.isEmpty ? null : current.query,
-      isFavorite: isFavoriteFilter,
-      isTrashed: isTrashedFilter,
+  Future<MediaCollectionState> loadNextPage(
+      [MediaCollectionState? base]) async {
+    final current = base ?? state.value;
+    if (current == null || !current.hasMore || current.isLoadingMore) {
+      return current ?? MediaCollectionState.initialize();
+    }
+    if (base == null) state = AsyncData(current.copyWith(isLoadingMore: true));
+    final items = await _queryPage(
+      offset: current.flatItems.length,
+      query: current.query,
     );
-    state = AsyncData(current.copyWith(
-      loaded: [...current.loaded, ...items],
+    final next = current.copyWith(
+      items: {...current._items, for (final item in items) item.id: item},
       hasMore: items.length == _pageSize,
       isLoadingMore: false,
-    ));
+    );
+    if (base == null) state = AsyncData(next);
+    return next;
   }
 
   void syncItem(MediaItem item) {
     final current = state.value;
     if (current == null) return;
-    // TODO: O(n) scan — consider maintaining an id→index map alongside `loaded`
-    final idx = current.loaded.indexWhere((e) => e.id == item.id);
 
+    final exists = current._items.containsKey(item.id);
     final shouldRemove =
         (item.isFavorite == false && isFavoriteFilter == true) ||
             (item.isTrashed == true && isTrashedFilter == false) ||
             (item.isTrashed == false && isTrashedFilter == true);
 
-    if (idx == -1 && shouldRemove) return;
+    if (!exists && shouldRemove) return;
 
-    final updated = List<MediaItem>.of(current.loaded);
-    if (idx == -1) {
-      final insertAt = updated.indexWhere(
-        (e) => e.capturedAt.isBefore(item.capturedAt),
-      );
-      if (insertAt == -1) {
-        updated.add(item);
-      } else {
-        updated.insert(insertAt, item);
-      }
-    } else if (shouldRemove) {
-      updated.removeAt(idx);
+    final updated = Map<String, MediaItem>.of(current._items);
+    if (shouldRemove) {
+      updated.remove(item.id);
     } else {
-      updated[idx] = item;
+      updated[item.id] = item;
     }
-    state = AsyncData(current.copyWith(loaded: updated));
+    state = AsyncData(current.copyWith(items: updated));
   }
 
   Future<void> setQuery(String query) async {
     state = const AsyncLoading();
-    state = AsyncData(await _fetch(offset: 0, query: query));
+    final next = await loadNextPage(
+      MediaCollectionState(
+        items: const {},
+        hasMore: true,
+        query: query,
+      ),
+    );
+    state = AsyncData(next);
   }
 
-  Future<MediaCollectionState> _fetch({
+  Future<List<MediaItem>> _queryPage({
     required int offset,
     required String query,
-  }) async {
-    if (!EchoDatabase.isOpen) {
-      return const MediaCollectionState(loaded: [], hasMore: false);
-    }
-    final items = await MediaDao.instance.queryPage(
+  }) {
+    if (!EchoDatabase.isOpen) return Future.value([]);
+    return MediaDao.instance.queryPage(
       offset: offset,
       limit: _pageSize,
       query: query.isEmpty ? null : query,
       isFavorite: isFavoriteFilter,
       isTrashed: isTrashedFilter,
-    );
-    return MediaCollectionState(
-      loaded: items,
-      hasMore: items.length == _pageSize,
-      query: query,
     );
   }
 }

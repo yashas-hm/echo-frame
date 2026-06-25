@@ -14,23 +14,36 @@ enum MediaCollectionSource {
 }
 
 class MediaCollectionState {
-  const MediaCollectionState({
-    required this.loaded,
+  MediaCollectionState({
+    required Map<String, MediaItem> items,
     required this.hasMore,
     this.isLoadingMore = false,
     this.query = '',
-  });
+  }) : _items = items {
+    flatItems = _items.values.toList()
+      ..sort((a, b) => b.capturedAt.compareTo(a.capturedAt));
+  }
 
-  final List<MediaItem> loaded;
+  MediaCollectionState._presorted({
+    required Map<String, MediaItem> items,
+    required List<MediaItem> sorted,
+    required this.hasMore,
+    required this.isLoadingMore,
+    required this.query,
+  })  : _items = items,
+        flatItems = sorted;
+
+  late final List<MediaItem> flatItems;
+  final Map<String, MediaItem> _items;
   final bool hasMore;
   final bool isLoadingMore;
   final String query;
 
-  List<MediaItem> get flatItems => loaded;
+  late final List<MonthData> byMonth = _buildByMonth();
 
-  List<MonthData> get byMonth {
+  List<MonthData> _buildByMonth() {
     final map = <(int, int), List<MediaItem>>{};
-    for (final item in loaded) {
+    for (final item in flatItems) {
       final key = (item.capturedAt.year, item.capturedAt.month);
       (map[key] ??= []).add(item);
     }
@@ -39,16 +52,29 @@ class MediaCollectionState {
         .toList();
   }
 
+  factory MediaCollectionState.initialize() =>
+      MediaCollectionState(items: {}, hasMore: true);
+
   MediaCollectionState copyWith({
-    List<MediaItem>? loaded,
+    Map<String, MediaItem>? items,
     bool? hasMore,
     bool? isLoadingMore,
     String? query,
-  }) =>
-      MediaCollectionState(
-        loaded: loaded ?? this.loaded,
+  }) {
+    if (items == null) {
+      return MediaCollectionState._presorted(
+        items: _items,
+        sorted: flatItems,
         hasMore: hasMore ?? this.hasMore,
         isLoadingMore: isLoadingMore ?? this.isLoadingMore,
         query: query ?? this.query,
       );
+    }
+    return MediaCollectionState(
+      items: items,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      query: query ?? this.query,
+    );
+  }
 }

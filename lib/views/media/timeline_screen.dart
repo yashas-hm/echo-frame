@@ -169,7 +169,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
               );
             },
             data: (timeline) {
-              if (timeline.loaded.isEmpty) {
+              if (timeline.flatItems.isEmpty) {
                 return EmptyView(
                   icon: Icons.photo_library_outlined,
                   title: timeline.query.isEmpty
