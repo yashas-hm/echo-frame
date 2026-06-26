@@ -70,10 +70,9 @@ class _EFSearchBarState extends State<EFSearchBar> {
     final colors = context.colors;
     return Container(
       height: Sizes.inputHeight,
+      width: context.width * 0.7,
       margin: EdgeInsets.only(
-        top: Sizes.edgePadding,
         right: Sizes.edgePadding,
-        left: Sizes.edgePadding,
       ),
       alignment: Alignment.center,
       child: ClipRRect(

@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:echo_frame/components/empty_view.dart';
 import 'package:echo_frame/components/error_view.dart';
+import 'package:echo_frame/constants/constants.dart' show Sizes;
 import 'package:echo_frame/views/media/components/loading_view.dart';
 import 'package:echo_frame/views/media/components/media_list_view.dart';
 import 'package:echo_frame/views/media/components/search_bar.dart';
@@ -61,9 +62,8 @@ class FavoritesScreen extends ConsumerWidget {
             },
           ),
           Positioned(
-            top: 0,
+            top: Sizes.edgePadding,
             left: 0,
-            right: 0,
             child: EFSearchBar(
               focusNode: ref.read(searchFocusProvider),
               initialQuery: favoriteAsync.value?.query ?? '',

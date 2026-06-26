@@ -1,15 +1,12 @@
-import 'dart:ui';
-
 import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart';
-import 'package:echo_frame/views/import/import_screen.dart';
 import 'package:echo_frame/views/media/favorites_screen.dart';
 import 'package:echo_frame/views/media/timeline_screen.dart';
 import 'package:echo_frame/views/media/trash_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart' show SvgPicture;
 import 'package:go_router/go_router.dart';
 
 typedef _NavDestination = ({String route, IconData icon, String label});
@@ -22,19 +19,16 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  bool _isCollapsed = false;
-  bool _showContent = true;
-
-  static const double _collapsedWidth = 30;
-  static const double _collapsedHeight = 60;
-  static const Duration _duration = Durations.short4;
-  static const Curve _curve = Curves.easeInOut;
-
   static const List<_NavDestination> _destinations = [
     (
       route: TimelineScreen.path,
       icon: Icons.grid_view_rounded,
       label: 'Library'
+    ),
+    (
+      route: 'TODO',
+      icon: Icons.photo_album_outlined,
+      label: 'Albums'
     ),
     (
       route: FavoritesScreen.path,
@@ -46,128 +40,105 @@ class _NavBarState extends State<NavBar> {
       icon: Icons.delete_outline_rounded,
       label: 'Trash',
     ),
-    (
-      route: ImportScreen.path,
-      icon: Icons.add_rounded,
-      label: 'Import',
-    ),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => Future.delayed(
-        Durations.extralong1,
-        () => _onExit(null),
-      ),
-    );
-  }
-
-  void _onEnter(PointerEnterEvent _) => setState(() => _isCollapsed = false);
-
-  void _onExit(PointerExitEvent? _) {
-    setState(() {
-      _isCollapsed = true;
-      _showContent = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final showLabel = Prefs.showNavLabel;
-    final expandedHeight = context.height * 0.8;
     final currentRoute = GoRouterState.of(context).uri.path;
 
-    return Align(
-      alignment: Alignment.centerRight,
-      child: MouseRegion(
-        onEnter: _onEnter,
-        onExit: _onExit,
-        child: Container(
-          alignment: Alignment.centerRight,
-          height: _isCollapsed ? expandedHeight * 0.5 : expandedHeight,
-          width: Sizes.navBarWidth / (_isCollapsed ? 2 : 1),
-          child: AnimatedContainer(
-            duration: _duration,
-            curve: _curve,
-            width: _isCollapsed ? _collapsedWidth : Sizes.navBarWidth,
-            height: _isCollapsed ? _collapsedHeight : expandedHeight,
-            onEnd: () {
-              if (!_isCollapsed) setState(() => _showContent = true);
-            },
-            margin: EdgeInsets.all(Sizes.spacingMedium),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: colors.textPrimary.withValues(alpha: 0.2),
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(Sizes.navBarWidth),
-              color: colors.textPrimary.withValues(alpha: 0.1),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(Sizes.navBarWidth),
-              child: Stack(
+    return Container(
+      width: Sizes.navBarWidth,
+      height: context.height,
+      padding: EdgeInsets.all(Sizes.edgePadding),
+      color: colors.background,
+      child: Material(
+        color: KnownColors.transparent,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: Sizes.edgePadding,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(Sizes.spacingRegular),
+              child: Row(
+                spacing: Sizes.spacingRegular,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Positioned.fill(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                      child: const SizedBox.expand(),
+                  SvgPicture.asset(
+                    Assets.logoAsset,
+                    height: Sizes.iconSizeLarge,
+                    width: Sizes.iconSizeLarge,
+                    fit: BoxFit.contain,
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      text: 'Echo',
+                      style: Styles.regularBold(color: colors.textPrimary),
+                      children: [
+                        TextSpan(
+                          text: 'Frame',
+                          style: Styles.regular(color: colors.textPrimary),
+                        ),
+                      ],
                     ),
                   ),
-                  if (!_showContent)
-                    Center(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Icon(
-                          Icons.chevron_left,
-                          size: Sizes.iconSizeMedium,
-                          color: colors.onPrimary,
-                        ),
-                      ),
-                    ),
-                  if (_showContent)
-                    Positioned.fill(
-                      child: Padding(
-                        padding: EdgeInsets.all(Sizes.spacingSmallRegular),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  spacing: Sizes.spacingSmall,
-                                  children: [
-                                    for (final dest in _destinations)
-                                      _tappableIcon(
-                                        dest,
-                                        colors,
-                                        showLabel: showLabel,
-                                        currentRoute: currentRoute,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            _tappableIcon(
-                              (
-                                route: SettingsScreen.path,
-                                icon: Icons.settings_outlined,
-                                label: 'Settings',
-                              ),
-                              colors,
-                              showLabel: showLabel,
-                              currentRoute: currentRoute,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),
-          ),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(Sizes.cardPadding),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: colors.textPrimary.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(Sizes.spacingMedium),
+                  color: colors.surfacePrimary,
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                spacing: Sizes.spacingSmallRegular,
+                                children: [
+                                  for (final dest in _destinations)
+                                    _tappableIcon(
+                                      dest,
+                                      colors,
+                                      showLabel: showLabel,
+                                      currentRoute: currentRoute,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          _tappableIcon(
+                            (
+                              route: SettingsScreen.path,
+                              icon: Icons.settings_outlined,
+                              label: 'Settings',
+                            ),
+                            colors,
+                            showLabel: showLabel,
+                            currentRoute: currentRoute,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -180,25 +151,26 @@ class _NavBarState extends State<NavBar> {
     required String currentRoute,
   }) {
     final VoidCallback callback = switch (destination.route) {
-      SettingsScreen.path || ImportScreen.path => () =>
-          context.push(destination.route),
+      SettingsScreen.path => () => context.push(destination.route),
       _ => () => context.go(destination.route),
     };
     return Material(
       color: currentRoute == destination.route
           ? colors.primaryColor.withValues(alpha: 0.6)
           : KnownColors.transparent,
-      shape: const CircleBorder(),
+      borderRadius: BorderRadius.circular(Sizes.maxFinite),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: callback,
         hoverColor: colors.onPrimary.hover,
+        mouseCursor: SystemMouseCursors.click,
         child: Container(
-          margin: EdgeInsets.all(
-            showLabel ? Sizes.iconWLabelPadding : Sizes.iconPadding,
+          margin: EdgeInsets.symmetric(
+            vertical: Sizes.spacingSmall,
+            horizontal: Sizes.spacingRegular,
           ),
           alignment: Alignment.center,
-          child: Column(
+          child: Row(
             spacing: Sizes.spacingExtraSmall,
             children: [
               Icon(
@@ -207,13 +179,10 @@ class _NavBarState extends State<NavBar> {
                 color: colors.onPrimary,
               ),
               if (showLabel)
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    destination.label,
-                    style: Styles.small(
-                      color: colors.onPrimary,
-                    ),
+                Text(
+                  destination.label,
+                  style: Styles.small(
+                    color: colors.onPrimary,
                   ),
                 ),
             ],

@@ -1,7 +1,7 @@
-import 'package:echo_frame/constants/constants.dart' show Assets, Sizes, Styles;
-import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
+import 'package:echo_frame/constants/constants.dart' show Sizes, Styles;
+import 'package:echo_frame/utilities/utilities.dart'
+    show ContextExtensions, Prefs;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:window_manager/window_manager.dart';
 
 class TitleBar extends StatelessWidget {
@@ -25,22 +25,9 @@ class TitleBar extends StatelessWidget {
             horizontal: 80,
           ),
           alignment: Alignment.center,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: Sizes.spacingSmall,
-            children: [
-              SvgPicture.asset(
-                Assets.logoAsset,
-                height: Sizes.iconSizeSmallRegular,
-                width: Sizes.iconSizeSmallRegular,
-                fit: BoxFit.contain,
-              ),
-              Text(
-                'Echo Frame',
-                style: Styles.small(color: context.colors.textSecondary),
-              )
-            ],
+          child: Text(
+            Prefs.activeLibraryRoot ?? 'Select Library',
+            style: Styles.small(color: context.colors.textSecondary),
           ),
         ),
       ),

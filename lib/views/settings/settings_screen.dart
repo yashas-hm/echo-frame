@@ -44,7 +44,7 @@ class SettingsScreen extends ConsumerWidget {
               title: 'Library Root',
               subtitle: settings.activeLibraryRoot ?? 'No library selected',
               colors: colors,
-              actionChild: settings.knownLibraryRoots.isNotEmpty &&
+              actionChild: settings.knownLibraryRoots.isNotEmpty ||
                       settings.activeLibraryRoot != null
                   ? DropdownButton<String>(
                       value: settings.activeLibraryRoot,
@@ -55,6 +55,10 @@ class SettingsScreen extends ConsumerWidget {
                           horizontal: Sizes.spacingRegular),
                       focusColor: KnownColors.transparent,
                       mouseCursor: SystemMouseCursors.click,
+                      hint: Text(
+                        'Select library root',
+                        style: Styles.micro(color: colors.textPrimary),
+                      ),
                       icon: Icon(
                         Icons.arrow_drop_down_rounded,
                         size: Sizes.iconSizeSmall,

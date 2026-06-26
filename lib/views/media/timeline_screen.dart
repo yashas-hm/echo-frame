@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:echo_frame/components/buttons/buttons.dart'
-    show EFPrimaryButton;
+    show EFPrimaryButton, EFIconButton;
 import 'package:echo_frame/components/dialog.dart';
 import 'package:echo_frame/components/empty_view.dart';
 import 'package:echo_frame/components/error_view.dart';
@@ -179,14 +179,30 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
             },
           ),
           Positioned(
-            top: 0,
+            top: Sizes.edgePadding,
             left: 0,
             right: 0,
-            child: EFSearchBar(
-              focusNode: ref.read(searchFocusProvider),
-              initialQuery: timelineAsync.value?.query ?? '',
-              onTextChanged: (q) =>
-                  ref.read(timelineProvider.notifier).setQuery(q),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: EFSearchBar(
+                    focusNode: ref.read(searchFocusProvider),
+                    initialQuery: timelineAsync.value?.query ?? '',
+                    onTextChanged: (q) =>
+                        ref.read(timelineProvider.notifier).setQuery(q),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(right: Sizes.edgePadding),
+                  child: EFIconButton(
+                    icon: Icons.add_rounded,
+                    iconSize: Sizes.iconSizeMedium,
+                    onPressed: () => context.push(ImportScreen.path),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

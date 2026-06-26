@@ -36,8 +36,14 @@ class ShellScreen extends ConsumerWidget {
           Expanded(
             child: Stack(
               children: [
-                Positioned.fill(child: child),
-                if (enableNavBar) NavBar(),
+                Positioned.fill(
+                  child: Row(
+                    children: [
+                      if (enableNavBar) NavBar(),
+                      Expanded(child: child),
+                    ],
+                  ),
+                ),
                 if (enableBackButton)
                   Positioned(
                     top: Sizes.spacingRegular,
