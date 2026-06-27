@@ -161,6 +161,10 @@ class MediaDao {
   Future<void> permanentDelete(String id) =>
       (_db.delete(_db.mediaRecords)..where((r) => r.id.equals(id))).go();
 
+  Future<void> deleteAllTrashed() =>
+      (_db.delete(_db.mediaRecords)..where((r) => r.isTrashed.equals(true)))
+          .go();
+
   // ── Writes ────────────────────────────────────────────────────────────────
 
   /// Single SQLite transaction for a bulk import. Prefer over calling

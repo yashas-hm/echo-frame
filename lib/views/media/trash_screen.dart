@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:echo_frame/components/buttons/buttons.dart';
+import 'package:echo_frame/components/dialog.dart';
 import 'package:echo_frame/components/empty_view.dart';
 import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/constants/constants.dart';
@@ -24,10 +25,28 @@ class TrashScreen extends ConsumerWidget {
         builder: (_, __) => const TrashScreen(),
       );
 
+  Future<void> _onEmptyBin(BuildContext context, WidgetRef ref) async {
+    final confirmed = await EFDialog.show(
+      context,
+      title: 'Empty Bin',
+      description:
+          'All items in the bin will be permanently deleted. This cannot be undone.',
+      confirmText: 'Empty Bin',
+      cancelText: 'Cancel',
+      icon: const Icon(Icons.delete_forever_rounded),
+    );
+    if (confirmed != true) return;
+    final success = await ref.read(trashProvider.notifier).emptyAll();
+    if (!success && context.mounted) {
+      dev.log('Failed to empty bin', name: 'TrashScreen._onEmptyBin');
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final trashAsync = ref.watch(trashProvider);
     final colors = context.colors;
+    final hasItems = trashAsync.value?.flatItems.isNotEmpty ?? false;
 
     return Scaffold(
       body: Padding(
@@ -39,31 +58,43 @@ class TrashScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: Sizes.inputHeight,
-              margin: EdgeInsets.only(
-                right: Sizes.edgePadding,
-              ),
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(Sizes.spacingSmallRegular),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Empty bin directory',
-                    style: Styles.regular(
-                      color: colors.textPrimary,
+            if (hasItems)
+              Container(
+                height: Sizes.inputHeight,
+                margin: EdgeInsets.only(
+                  right: Sizes.edgePadding,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.surfacePrimary,
+                  borderRadius: BorderRadius.circular(Sizes.cardBorderRadius),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.borderPrimary.withValues(alpha: 0.5),
+                      spreadRadius: 0.8,
+                      blurRadius: 4,
+                    )
+                  ],
+                ),
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(Sizes.spacingSmallRegular),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Items in the bin will be permanently deleted',
+                      style: Styles.regular(
+                        color: colors.textPrimary,
+                      ),
                     ),
-                  ),
-                  EFErrorButton(
-                    onPressed: () {},
-                    text: 'Empty Bin',
-                    icon: Icons.delete_outline_rounded,
-                  ),
-                ],
+                    EFErrorButton(
+                      onPressed: () => _onEmptyBin(context, ref),
+                      text: 'Empty Bin',
+                      icon: Icons.delete_outline_rounded,
+                    ),
+                  ],
+                ),
               ),
-            ),
             Flexible(
               child: trashAsync.when(
                 loading: () => const LoadingView(text: 'Loading bin'),

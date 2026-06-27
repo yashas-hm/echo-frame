@@ -80,8 +80,8 @@ class _EFSearchBarState extends State<EFSearchBar> {
         boxShadow: [
           BoxShadow(
             color: colors.borderPrimary.withValues(alpha: 0.5),
-            spreadRadius: 1,
-            blurRadius: 5,
+            spreadRadius: 0.8,
+            blurRadius: 4,
           )
         ],
       ),

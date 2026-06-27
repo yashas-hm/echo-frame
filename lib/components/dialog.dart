@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class EFDialog {
   const EFDialog._();
 
-  static Future<bool?> show(BuildContext context, {
+  static Future<bool?> show(
+    BuildContext context, {
     required String title,
     required String description,
     String confirmText = 'Confirm',
@@ -24,10 +25,17 @@ class EFDialog {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(Sizes.inputBorderRadius),
             ),
-            icon: icon,
-            title: Text(
-              title,
-              style: Styles.regularBold(color: colors.textPrimary),
+            title: Row(
+              spacing: Sizes.spacingSmall,
+              children: [
+                if (icon != null) icon,
+                Expanded(
+                  child: Text(
+                    title,
+                    style: Styles.regularBold(color: colors.textPrimary),
+                  ),
+                ),
+              ],
             ),
             content: SizedBox(
               width: Sizes.viewBoxWidth,

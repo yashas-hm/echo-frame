@@ -60,6 +60,23 @@ class TrashService {
     return true;
   }
 
+  /// Deletes the entire `.echotrash` folder and all its contents.
+  static Future<bool> emptyAll(String libraryRoot) async {
+    final trashDir = Directory('$libraryRoot/${Keys.trashFolderName}');
+    if (!await trashDir.exists()) return true;
+    try {
+      await trashDir.delete(recursive: true);
+      return true;
+    } catch (e, st) {
+      dev.log(
+        'Failed to empty trash directory: $e',
+        stackTrace: st,
+        name: 'TrashService.emptyAll',
+      );
+      return false;
+    }
+  }
+
   /// Returns true if the move succeeded, false otherwise.
   static Future<bool> _move(String from, String to) async {
     try {
