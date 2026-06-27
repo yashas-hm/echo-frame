@@ -14,7 +14,7 @@ class DarkColors extends AppThemeColors {
   Color get secondaryColor => KnownColors.sky400;
 
   @override
-  Color get surfacePrimary => KnownColors.slate800;
+  Color get surfacePrimary => KnownColors.slate900;
 
   @override
   Color get background => KnownColors.slate950;

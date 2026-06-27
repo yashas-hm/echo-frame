@@ -25,11 +25,7 @@ class _NavBarState extends State<NavBar> {
       icon: Icons.grid_view_rounded,
       label: 'Library'
     ),
-    (
-      route: 'TODO',
-      icon: Icons.photo_album_outlined,
-      label: 'Albums'
-    ),
+    (route: 'TODO', icon: Icons.photo_album_outlined, label: 'Albums'),
     (
       route: FavoritesScreen.path,
       icon: Icons.star_border_rounded,
@@ -48,13 +44,17 @@ class _NavBarState extends State<NavBar> {
     final showLabel = Prefs.showNavLabel;
     final currentRoute = GoRouterState.of(context).uri.path;
 
-    return Container(
-      width: Sizes.navBarWidth,
-      height: context.height,
-      padding: EdgeInsets.all(Sizes.edgePadding),
+    return Material(
       color: colors.background,
-      child: Material(
-        color: KnownColors.transparent,
+      child: Container(
+        width: Sizes.navBarWidth,
+        height: context.height,
+        padding: EdgeInsets.fromLTRB(
+          Sizes.edgePadding,
+          Sizes.edgePadding,
+          Sizes.spacingSmall,
+          Sizes.edgePadding,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -91,12 +91,15 @@ class _NavBarState extends State<NavBar> {
               child: Container(
                 padding: EdgeInsets.all(Sizes.cardPadding),
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: colors.textPrimary.withValues(alpha: 0.2),
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(Sizes.spacingMedium),
+                  borderRadius: BorderRadius.circular(Sizes.cardBorderRadius),
                   color: colors.surfacePrimary,
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.borderPrimary.withValues(alpha: 0.5),
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                    )
+                  ],
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Column(
@@ -150,19 +153,19 @@ class _NavBarState extends State<NavBar> {
     bool showLabel = false,
     required String currentRoute,
   }) {
+    final selected = currentRoute == destination.route;
     final VoidCallback callback = switch (destination.route) {
       SettingsScreen.path => () => context.push(destination.route),
       _ => () => context.go(destination.route),
     };
     return Material(
-      color: currentRoute == destination.route
-          ? colors.primaryColor.withValues(alpha: 0.6)
-          : KnownColors.transparent,
+      color: selected ? colors.secondaryColor : KnownColors.transparent,
       borderRadius: BorderRadius.circular(Sizes.maxFinite),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: callback,
-        hoverColor: colors.onPrimary.hover,
+        hoverColor: colors.borderPrimary.hover,
+        splashColor: colors.primaryColor.splash,
         mouseCursor: SystemMouseCursors.click,
         child: Container(
           margin: EdgeInsets.symmetric(
@@ -176,13 +179,13 @@ class _NavBarState extends State<NavBar> {
               Icon(
                 destination.icon,
                 size: Sizes.iconSizeRegular,
-                color: colors.onPrimary,
+                color: selected ? colors.onPrimary : colors.textPrimary,
               ),
               if (showLabel)
                 Text(
                   destination.label,
                   style: Styles.small(
-                    color: colors.onPrimary,
+                    color: selected ? colors.onPrimary : colors.textPrimary,
                   ),
                 ),
             ],

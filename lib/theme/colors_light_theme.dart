@@ -14,7 +14,7 @@ class LightColors extends AppThemeColors {
   Color get secondaryColor => KnownColors.sky500;
 
   @override
-  Color get surfacePrimary => KnownColors.slate200;
+  Color get surfacePrimary => KnownColors.slate100;
 
   @override
   Color get background => KnownColors.slate50;

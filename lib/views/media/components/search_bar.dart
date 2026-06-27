@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:echo_frame/components/buttons/buttons.dart';
 import 'package:echo_frame/constants/constants.dart' show Sizes, Styles;
@@ -75,75 +74,61 @@ class _EFSearchBarState extends State<EFSearchBar> {
         right: Sizes.edgePadding,
       ),
       alignment: Alignment.center,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(100),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: colors.textPrimary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(
-                      color: colors.textPrimary.withValues(alpha: 0.15),
-                      width: 1,
+      decoration: BoxDecoration(
+        color: colors.surfacePrimary,
+        borderRadius: BorderRadius.circular(Sizes.maxFinite),
+        boxShadow: [
+          BoxShadow(
+            color: colors.borderPrimary.withValues(alpha: 0.5),
+            spreadRadius: 1,
+            blurRadius: 5,
+          )
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      padding: EdgeInsets.all(Sizes.spacingSmallRegular),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        spacing: Sizes.spacingExtraSmall,
+        children: [
+          Icon(
+            Icons.search_rounded,
+            color: colors.textSecondary,
+          ),
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              focusNode: widget.focusNode,
+              onChanged: _onChanged,
+              decoration: InputDecoration(
+                fillColor: KnownColors.transparent,
+                hintText: 'Search',
+                hoverColor: KnownColors.transparent,
+                contentPadding: EdgeInsets.zero,
+                border: Styles.borderNone,
+                enabledBorder: Styles.borderNone,
+                focusedBorder: Styles.borderNone,
+                filled: true,
+              ),
+            ),
+          ),
+          ValueListenableBuilder(
+            valueListenable: _controller,
+            builder: (_, value, __) => value.text.isEmpty
+                ? const SizedBox.shrink()
+                : EFIconButton(
+                    icon: Icons.clear_rounded,
+                    onPressed: _clear,
+                    iconPadding: EdgeInsets.all(
+                      Sizes.spacingExtraExtraSmall,
                     ),
+                    iconSize: Sizes.iconSizeSmallRegular,
+                    iconColor: colors.textSecondary,
                   ),
-                ),
-              ),
-            ),
-            Center(
-              child: Padding(
-                padding: EdgeInsets.all(Sizes.spacingSmallRegular),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: Sizes.spacingExtraSmall,
-                  children: [
-                    Icon(
-                      Icons.search_rounded,
-                      color: colors.textSecondary,
-                    ),
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        focusNode: widget.focusNode,
-                        onChanged: _onChanged,
-                        decoration: InputDecoration(
-                          fillColor: KnownColors.transparent,
-                          hintText: 'Search',
-                          hoverColor: KnownColors.transparent,
-                          contentPadding: EdgeInsets.zero,
-                          border: Styles.borderNone,
-                          enabledBorder: Styles.borderNone,
-                          focusedBorder: Styles.borderNone,
-                          filled: true,
-                        ),
-                      ),
-                    ),
-                    ValueListenableBuilder(
-                      valueListenable: _controller,
-                      builder: (_, value, __) => value.text.isEmpty
-                          ? const SizedBox.shrink()
-                          : EFIconButton(
-                              icon: Icons.clear_rounded,
-                              onPressed: _clear,
-                              iconPadding: EdgeInsets.all(
-                                Sizes.spacingExtraExtraSmall,
-                              ),
-                              iconSize: Sizes.iconSizeSmallRegular,
-                              iconColor: colors.textSecondary,
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

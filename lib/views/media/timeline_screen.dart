@@ -135,54 +135,16 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     final timelineAsync = ref.watch(timelineProvider);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          timelineAsync.when(
-            loading: () => const LoadingView(text: 'Loading library'),
-            error: (e, st) {
-              dev.log(
-                'Failed to load timeline: $e',
-                stackTrace: st,
-                name: 'TimelineScreen._buildTimeline',
-              );
-              return ErrorView(
-                errorMessage: 'Failed to load library',
-                description: 'Something unexpected occurred while loading '
-                    'your library. Please try again.',
-                buttonText: 'Try Again',
-                onButtonPressed: () => ref.invalidate(timelineProvider),
-              );
-            },
-            data: (timeline) {
-              if (timeline.flatItems.isEmpty) {
-                return EmptyView(
-                  icon: Icons.photo_library_outlined,
-                  title: timeline.query.isEmpty
-                      ? 'No media available'
-                      : 'No results for "${timeline.query}"',
-                  message: timeline.query.isEmpty
-                      ? 'Import some photos to see them here'
-                      : 'Try a different search term',
-                  button: timeline.query.isEmpty
-                      ? EFPrimaryButton(
-                          onPressed: () => context.push(ImportScreen.path),
-                          text: 'Import Media',
-                          icon: Icons.add_rounded,
-                        )
-                      : null,
-                );
-              }
-              return MediaListView(
-                state: timeline,
-                source: MediaCollectionSource.timeline,
-              );
-            },
-          ),
-          Positioned(
-            top: Sizes.edgePadding,
-            left: 0,
-            right: 0,
-            child: Row(
+      body: Padding(
+        padding: EdgeInsets.only(
+          left: Sizes.spacingSmall,
+          top: Sizes.edgePadding,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -204,8 +166,51 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                 ),
               ],
             ),
-          ),
-        ],
+            Flexible(
+              child: timelineAsync.when(
+                loading: () => const LoadingView(text: 'Loading library'),
+                error: (e, st) {
+                  dev.log(
+                    'Failed to load timeline: $e',
+                    stackTrace: st,
+                    name: 'TimelineScreen._buildTimeline',
+                  );
+                  return ErrorView(
+                    errorMessage: 'Failed to load library',
+                    description: 'Something unexpected occurred while loading '
+                        'your library. Please try again.',
+                    buttonText: 'Try Again',
+                    onButtonPressed: () => ref.invalidate(timelineProvider),
+                  );
+                },
+                data: (timeline) {
+                  if (timeline.flatItems.isEmpty) {
+                    return EmptyView(
+                      icon: Icons.photo_library_outlined,
+                      title: timeline.query.isEmpty
+                          ? 'No media available'
+                          : 'No results for "${timeline.query}"',
+                      message: timeline.query.isEmpty
+                          ? 'Import some photos to see them here'
+                          : 'Try a different search term',
+                      button: timeline.query.isEmpty
+                          ? EFPrimaryButton(
+                              onPressed: () => context.push(ImportScreen.path),
+                              text: 'Import Media',
+                              icon: Icons.add_rounded,
+                            )
+                          : null,
+                    );
+                  }
+                  return MediaListView(
+                    state: timeline,
+                    source: MediaCollectionSource.timeline,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

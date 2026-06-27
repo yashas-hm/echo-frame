@@ -8,13 +8,16 @@ final class Sizes {
   static const double kInitWindowWidth = 1200.0;
   static const double kInitWindowHeight = 800.0;
   static const double navBarWidth = 200.0;
+  static const double maxFinite = 999999;
+  static const double viewBoxWidth = 480;
 
   static const double edgePadding = spacingMedium;
+
   static const double cardPadding = spacingRegular;
-  static const double inputPadding = spacingMedium;
+  static const double cardBorderRadius = spacingMedium;
+
   static const double iconPadding = spacingSmallRegular;
   static const double iconWLabelPadding = 18.0;
-
   static const double iconSizeExtraSmall = 14.0;
   static const double iconSizeSmall = 18.0;
   static const double iconSizeSmallRegular = 20.0;
@@ -41,13 +44,11 @@ final class Sizes {
   static const double fontSizeExtraSmall = 10.0;
   static const double fontSizeExtraExtraSmall = 8.0;
 
+  static const double inputPadding = spacingMedium;
   static const double inputFontSize = fontSizeRegular;
   static const double inputErrorFontSize = fontSizeExtraSmall;
   static const double inputBorderRadius = 8.0;
   static const double inputBorderWidth = 1.0;
   static const double inputBorderFocusedWidth = 1.5;
   static const double inputHeight = 45.0;
-
-  static const double maxFinite = 999999;
-  static const double viewBoxWidth = 480;
 }

@@ -14,12 +14,10 @@ class MediaListView extends ConsumerStatefulWidget {
     super.key,
     required this.state,
     required this.source,
-    this.searchEnabled = true,
   });
 
   final MediaCollectionState state;
   final MediaCollectionSource source;
-  final bool searchEnabled;
 
   @override
   ConsumerState<MediaListView> createState() => _MediaListViewState();
@@ -52,60 +50,61 @@ class _MediaListViewState extends ConsumerState<MediaListView> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      controller: _scrollController,
-      slivers: [
-        if (widget.searchEnabled)
-          const SliverToBoxAdapter(
-            child: SizedBox(
-              height: Sizes.inputHeight + Sizes.edgePadding,
-            ),
+    return Padding(
+      padding: EdgeInsets.only(top: Sizes.edgePadding),
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(
+            Sizes.cardBorderRadius,
           ),
-        for (final month in widget.state.byMonth) ...[
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: Sizes.spacingMediumLarge,
-              vertical: Sizes.spacingMedium,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: Text(
-                DateFormat('MMMM yyyy')
-                    .format(DateTime(month.year, month.month)),
-                style: Styles.subTitleBold(
-                  color: context.colors.textPrimary,
+        ),
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            for (final month in widget.state.byMonth) ...[
+              SliverPadding(
+                padding: const EdgeInsets.only(
+                  left: Sizes.spacingMediumLarge,
+                  bottom: Sizes.spacingMedium,
                 ),
-              ),
-            ),
-          ),
-          SliverGrid.builder(
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 180,
-              crossAxisSpacing: 2,
-              mainAxisSpacing: 2,
-            ),
-            itemCount: month.items.length,
-            itemBuilder: (_, i) => PhotoTile(
-              item: month.items[i],
-              source: widget.source,
-            ),
-          ),
-        ],
-        if (widget.state.isLoadingMore)
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(Sizes.edgePadding),
-              child: Center(
-                child: SizedBox(
-                  width: Sizes.spacingExtraLarge,
-                  height: Sizes.spacingExtraLarge,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
+                sliver: SliverToBoxAdapter(
+                  child: Text(
+                    DateFormat('MMMM yyyy')
+                        .format(DateTime(month.year, month.month)),
+                    style: Styles.subTitleBold(
+                      color: context.colors.textPrimary,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-      ],
+              SliverGrid.builder(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 180,
+                  crossAxisSpacing: 2,
+                  mainAxisSpacing: 2,
+                ),
+                itemCount: month.items.length,
+                itemBuilder: (_, i) => PhotoTile(
+                  item: month.items[i],
+                  source: widget.source,
+                ),
+              ),
+            ],
+            if (widget.state.isLoadingMore)
+              const SliverToBoxAdapter(
+                child: Center(
+                  child: SizedBox(
+                    width: Sizes.spacingExtraLarge,
+                    height: Sizes.spacingExtraLarge,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

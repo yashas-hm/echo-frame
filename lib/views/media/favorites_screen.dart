@@ -29,49 +29,56 @@ class FavoritesScreen extends ConsumerWidget {
     final favoriteAsync = ref.watch(favoritesProvider);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          favoriteAsync.when(
-            loading: () => const LoadingView(text: 'Loading favourites'),
-            error: (e, st) {
-              dev.log(
-                'Failed to load favourites: $e',
-                stackTrace: st,
-                name: 'FavoritesScreen.build',
-              );
-              return ErrorView(
-                errorMessage: 'Failed to load favourites',
-                description: 'Something unexpected occurred. Please try again.',
-                buttonText: 'Try Again',
-                onButtonPressed: () => ref.invalidate(favoritesProvider),
-              );
-            },
-            data: (favorite) {
-              final items = favorite.flatItems;
-              if (items.isEmpty) {
-                return const EmptyView(
-                  icon: Icons.favorite_outline_rounded,
-                  title: 'No media starred yet',
-                  message: 'Open a photo and tap the star to save it here',
-                );
-              }
-              return MediaListView(
-                state: favorite,
-                source: MediaCollectionSource.favorites,
-              );
-            },
-          ),
-          Positioned(
-            top: Sizes.edgePadding,
-            left: 0,
-            child: EFSearchBar(
+      body: Padding(
+        padding: EdgeInsets.only(
+          left: Sizes.spacingSmall,
+          top: Sizes.edgePadding,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            EFSearchBar(
               focusNode: ref.read(searchFocusProvider),
               initialQuery: favoriteAsync.value?.query ?? '',
               onTextChanged: (q) =>
                   ref.read(favoritesProvider.notifier).setQuery(q),
             ),
-          ),
-        ],
+            Flexible(
+              child: favoriteAsync.when(
+                loading: () => const LoadingView(text: 'Loading favourites'),
+                error: (e, st) {
+                  dev.log(
+                    'Failed to load favourites: $e',
+                    stackTrace: st,
+                    name: 'FavoritesScreen.build',
+                  );
+                  return ErrorView(
+                    errorMessage: 'Failed to load favourites',
+                    description:
+                        'Something unexpected occurred. Please try again.',
+                    buttonText: 'Try Again',
+                    onButtonPressed: () => ref.invalidate(favoritesProvider),
+                  );
+                },
+                data: (favorite) {
+                  final items = favorite.flatItems;
+                  if (items.isEmpty) {
+                    return const EmptyView(
+                      icon: Icons.favorite_outline_rounded,
+                      title: 'No media starred yet',
+                      message: 'Open a photo and tap the star to save it here',
+                    );
+                  }
+                  return MediaListView(
+                    state: favorite,
+                    source: MediaCollectionSource.favorites,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
