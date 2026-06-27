@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:echo_frame/models/metadata.dart';
+import 'package:echo_frame/models/media/media.dart' show Metadata, MediaType;
 import 'package:media_metadata_plus/media_metadata_plus.dart';
 
 class MetadataService {

@@ -1,8 +1,4 @@
-import 'dart:developer' as dev;
-
-import 'package:echo_frame/database/daos/tag_dao.dart';
-import 'package:echo_frame/models/tag.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+part of '../components/gallery_info_panel.dart';
 
 class TagsNotifier extends AsyncNotifier<List<Tag>> {
   @override

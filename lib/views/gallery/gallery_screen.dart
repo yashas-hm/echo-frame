@@ -1,13 +1,17 @@
-import 'package:echo_frame/models/media_item.dart';
+
+import 'package:echo_frame/models/media/media.dart' show MediaItem;
 import 'package:echo_frame/views/gallery/components/actions_tray.dart';
 import 'package:echo_frame/views/gallery/components/caret_arrows.dart';
 import 'package:echo_frame/views/gallery/components/gallery_info_panel.dart';
 import 'package:echo_frame/views/gallery/image_view.dart';
 import 'package:echo_frame/views/gallery/video_view.dart';
-import 'package:echo_frame/views/media/provider/favorites_provider.dart';
 import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
-import 'package:echo_frame/views/media/provider/timeline_provider.dart';
-import 'package:echo_frame/views/media/provider/trash_provider.dart';
+import 'package:echo_frame/views/media/favourites/favorites_screen.dart'
+    show favoritesProvider;
+import 'package:echo_frame/views/media/timeline/timeline_screen.dart'
+    show timelineProvider;
+import 'package:echo_frame/views/media/trash/trash_screen.dart'
+    show trashProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

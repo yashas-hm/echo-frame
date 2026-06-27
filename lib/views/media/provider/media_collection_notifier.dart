@@ -1,6 +1,6 @@
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/media_item.dart';
+import 'package:echo_frame/models/media/media.dart' show MediaItem;
 import 'package:echo_frame/models/month_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

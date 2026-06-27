@@ -1,4 +1,4 @@
-part of '../import_screen.dart';
+part of 'views.dart';
 
 class ErrorList extends StatefulWidget {
   const ErrorList({super.key, required this.errors});

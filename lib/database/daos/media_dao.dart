@@ -7,10 +7,9 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:echo_frame/constants/constants.dart' show Keys;
+import 'package:echo_frame/database/daos/tag_dao.dart';
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/media_item.dart';
-import 'package:echo_frame/models/metadata.dart';
-import 'package:echo_frame/models/tag.dart';
+import 'package:echo_frame/models/media/media.dart' show MediaItem, Metadata;
 import 'package:echo_frame/services/thumbnail_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:uuid/uuid.dart';
@@ -29,22 +28,7 @@ class MediaDao {
 
     final ids = records.map((r) => r.id).toList();
     final root = Prefs.activeLibraryRoot!;
-
-    final tagRows = await (_db.select(_db.tagRecords).join([
-      innerJoin(
-        _db.mediaTagRecords,
-        _db.mediaTagRecords.tagId.equalsExp(_db.tagRecords.id),
-      ),
-    ])
-          ..where(_db.mediaTagRecords.mediaId.isIn(ids)))
-        .get();
-
-    final tagsById = <String, List<Tag>>{};
-    for (final row in tagRows) {
-      final mediaId = row.readTable(_db.mediaTagRecords).mediaId;
-      final t = row.readTable(_db.tagRecords);
-      (tagsById[mediaId] ??= []).add(Tag(id: t.id, value: t.value));
-    }
+    final tagsById = await TagDao.instance.fetchForMediaIds(ids);
 
     return records
         .map((r) => MediaItem.fromRecord(

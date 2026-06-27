@@ -1,15 +1,28 @@
+import 'dart:convert';
+import 'dart:developer' as dev;
+import 'dart:io';
+
 import 'package:echo_frame/components/buttons/buttons.dart';
 import 'package:echo_frame/components/dialog.dart';
 import 'package:echo_frame/constants/constants.dart';
+import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/theme/provider/theme_provider.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart';
-import 'package:echo_frame/views/settings/provider/settings_provider.dart';
+import 'package:echo_frame/views/media/favourites/favorites_screen.dart'
+    show favoritesProvider;
+import 'package:echo_frame/views/media/timeline/timeline_screen.dart'
+    show timelineProvider;
+import 'package:echo_frame/views/media/trash/trash_screen.dart'
+    show trashProvider;
 import 'package:echo_frame/views/settings/shortcut_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+part 'provider/settings_provider.dart';
+part 'provider/settings_state.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

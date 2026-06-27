@@ -2,10 +2,23 @@ import 'package:echo_frame/components/buttons/buttons.dart' show EFIconButton;
 import 'package:echo_frame/components/dialog.dart';
 import 'package:echo_frame/components/snackbar.dart';
 import 'package:echo_frame/constants/constants.dart' show Sizes;
-import 'package:echo_frame/models/media_item.dart';
-import 'package:echo_frame/views/gallery/provider/gallery_actions.dart';
+import 'package:echo_frame/database/daos/media_dao.dart';
+import 'package:echo_frame/database/database.dart';
+import 'package:echo_frame/models/media/media.dart' show MediaItem, Tag;
+import 'package:echo_frame/services/trash_service.dart';
+import 'package:echo_frame/utilities/utilities.dart' show Prefs;
+import 'package:echo_frame/views/gallery/components/gallery_info_panel.dart'
+    show tagsProvider;
+import 'package:echo_frame/views/media/favourites/favorites_screen.dart'
+    show favoritesProvider;
+import 'package:echo_frame/views/media/timeline/timeline_screen.dart'
+    show timelineProvider;
+import 'package:echo_frame/views/media/trash/trash_screen.dart'
+    show trashProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+part '../provider/gallery_actions_provider.dart';
 
 class ActionsTray extends ConsumerWidget {
   const ActionsTray({

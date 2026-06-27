@@ -1,12 +1,4 @@
-import 'package:echo_frame/models/discovery/discovery.dart';
-import 'package:echo_frame/models/import/import.dart';
-import 'package:echo_frame/services/importing/import_service.dart';
-import 'package:echo_frame/services/importing/organizer_service.dart';
-import 'package:echo_frame/services/importing/takeout_service.dart';
-import 'package:echo_frame/utilities/utilities.dart' show Prefs;
-import 'package:echo_frame/views/import/import_screen.dart';
-import 'package:echo_frame/views/media/provider/timeline_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+part of '../import_screen.dart';
 
 class ImportNotifier extends Notifier<ImportState> {
   ImportNotifier({required ImportService service}) : _service = service;

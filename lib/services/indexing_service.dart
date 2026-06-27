@@ -3,7 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
-import 'package:echo_frame/models/metadata.dart';
+import 'package:echo_frame/models/media/media.dart' show Metadata;
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;

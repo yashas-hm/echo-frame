@@ -1,9 +1,4 @@
-import 'dart:convert';
-
-import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/metadata.dart';
-import 'package:echo_frame/models/tag.dart';
-import 'package:flutter/foundation.dart';
+part of 'media.dart';
 
 class MediaItem {
   final String id;

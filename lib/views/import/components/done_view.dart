@@ -1,4 +1,4 @@
-part of '../import_screen.dart';
+part of 'views.dart';
 
 class DoneView extends ConsumerWidget {
   const DoneView(this.state, this.type, {super.key});

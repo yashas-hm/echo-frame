@@ -4,7 +4,8 @@ import 'dart:io';
 
 import 'package:echo_frame/constants/constants.dart'
     show Sizes, SpacerExtraSmall, SpacerSmall;
-import 'package:echo_frame/models/media_item.dart';
+
+import 'package:echo_frame/models/media/media.dart' show MediaItem;
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtensions, DurationExtensions;

@@ -1,9 +1,9 @@
 import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/theme/theme.dart';
 import 'package:echo_frame/utilities/utilities.dart';
-import 'package:echo_frame/views/media/favorites_screen.dart';
-import 'package:echo_frame/views/media/timeline_screen.dart';
-import 'package:echo_frame/views/media/trash_screen.dart';
+import 'package:echo_frame/views/media/favourites/favorites_screen.dart';
+import 'package:echo_frame/views/media/timeline/timeline_screen.dart';
+import 'package:echo_frame/views/media/trash/trash_screen.dart';
 import 'package:echo_frame/views/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart' show SvgPicture;

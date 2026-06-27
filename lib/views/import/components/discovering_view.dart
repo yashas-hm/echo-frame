@@ -1,4 +1,4 @@
-part of '../import_screen.dart';
+part of 'views.dart';
 
 class DiscoveringView extends StatefulWidget {
   const DiscoveringView(this.state, {super.key});

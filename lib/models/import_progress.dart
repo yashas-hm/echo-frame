@@ -1,4 +1,4 @@
-part of 'import.dart';
+import 'package:echo_frame/models/discovery/discovery.dart' show DiscoveryError;
 
 class ImportProgress {
   const ImportProgress({

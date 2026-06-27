@@ -1,10 +1,10 @@
 import 'package:echo_frame/constants/constants.dart' show Sizes, Styles;
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:echo_frame/views/media/components/photo_tile.dart';
-import 'package:echo_frame/views/media/provider/favorites_provider.dart';
+import 'package:echo_frame/views/media/favourites/favorites_screen.dart' show favoritesProvider;
 import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
-import 'package:echo_frame/views/media/provider/timeline_provider.dart';
-import 'package:echo_frame/views/media/provider/trash_provider.dart';
+import 'package:echo_frame/views/media/timeline/timeline_screen.dart' show timelineProvider;
+import 'package:echo_frame/views/media/trash/trash_screen.dart' show trashProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart' show DateFormat;

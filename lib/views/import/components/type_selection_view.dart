@@ -1,4 +1,4 @@
-part of '../import_screen.dart';
+part of 'views.dart';
 
 class TypeSelectionView extends StatelessWidget {
   const TypeSelectionView({super.key, required this.onSelectType});

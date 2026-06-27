@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/models/discovery/discovery.dart';
-import 'package:echo_frame/models/import/import.dart' show ImportProgress;
-import 'package:echo_frame/models/metadata.dart';
+import 'package:echo_frame/models/import_progress.dart';
+import 'package:echo_frame/models/media/media.dart' show Metadata;
 import 'package:echo_frame/services/metadata_service.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show DirUtils;
@@ -133,7 +133,8 @@ abstract class ImportService {
     if (dbItems.isNotEmpty) await _upsertDb(dbItems, libraryRoot);
   }
 
-  Future<void> _upsertDb(List<(Metadata, String)> items, String libraryRoot) async {
+  Future<void> _upsertDb(
+      List<(Metadata, String)> items, String libraryRoot) async {
     try {
       await MediaDao.instance.upsertBulk(
         items.map((t) => (t.$1, t.$2, libraryRoot)).toList(),

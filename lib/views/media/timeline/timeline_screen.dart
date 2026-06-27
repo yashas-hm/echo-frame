@@ -18,12 +18,17 @@ import 'package:echo_frame/views/media/components/media_list_view.dart';
 import 'package:echo_frame/views/media/components/search_bar.dart';
 import 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
     show MediaCollectionSource;
-import 'package:echo_frame/views/media/provider/search_focus_provider.dart';
-import 'package:echo_frame/views/media/provider/timeline_provider.dart';
+import 'package:echo_frame/views/media/provider/search_focus_provider.dart';import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+export 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
+    show MediaCollectionState;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+part './provider/timeline_provider.dart';
 
 class TimelineScreen extends ConsumerStatefulWidget {
   const TimelineScreen({super.key});

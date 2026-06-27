@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/tag.dart';
+import 'package:echo_frame/models/media/media.dart' show Tag;
 import 'package:uuid/uuid.dart';
 
 class TagDao {
@@ -35,4 +35,24 @@ class TagDao {
       (_db.delete(_db.mediaTagRecords)
             ..where((r) => r.mediaId.equals(mediaId) & r.tagId.equals(tagId)))
           .go();
+
+  Future<Map<String, List<Tag>>> fetchForMediaIds(List<String> ids) async {
+    if (ids.isEmpty) return {};
+    final rows = await (_db.select(_db.tagRecords).join([
+      innerJoin(
+        _db.mediaTagRecords,
+        _db.mediaTagRecords.tagId.equalsExp(_db.tagRecords.id),
+      ),
+    ])
+          ..where(_db.mediaTagRecords.mediaId.isIn(ids)))
+        .get();
+
+    final tagsById = <String, List<Tag>>{};
+    for (final row in rows) {
+      final mediaId = row.readTable(_db.mediaTagRecords).mediaId;
+      final t = row.readTable(_db.tagRecords);
+      (tagsById[mediaId] ??= []).add(Tag(id: t.id, value: t.value));
+    }
+    return tagsById;
+  }
 }

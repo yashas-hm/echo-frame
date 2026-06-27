@@ -1,4 +1,4 @@
-part of '../import_screen.dart';
+part of 'views.dart';
 
 class FolderTreePreview extends StatelessWidget {
   const FolderTreePreview({super.key, required this.tree});

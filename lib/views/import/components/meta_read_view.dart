@@ -1,4 +1,4 @@
-part of '../import_screen.dart';
+part of 'views.dart';
 
 class MetaReadView extends StatefulWidget {
   const MetaReadView(this.state, {super.key});

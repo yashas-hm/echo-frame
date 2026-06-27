@@ -1,4 +1,4 @@
-part of '../import_screen.dart';
+part of 'views.dart';
 
 class ReviewView extends ConsumerWidget {
   const ReviewView(this.state, this.type, {super.key});

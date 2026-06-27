@@ -1,14 +1,4 @@
-import 'package:echo_frame/database/daos/media_dao.dart';
-import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/models/media_item.dart';
-import 'package:echo_frame/models/tag.dart';
-import 'package:echo_frame/services/trash_service.dart';
-import 'package:echo_frame/utilities/utilities.dart' show Prefs;
-import 'package:echo_frame/views/media/provider/favorites_provider.dart';
-import 'package:echo_frame/views/gallery/provider/tags_provider.dart';
-import 'package:echo_frame/views/media/provider/timeline_provider.dart';
-import 'package:echo_frame/views/media/provider/trash_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+part of '../components/actions_tray.dart';
 
 class GalleryActions {
   const GalleryActions(this._ref);

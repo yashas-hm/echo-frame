@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show ValueGetter;
+part of 'media.dart';
 
 enum MediaType { image, video, unknown }
 

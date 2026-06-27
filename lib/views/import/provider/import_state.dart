@@ -1,4 +1,4 @@
-part of 'import.dart';
+part of '../import_screen.dart';
 
 enum ImportPhase { idle, discovering, metaRead, review, applying, done, error }
 

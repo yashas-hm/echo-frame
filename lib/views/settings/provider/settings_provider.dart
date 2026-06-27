@@ -1,38 +1,4 @@
-import 'dart:convert';
-import 'dart:developer' as dev;
-import 'dart:io';
-
-import 'package:echo_frame/database/database.dart';
-import 'package:echo_frame/theme/provider/theme_provider.dart';
-import 'package:echo_frame/utilities/utilities.dart' show Prefs;
-import 'package:echo_frame/views/media/provider/favorites_provider.dart';
-import 'package:echo_frame/views/media/provider/timeline_provider.dart';
-import 'package:echo_frame/views/media/provider/trash_provider.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-class SettingsState {
-  const SettingsState({
-    required this.showNavLabel,
-    required this.activeLibraryRoot,
-    required this.knownLibraryRoots,
-  });
-
-  final bool showNavLabel;
-  final String? activeLibraryRoot;
-  final List<String> knownLibraryRoots;
-
-  SettingsState copyWith({
-    bool? showNavLabel,
-    String? activeLibraryRoot,
-    List<String>? knownLibraryRoots,
-  }) =>
-      SettingsState(
-        showNavLabel: showNavLabel ?? this.showNavLabel,
-        activeLibraryRoot: activeLibraryRoot ?? this.activeLibraryRoot,
-        knownLibraryRoots: knownLibraryRoots ?? this.knownLibraryRoots,
-      );
-}
+part of '../settings_screen.dart';
 
 class SettingsNotifier extends Notifier<SettingsState> {
   @override

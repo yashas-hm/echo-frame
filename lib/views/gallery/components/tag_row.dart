@@ -1,11 +1,13 @@
 import 'package:echo_frame/components/buttons/buttons.dart' show EFIconButton;
 import 'package:echo_frame/constants/constants.dart'
     show Styles, Sizes, SpacerSmall;
-import 'package:echo_frame/models/media_item.dart' show MediaItem;
+import 'package:echo_frame/models/media/media.dart' show MediaItem;
 import 'package:echo_frame/theme/theme.dart' show KnownColors, AppThemeColors;
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
-import 'package:echo_frame/views/gallery/provider/gallery_actions.dart';
-import 'package:echo_frame/views/gallery/provider/tags_provider.dart';
+import 'package:echo_frame/views/gallery/components/actions_tray.dart'
+    show galleryActionsProvider;
+import 'package:echo_frame/views/gallery/components/gallery_info_panel.dart'
+    show tagsProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,29 +1,18 @@
-import 'package:echo_frame/components/buttons/buttons.dart';
 import 'package:echo_frame/components/empty_view.dart';
 import 'package:echo_frame/components/error_view.dart';
-import 'package:echo_frame/constants/constants.dart';
-import 'package:echo_frame/models/discovery/discovery.dart' show DiscoveryError;
-import 'package:echo_frame/models/folder_tree.dart' show FolderTree;
-import 'package:echo_frame/models/import/import.dart';
-import 'package:echo_frame/theme/theme.dart';
-import 'package:echo_frame/utilities/utilities.dart'
-    show ColorExtensions, ContextExtensions, StringExtensions;
-import 'package:echo_frame/views/import/provider/import_provider.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:echo_frame/models/discovery/discovery.dart';
+import 'package:echo_frame/services/importing/import_service.dart';
+import 'package:echo_frame/services/importing/organizer_service.dart';
+import 'package:echo_frame/services/importing/takeout_service.dart';
+import 'package:echo_frame/utilities/utilities.dart' show Prefs;
+import 'package:echo_frame/views/import/components/views.dart';
+import 'package:echo_frame/views/media/timeline/timeline_screen.dart' show timelineProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
-part 'components/applying_view.dart';
-part 'components/discovering_view.dart';
-part 'components/done_view.dart';
-part 'components/error_list.dart';
-part 'components/folder_tree_preview.dart';
-part 'components/idle_view.dart';
-part 'components/meta_read_view.dart';
-part 'components/review_view.dart';
-part 'components/type_selection_view.dart';
+part 'provider/import_provider.dart';
+part 'provider/import_state.dart';
 
 enum ImportType {
   mediaOrganizer,

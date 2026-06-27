@@ -1,4 +1,4 @@
-import 'package:echo_frame/models/media_item.dart';
+import 'package:echo_frame/models/media/media.dart' show MediaItem;
 
 class MonthData {
   final int year;

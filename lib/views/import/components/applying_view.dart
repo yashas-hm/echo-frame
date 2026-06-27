@@ -1,4 +1,4 @@
-part of '../import_screen.dart';
+part of 'views.dart';
 
 class ApplyingView extends StatefulWidget {
   const ApplyingView(this.state, {super.key});
