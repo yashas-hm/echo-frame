@@ -1,6 +1,5 @@
 import 'dart:io';
 
-
 import 'package:echo_frame/models/media/media.dart' show MediaItem;
 import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
 import 'package:flutter/material.dart';

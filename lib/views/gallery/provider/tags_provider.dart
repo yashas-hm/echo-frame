@@ -10,7 +10,8 @@ class TagsNotifier extends AsyncNotifier<List<Tag>> {
       state = AsyncData([...state.value ?? [], tag]);
       return tag;
     } catch (e, st) {
-      dev.log('failed to create tag: $e', stackTrace: st, name: 'TagsNotifier.createTag');
+      dev.log('failed to create tag: $e',
+          stackTrace: st, name: 'TagsNotifier.createTag');
       return null;
     }
   }
@@ -20,7 +21,8 @@ class TagsNotifier extends AsyncNotifier<List<Tag>> {
       await TagDao.instance.attachTag(mediaId, tagId);
       return true;
     } catch (e, st) {
-      dev.log('failed to attach tag: $e', stackTrace: st, name: 'TagsNotifier.attachToMedia');
+      dev.log('failed to attach tag: $e',
+          stackTrace: st, name: 'TagsNotifier.attachToMedia');
       return false;
     }
   }
@@ -30,7 +32,8 @@ class TagsNotifier extends AsyncNotifier<List<Tag>> {
       await TagDao.instance.detachTag(mediaId, tagId);
       return true;
     } catch (e, st) {
-      dev.log('failed to detach tag: $e', stackTrace: st, name: 'TagsNotifier.detachFromMedia');
+      dev.log('failed to detach tag: $e',
+          stackTrace: st, name: 'TagsNotifier.detachFromMedia');
       return false;
     }
   }

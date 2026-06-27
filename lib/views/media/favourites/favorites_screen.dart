@@ -5,17 +5,15 @@ import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/constants/constants.dart' show Sizes;
 import 'package:echo_frame/views/media/components/loading_view.dart';
 import 'package:echo_frame/views/media/components/media_list_view.dart';
-import 'package:echo_frame/views/media/components/search_bar.dart';import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-export 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
-    show MediaCollectionState;
-import 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
-    show MediaCollectionSource;
+import 'package:echo_frame/views/media/components/search_bar.dart';
+import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
 import 'package:echo_frame/views/media/provider/search_focus_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+export 'package:echo_frame/views/media/provider/media_collection_notifier.dart'
+    show MediaCollectionState;
 
 part './provider/favorites_provider.dart';
 

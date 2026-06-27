@@ -6,7 +6,8 @@ import 'package:echo_frame/services/importing/organizer_service.dart';
 import 'package:echo_frame/services/importing/takeout_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:echo_frame/views/import/components/views.dart';
-import 'package:echo_frame/views/media/timeline/timeline_screen.dart' show timelineProvider;
+import 'package:echo_frame/views/media/timeline/timeline_screen.dart'
+    show timelineProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
