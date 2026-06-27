@@ -1,6 +1,26 @@
 part of 'media.dart';
 
-enum MediaType { image, video, unknown }
+enum MediaType {
+  image,
+  video,
+  unknown;
+
+  static const _videoExts = {
+    'mp4', 'mov', 'avi', 'mkv', 'm4v', 'wmv', 'flv', 'webm',
+    '3gp', 'mts', 'm2ts'
+  };
+  static const _imageExts = {
+    'jpg', 'jpeg', 'png', 'heic', 'heif', 'gif', 'webp',
+    'tiff', 'tif', 'bmp', 'raw', 'cr2', 'nef', 'arw', 'dng'
+  };
+
+  static MediaType fromPath(String path) {
+    final ext = path.split('.').last.toLowerCase();
+    if (_videoExts.contains(ext)) return MediaType.video;
+    if (_imageExts.contains(ext)) return MediaType.image;
+    return MediaType.unknown;
+  }
+}
 
 class Metadata {
   final DateTime capturedAt;
@@ -29,13 +49,13 @@ class Metadata {
     this.mediaType = MediaType.image,
   });
 
-  factory Metadata.fallback({required DateTime mtime}) => Metadata(
+  factory Metadata.fallback({required DateTime mtime, String? path}) => Metadata(
         capturedAt: mtime,
-        mediaType: MediaType.unknown,
+        mediaType: path != null ? MediaType.fromPath(path) : MediaType.unknown,
       );
 
   factory Metadata.fromJson(Map<String, dynamic> json) {
-    final durationMs = json['durationMs'] as int?;
+    final filename = json['filename'] as String?;
     return Metadata(
       capturedAt: DateTime.parse(json['capturedAt'] as String),
       width: json['width'] as int?,
@@ -45,8 +65,8 @@ class Metadata {
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       altitude: (json['altitude'] as num?)?.toDouble(),
-      durationMs: durationMs,
-      mediaType: durationMs != null ? MediaType.video : MediaType.image,
+      durationMs: json['durationMs'] as int?,
+      mediaType: filename != null ? MediaType.fromPath(filename) : MediaType.unknown,
     );
   }
 
