@@ -51,20 +51,27 @@ class TakeoutService extends ImportService {
 
     final sidecarMap = <String, TakeoutSidecar>{};
     for (final entry in sidecarPaths.entries) {
+      final path = entry.value;
       try {
-        final raw = await File(entry.value).readAsString();
+        yield DiscoverTakeoutSideCar(
+          dirName: path.substring(sourceDir.length, path.lastIndexOf('/')),
+          filesFound: sidecarMap.length,
+        );
+        final raw = await File(path).readAsString();
         final json = jsonDecode(raw) as Map<String, dynamic>;
         if (json['photoTakenTime'] != null || json['creationTime'] != null) {
           sidecarMap[entry.key] = TakeoutSidecar.fromJson(json);
         }
       } catch (e, st) {
         dev.log(
-          'Failed to parse sidecar ${entry.value}: $e',
+          'Failed to parse sidecar $path: $e',
           stackTrace: st,
           name: 'TakeoutService.discover',
         );
       }
     }
+
+    yield DiscoverReading(done: 0, total: allMediaPaths.length);
 
     var mmpByPath = <String, Metadata>{};
     await for (final reading in fetchMetadata(allMediaPaths)) {

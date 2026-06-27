@@ -27,6 +27,11 @@ class ImportNotifier extends Notifier<ImportState> {
         destRoot: destRoot,
       )) {
         switch (event) {
+          case DiscoverTakeoutSideCar(:final dirName, :final filesFound):
+            state = state.copyWith(
+              scanningDir: dirName,
+              sidecarFilesFound: filesFound,
+            );
           case DiscoverScanning(:final dirName, :final filesFound):
             state = state.copyWith(
               scanningDir: dirName,

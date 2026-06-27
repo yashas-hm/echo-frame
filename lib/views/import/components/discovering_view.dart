@@ -40,6 +40,7 @@ class _DiscoveringViewState extends State<DiscoveringView>
     final state = widget.state;
 
     final dir = state.scanningDir;
+    final sidecar = state.sidecarFilesFound > 0;
 
     return Center(
       child: SizedBox(
@@ -62,15 +63,20 @@ class _DiscoveringViewState extends State<DiscoveringView>
             ),
             const SpacerMedium(),
             Text(
-              'Finding media',
+              sidecar ? 'Reading Takeout Sidecars' : 'Finding media',
               style: Styles.subtitle(color: colors.textPrimary),
             ),
             const SpacerSmall(),
-            const LinearProgressIndicator(),
+            LinearProgressIndicator(
+              value:
+                  sidecar ? state.sidecarFilesFound / state.filesFound : null,
+            ),
             const SpacerSmall(),
             if (state.filesFound > 0)
               Text(
-                '${state.filesFound} ${'file'.plural(state.filesFound)} found',
+                sidecar
+                    ? '${state.sidecarFilesFound} / ${state.filesFound}'
+                    : '${state.filesFound} ${'file'.plural(state.filesFound)} found',
                 style: Styles.smallRegular(color: colors.textSecondary),
               ),
             if (dir != null) ...[

@@ -9,6 +9,10 @@ class DiscoverScanning extends DiscoverEvent {
   final int filesFound;
 }
 
+class DiscoverTakeoutSideCar extends DiscoverScanning{
+  DiscoverTakeoutSideCar({required super.dirName, required super.filesFound});
+}
+
 class DiscoverReading extends DiscoverEvent {
   DiscoverReading({required this.done, required this.total, this.result});
 
