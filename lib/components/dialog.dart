@@ -10,11 +10,12 @@ class EFDialog {
     BuildContext context, {
     required String title,
     required String description,
-    String confirmText = 'Confirm',
-    String cancelText = 'Cancel',
+    String? confirmText = 'Confirm',
+    String? cancelText = 'Cancel',
     bool showCancel = true,
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
+    Widget Function(BuildContext)? action3,
     Widget? icon,
   }) =>
       showDialog<bool>(
@@ -22,6 +23,7 @@ class EFDialog {
         builder: (context) {
           final colors = context.colors;
           return AlertDialog(
+            backgroundColor: context.colors.surfacePrimary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(Sizes.inputBorderRadius),
             ),
@@ -45,7 +47,7 @@ class EFDialog {
               ),
             ),
             actions: [
-              if (showCancel)
+              if (showCancel && cancelText != null)
                 EFErrorButton.flat(
                   onPressed: () {
                     onCancel?.call();
@@ -53,13 +55,15 @@ class EFDialog {
                   },
                   text: cancelText,
                 ),
-              EFPrimaryButton.flat(
-                onPressed: () {
-                  onConfirm?.call();
-                  Navigator.pop(context, true);
-                },
-                text: confirmText,
-              ),
+              if (confirmText != null)
+                EFPrimaryButton.flat(
+                  onPressed: () {
+                    onConfirm?.call();
+                    Navigator.pop(context, true);
+                  },
+                  text: confirmText,
+                ),
+              if (action3 != null) action3(context)
             ],
           );
         },

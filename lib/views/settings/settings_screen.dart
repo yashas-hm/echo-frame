@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:echo_frame/components/buttons/buttons.dart';
 import 'package:echo_frame/components/dialog.dart';
+import 'package:echo_frame/components/snackbar.dart';
+import 'package:echo_frame/components/dropdown.dart';
 import 'package:echo_frame/constants/constants.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/theme/provider/theme_provider.dart';
@@ -22,6 +24,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 part 'provider/settings_provider.dart';
+
 part 'provider/settings_state.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -29,7 +32,8 @@ class SettingsScreen extends ConsumerWidget {
 
   static const String path = '/settings';
 
-  static GoRoute get route => GoRoute(
+  static GoRoute get route =>
+      GoRoute(
         path: path,
         builder: (_, __) => const SettingsScreen(),
       );
@@ -38,7 +42,9 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final settings = ref.watch(settingsProvider);
-    final themeMode = ref.watch(appThemeProvider).mode;
+    final themeMode = ref
+        .watch(appThemeProvider)
+        .mode;
 
     return Scaffold(
       body: Padding(
@@ -57,91 +63,66 @@ class SettingsScreen extends ConsumerWidget {
               title: 'Library Root',
               subtitle: settings.activeLibraryRoot ?? 'No library selected',
               colors: colors,
-              actionChild: settings.knownLibraryRoots.isNotEmpty ||
-                      settings.activeLibraryRoot != null
-                  ? DropdownButton<String>(
-                      value: settings.activeLibraryRoot,
-                      dropdownColor: colors.surfacePrimary,
-                      borderRadius:
-                          BorderRadius.circular(Sizes.inputBorderRadius),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: Sizes.spacingRegular),
-                      focusColor: KnownColors.transparent,
-                      mouseCursor: SystemMouseCursors.click,
-                      hint: Text(
-                        'Select library root',
-                        style: Styles.micro(color: colors.textPrimary),
-                      ),
-                      icon: Icon(
-                        Icons.arrow_drop_down_rounded,
-                        size: Sizes.iconSizeSmall,
-                        color: colors.textPrimary,
-                      ),
-                      underline: const SizedBox.shrink(),
-                      items: [
-                        DropdownMenuItem(
-                          value: 'NewRoot',
-                          child: Row(
-                            spacing: Sizes.spacingExtraSmall,
-                            children: [
-                              Text(
-                                'New Library Root',
-                                style: Styles.micro(color: colors.textPrimary),
-                              ),
-                              Icon(
-                                Icons.add_rounded,
-                                size: Sizes.iconSizeExtraSmall,
-                                color: colors.textPrimary,
-                              ),
-                            ],
-                          ),
+              actionChild: settings.knownLibraryRoots.isNotEmpty
+                  ? EFDropdown<String>(
+                value: settings.activeLibraryRoot,
+                hint: Text(
+                  'Select library root',
+                  style: Styles.micro(color: colors.textPrimary),
+                ),
+                items: [
+                  DropdownMenuItem(
+                    value: 'NewRoot',
+                    child: Row(
+                      spacing: Sizes.spacingExtraSmall,
+                      children: [
+                        Text(
+                          'New Library Root',
+                          style: Styles.micro(color: colors.textPrimary),
                         ),
-                        ...settings.knownLibraryRoots.map(
-                          (path) => DropdownMenuItem(
-                            value: path,
-                            child: Text(
-                              path,
-                              style: Styles.micro(color: colors.textPrimary),
-                            ),
-                          ),
+                        Icon(
+                          Icons.add_rounded,
+                          size: Sizes.iconSizeExtraSmall,
+                          color: colors.textPrimary,
                         ),
                       ],
-                      onChanged: (path) {
-                        if (path == 'NewRoot') {
-                          _addLibrary(ref);
-                          return;
-                        }
-
-                        if (path != null &&
-                            path != settings.activeLibraryRoot) {
-                          ref
-                              .read(settingsProvider.notifier)
-                              .switchLibrary(path);
-                        }
-                      },
-                    )
-                  : EFIconButton(
-                      icon: Icons.add_rounded,
-                      onPressed: () => _addLibrary(ref),
                     ),
+                  ),
+                  ...settings.knownLibraryRoots.map(
+                        (path) =>
+                        DropdownMenuItem(
+                          value: path,
+                          child: Text(
+                            path,
+                            style: Styles.micro(color: colors.textPrimary),
+                          ),
+                        ),
+                  ),
+                ],
+                onChanged: (path) {
+                  if (path == 'NewRoot') {
+                    _addLibrary(context, ref);
+                    return;
+                  }
+                  if (path != null &&
+                      path != settings.activeLibraryRoot) {
+                    ref
+                        .read(settingsProvider.notifier)
+                        .switchLibrary(path);
+                  }
+                },
+              )
+                  : EFIconButton(
+                icon: Icons.add_rounded,
+                onPressed: () => _addLibrary(context, ref),
+              ),
             ),
             ..._settingTile(
               title: 'Theme',
               subtitle: 'Choose how EchoFrame looks',
               colors: colors,
-              actionChild: DropdownButton<ThemeMode>(
+              actionChild: EFDropdown<ThemeMode>(
                 value: themeMode,
-                dropdownColor: colors.surfacePrimary,
-                borderRadius: BorderRadius.circular(Sizes.inputBorderRadius),
-                padding: EdgeInsets.symmetric(horizontal: Sizes.spacingRegular),
-                focusColor: KnownColors.transparent,
-                mouseCursor: SystemMouseCursors.click,
-                icon: Icon(
-                  Icons.arrow_drop_down_rounded,
-                  size: Sizes.iconSizeSmall,
-                  color: colors.textPrimary,
-                ),
-                underline: const SizedBox.shrink(),
                 items: [
                   DropdownMenuItem(
                     value: ThemeMode.system,
@@ -178,7 +159,9 @@ class SettingsScreen extends ConsumerWidget {
               colors: colors,
               actionChild: Switch(
                 value: settings.showNavLabel,
-                onChanged: ref.read(settingsProvider.notifier).setShowNavLabel,
+                onChanged: ref
+                    .read(settingsProvider.notifier)
+                    .setShowNavLabel,
               ),
             ),
             SpacerRegular(),
@@ -293,24 +276,26 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _addLibrary(WidgetRef ref) async {
+  Future<void> _addLibrary(BuildContext context, WidgetRef ref) async {
     final path = await FilePicker.getDirectoryPath(
       dialogTitle: 'Select Library Folder',
     );
-    if (path == null) return;
-    await ref.read(settingsProvider.notifier).addLibrary(path);
+    if (path == null || !context.mounted) return;
+    final result = await ref.read(settingsProvider.notifier).addLibrary(path);
+    if (!context.mounted) return;
+    if (!result.success) {
+      EFSnackbar.showError(context, message: 'Failed to open library');
+    }
   }
 
   Future<void> _saveSettings(BuildContext context, WidgetRef ref) async {
     final ok = await ref.read(settingsProvider.notifier).saveSettings();
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          ok ? 'Settings saved to library' : 'No active library selected',
-        ),
-      ),
-    );
+    if (ok) {
+      EFSnackbar.showSuccess(context, message: 'Settings saved to library');
+    } else {
+      EFSnackbar.showError(context, message: 'No active library selected');
+    }
   }
 
   Future<void> _importSettings(BuildContext context, WidgetRef ref) async {
@@ -326,13 +311,11 @@ class SettingsScreen extends ConsumerWidget {
       );
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          result ? 'Settings imported' : 'Failed to import settings',
-        ),
-      ),
-    );
+    if (result) {
+      EFSnackbar.showSuccess(context, message: 'Settings imported');
+    } else {
+      EFSnackbar.showError(context, message: 'Failed to import settings');
+    }
   }
 
   Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {

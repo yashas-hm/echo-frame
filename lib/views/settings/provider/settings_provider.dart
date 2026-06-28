@@ -13,40 +13,46 @@ class SettingsNotifier extends Notifier<SettingsState> {
     state = state.copyWith(showNavLabel: value);
   }
 
-  Future<void> switchLibrary(String path) async {
+  Future<EchoDBOpenResult> switchLibrary(String path) async {
     try {
       await EchoDatabase.closeDb();
-      await EchoDatabase.open(path);
+      final result = await EchoDatabase.open(path);
+      if (!result.success) return result;
       Prefs.activeLibraryRoot = path;
       state = state.copyWith(activeLibraryRoot: path);
       ref.invalidate(timelineProvider);
       ref.invalidate(favoritesProvider);
       ref.invalidate(trashProvider);
+      return result;
     } catch (e, st) {
       dev.log(
         'Failed to switch library: $e',
         stackTrace: st,
         name: 'SettingsNotifier.switchLibrary',
       );
+      return EchoDBOpenResult(success: false, isExisting: false);
     }
   }
 
-  Future<void> addLibrary(String path) async {
+  Future<EchoDBOpenResult> addLibrary(String path) async {
     try {
       await EchoDatabase.closeDb();
-      await EchoDatabase.open(path);
+      final result = await EchoDatabase.open(path);
+      if (!result.success) return result;
       Prefs.addKnownLibrary(path);
       state = state.copyWith(
         activeLibraryRoot: path,
         knownLibraryRoots: Prefs.knownLibraryRoots,
       );
       ref.invalidate(timelineProvider);
+      return result;
     } catch (e, st) {
       dev.log(
         'Failed to add library: $e',
         stackTrace: st,
         name: 'SettingsNotifier.addLibrary',
       );
+      return EchoDBOpenResult(success: false, isExisting: false);
     }
   }
 

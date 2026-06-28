@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -44,15 +45,39 @@ class EchoDatabase extends _$EchoDatabase {
 
   static String echoframeDir(String libraryRoot) => '$libraryRoot/.echoframe';
 
-  static Future<void> open(String libraryRoot) async {
-    final dir = Directory(echoframeDir(libraryRoot));
-    await dir.create(recursive: true);
-    final file = File('${dir.path}/${Keys.dbFileName}');
-    _instance = EchoDatabase(NativeDatabase.createInBackground(file));
+  static Future<EchoDBOpenResult> open(String libraryRoot) async {
+    bool isExisting = false;
+    bool success = false;
+    try {
+      final dir = Directory(echoframeDir(libraryRoot));
+      isExisting = await dir.exists();
+      if (!isExisting) await dir.create(recursive: true);
+      final file = File('${dir.path}/${Keys.dbFileName}');
+      _instance = EchoDatabase(NativeDatabase.createInBackground(file));
+      success = true;
+    } catch (e, st) {
+      dev.log(
+        'Failed to open database at $libraryRoot: $e',
+        stackTrace: st,
+        name: 'EchoDatabase.open',
+      );
+    }
+
+    return EchoDBOpenResult(success: success, isExisting: isExisting);
   }
 
   static Future<void> closeDb() async {
     await _instance?.close();
     _instance = null;
   }
+}
+
+class EchoDBOpenResult {
+  final bool success;
+  final bool isExisting;
+
+  EchoDBOpenResult({
+    required this.success,
+    this.isExisting = false,
+  });
 }

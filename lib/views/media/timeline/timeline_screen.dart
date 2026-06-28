@@ -1,13 +1,13 @@
 import 'dart:developer' as dev;
-import 'dart:io';
 
 import 'package:echo_frame/components/buttons/buttons.dart'
     show EFPrimaryButton, EFIconButton;
 import 'package:echo_frame/components/dialog.dart';
+import 'package:echo_frame/components/dropdown.dart';
 import 'package:echo_frame/components/empty_view.dart';
 import 'package:echo_frame/components/error_view.dart';
+import 'package:echo_frame/components/snackbar.dart';
 import 'package:echo_frame/constants/constants.dart';
-import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/indexing_progress.dart';
 import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
@@ -18,6 +18,8 @@ import 'package:echo_frame/views/media/components/media_list_view.dart';
 import 'package:echo_frame/views/media/components/search_bar.dart';
 import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
 import 'package:echo_frame/views/media/provider/search_focus_provider.dart';
+import 'package:echo_frame/views/settings/settings_screen.dart'
+    show settingsProvider;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,16 +73,81 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
   }
 
   Future<void> _showSetupDialog() async {
-    final confirmed = await EFDialog.show(
-      context,
-      title: 'Choose your photo library',
-      description: 'EchoFrame keeps your photos organised in a YYYY/MonthName '
-          'folder structure on your drive. Select the root folder where your '
-          'photos are stored or where you\'d like them organised.',
-      confirmText: 'Choose Folder',
-      cancelText: 'Not now',
-    );
+    final roots = Prefs.knownLibraryRoots;
+
+    final confirmed = await EFDialog.show(context,
+        title: 'Choose your photo library',
+        description:
+            'EchoFrame keeps your photos organised in a YYYY/MonthName '
+            'folder structure on your drive. Select the root folder where your '
+            'photos are stored or where you\'d like them organised.',
+        confirmText: roots.isEmpty ? 'Choose Folder' : null,
+        cancelText: 'Not now',
+        action3: roots.isNotEmpty ? (ctx)=>_rootsDropdown(ctx) : null);
     if (confirmed == true) await _pickLibraryFolder();
+  }
+
+  Widget _rootsDropdown(BuildContext context) {
+    final colors = context.colors;
+    final activeRoot = Prefs.activeLibraryRoot;
+    final roots = Prefs.knownLibraryRoots;
+
+    return EFDropdown<String>(
+      value: activeRoot,
+      hint: Text(
+        'Select library root',
+        style: Styles.micro(color: colors.textPrimary),
+      ),
+      items: [
+        DropdownMenuItem(
+          value: 'NewRoot',
+          child: Row(
+            spacing: Sizes.spacingExtraSmall,
+            children: [
+              Text(
+                'New Library Root',
+                style: Styles.micro(color: colors.textPrimary),
+              ),
+              Icon(
+                Icons.add_rounded,
+                size: Sizes.iconSizeExtraSmall,
+                color: colors.textPrimary,
+              ),
+            ],
+          ),
+        ),
+        ...roots.map(
+          (path) => DropdownMenuItem(
+            value: path,
+            child: Text(
+              path,
+              style: Styles.micro(color: colors.textPrimary),
+            ),
+          ),
+        ),
+      ],
+      onChanged: (path) {
+        Navigator.pop(context);
+        if (path == 'NewRoot') {
+          _pickLibraryFolder();
+          return;
+        }
+        if (path != null && path != Prefs.activeLibraryRoot) {
+          ref.read(settingsProvider.notifier).switchLibrary(path).then(
+            (result) {
+              if (!mounted) return;
+              if (result.success) {
+                setState(() => _hasLibrary = true);
+                _startupIndex();
+              } else {
+                EFSnackbar.showError(context,
+                    message: 'Failed to switch library');
+              }
+            },
+          );
+        }
+      },
+    );
   }
 
   Future<void> _pickLibraryFolder() async {
@@ -89,20 +156,17 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     );
     if (path == null || !mounted) return;
 
-    final echoframeDir = EchoDatabase.echoframeDir(path);
-    final isExisting = File('$echoframeDir/${Keys.dbFileName}').existsSync();
+    final result = await ref.read(settingsProvider.notifier).addLibrary(path);
+    if (!mounted) return;
 
-    if (!isExisting) {
-      await Directory(echoframeDir).create(recursive: true);
+    if (!result.success) {
+      EFSnackbar.showError(context, message: 'Failed to open library');
+      return;
     }
 
-    await EchoDatabase.open(path);
-    Prefs.addKnownLibrary(path);
-
-    if (!mounted) return;
     setState(() => _hasLibrary = true);
 
-    final stream = isExisting
+    final stream = result.isExisting
         ? IndexingService.autoIndex(libraryRoot: path)
         : IndexingService.fullIndex(libraryRoot: path);
 
