@@ -10,6 +10,7 @@ import 'package:echo_frame/constants/constants.dart' show Keys;
 import 'package:echo_frame/database/daos/tag_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/models/media/media.dart' show MediaItem, Metadata;
+import 'package:echo_frame/models/month_count.dart';
 import 'package:echo_frame/services/thumbnail_service.dart';
 import 'package:echo_frame/utilities/utilities.dart' show Prefs;
 import 'package:uuid/uuid.dart';
@@ -39,6 +40,36 @@ class MediaDao {
         .toList();
   }
 
+  // ── Shared filter builder ─────────────────────────────────────────────────
+
+  Expression<bool> _buildCondition({
+    bool? isFavorite,
+    bool isTrashed = false,
+    String? query,
+  }) {
+    final r = _db.mediaRecords;
+    var cond = r.isTrashed.equals(isTrashed);
+    if (isFavorite != null) cond = cond & r.isFavorite.equals(isFavorite);
+    if (query != null && query.isNotEmpty) {
+      final like = '%$query%';
+      final tagSubquery = _db.selectOnly(_db.mediaTagRecords)
+        ..addColumns([_db.mediaTagRecords.mediaId])
+        ..join([
+          innerJoin(
+            _db.tagRecords,
+            _db.tagRecords.id.equalsExp(_db.mediaTagRecords.tagId),
+          ),
+        ])
+        ..where(_db.tagRecords.value.like(like));
+      cond = cond &
+          (r.filename.like(like) |
+              r.cameraMake.like(like) |
+              r.cameraModel.like(like) |
+              r.id.isInQuery(tagSubquery));
+    }
+    return cond;
+  }
+
   // ── Queries ───────────────────────────────────────────────────────────────
 
   Future<Set<String>> listFilePaths() async {
@@ -59,30 +90,11 @@ class MediaDao {
     bool isTrashed = false,
   }) async {
     final records = await (_db.select(_db.mediaRecords)
-          ..where((r) {
-            var cond = r.isTrashed.equals(isTrashed);
-            if (isFavorite != null) {
-              cond = cond & r.isFavorite.equals(isFavorite);
-            }
-            if (query != null && query.isNotEmpty) {
-              final like = '%$query%';
-              final tagSubquery = _db.selectOnly(_db.mediaTagRecords)
-                ..addColumns([_db.mediaTagRecords.mediaId])
-                ..join([
-                  innerJoin(
-                    _db.tagRecords,
-                    _db.tagRecords.id.equalsExp(_db.mediaTagRecords.tagId),
-                  ),
-                ])
-                ..where(_db.tagRecords.value.like(like));
-              cond = cond &
-                  (r.filename.like(like) |
-                      r.cameraMake.like(like) |
-                      r.cameraModel.like(like) |
-                      r.id.isInQuery(tagSubquery));
-            }
-            return cond;
-          })
+          ..where((_) => _buildCondition(
+                isFavorite: isFavorite,
+                isTrashed: isTrashed,
+                query: query,
+              ))
           ..orderBy([
             (r) =>
                 OrderingTerm(expression: r.capturedAt, mode: OrderingMode.desc),
@@ -92,39 +104,45 @@ class MediaDao {
     return _toItems(records);
   }
 
-  Future<List<MediaItem>> queryByMonth(int year, int month) async {
-    final records = await (_db.select(_db.mediaRecords)
-          ..where((r) =>
-              r.capturedYear.equals(year) &
-              r.capturedMonth.equals(month) &
-              r.isTrashed.equals(false))
-          ..orderBy([(r) => OrderingTerm(expression: r.capturedAt)]))
-        .get();
-    return _toItems(records);
-  }
+  Future<List<MonthCount>> queryMonthCounts({
+    bool? isFavorite,
+    bool isTrashed = false,
+    String? query,
+  }) async {
+    final yearCol = _db.mediaRecords.capturedYear;
+    final monthCol = _db.mediaRecords.capturedMonth;
+    final countCol = _db.mediaRecords.id.count();
 
-  Future<MediaItem?> getById(String id) async {
-    final r = await (_db.select(_db.mediaRecords)
-          ..where((r) => r.id.equals(id)))
-        .getSingleOrNull();
-    if (r == null) return null;
-    return (await _toItems([r])).first;
+    final rows = await (_db.selectOnly(_db.mediaRecords)
+          ..addColumns([yearCol, monthCol, countCol])
+          ..where(_buildCondition(
+            isFavorite: isFavorite,
+            isTrashed: isTrashed,
+            query: query,
+          ))
+          ..groupBy([yearCol, monthCol])
+          ..orderBy([
+            OrderingTerm(expression: yearCol, mode: OrderingMode.desc),
+            OrderingTerm(expression: monthCol, mode: OrderingMode.desc),
+          ]))
+        .get();
+
+    final result = <MonthCount>[];
+    var offset = 0;
+    for (final row in rows) {
+      final mc = MonthCount(
+        year: row.read(yearCol)!,
+        month: row.read(monthCol)!,
+        count: row.read(countCol)!,
+        globalOffset: offset,
+      );
+      offset += mc.count;
+      result.add(mc);
+    }
+    return result;
   }
 
   // ── Favorites ─────────────────────────────────────────────────────────────
-
-  Future<List<MediaItem>> listFavorites() async {
-    final records = await (_db.select(_db.mediaRecords)
-          ..where((r) => r.isFavorite.equals(true) & r.isTrashed.equals(false))
-          ..orderBy([
-            (r) => OrderingTerm(
-                  expression: r.capturedAt,
-                  mode: OrderingMode.desc,
-                ),
-          ]))
-        .get();
-    return _toItems(records);
-  }
 
   Future<void> setFavorite(String id, {required bool value}) =>
       (_db.update(_db.mediaRecords)..where((r) => r.id.equals(id)))

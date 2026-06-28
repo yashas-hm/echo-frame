@@ -3,7 +3,7 @@ import 'dart:developer' as dev;
 import 'package:echo_frame/components/empty_view.dart';
 import 'package:echo_frame/components/error_view.dart';
 import 'package:echo_frame/constants/constants.dart' show Sizes;
-import 'package:echo_frame/views/media/components/loading_view.dart';
+import 'package:echo_frame/views/media/components/media_list_skeleton.dart';
 import 'package:echo_frame/views/media/components/media_list_view.dart';
 import 'package:echo_frame/views/media/components/search_bar.dart';
 import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
@@ -49,7 +49,7 @@ class FavoritesScreen extends ConsumerWidget {
             ),
             Flexible(
               child: favoriteAsync.when(
-                loading: () => const LoadingView(text: 'Loading favourites'),
+                loading: () => const MediaListSkeleton(),
                 error: (e, st) {
                   dev.log(
                     'Failed to load favourites: $e',
@@ -65,8 +65,7 @@ class FavoritesScreen extends ConsumerWidget {
                   );
                 },
                 data: (favorite) {
-                  final items = favorite.flatItems;
-                  if (items.isEmpty) {
+                  if (favorite.monthCounts.isEmpty) {
                     return const EmptyView(
                       icon: Icons.favorite_outline_rounded,
                       title: 'No media starred yet',

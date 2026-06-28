@@ -84,7 +84,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   }
 
   void _checkLoadRequired(MediaCollectionState state, List<MediaItem> flat) {
-    if (!state.hasMore || state.isLoadingMore) return;
+    if (!state.hasMoreBottom || state.isLoadingMore) return;
     if (flat.length - 1 - _currentIndex <= 10) {
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => ref.read(_provider.notifier).loadNextPage(),
@@ -132,7 +132,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     if (_currentIndex >= flat.length) _currentIndex = flat.length - 1;
     _checkLoadRequired(state, flat);
     final canPrev = _currentIndex > 0;
-    final canNext = _currentIndex < flat.length - 1 || state.hasMore;
+    final canNext = _currentIndex < flat.length - 1 || state.hasMoreBottom;
     final item = flat[_currentIndex];
 
     return Scaffold(

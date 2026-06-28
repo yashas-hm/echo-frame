@@ -9,7 +9,7 @@ import 'package:echo_frame/database/daos/media_dao.dart';
 import 'package:echo_frame/database/database.dart';
 import 'package:echo_frame/services/trash_service.dart';
 import 'package:echo_frame/utilities/utilities.dart';
-import 'package:echo_frame/views/media/components/loading_view.dart';
+import 'package:echo_frame/views/media/components/media_list_skeleton.dart';
 import 'package:echo_frame/views/media/components/media_list_view.dart';
 import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +52,7 @@ class TrashScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final trashAsync = ref.watch(trashProvider);
     final colors = context.colors;
-    final hasItems = trashAsync.value?.flatItems.isNotEmpty ?? false;
+    final hasItems = (trashAsync.value?.totalCount ?? 0) > 0;
 
     return Scaffold(
       body: Padding(
@@ -103,7 +103,7 @@ class TrashScreen extends ConsumerWidget {
               ),
             Flexible(
               child: trashAsync.when(
-                loading: () => const LoadingView(text: 'Loading bin'),
+                loading: () => const MediaListSkeleton(),
                 error: (e, st) {
                   dev.log(
                     'Failed to load bin: $e',
@@ -119,8 +119,7 @@ class TrashScreen extends ConsumerWidget {
                   );
                 },
                 data: (trash) {
-                  final items = trash.flatItems;
-                  if (items.isEmpty) {
+                  if (trash.monthCounts.isEmpty) {
                     return const EmptyView(
                       icon: Icons.delete_outline_rounded,
                       title: 'Bin is empty',

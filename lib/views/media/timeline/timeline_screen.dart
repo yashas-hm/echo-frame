@@ -13,7 +13,7 @@ import 'package:echo_frame/services/indexing_service.dart';
 import 'package:echo_frame/utilities/utilities.dart'
     show ContextExtensions, Prefs;
 import 'package:echo_frame/views/import/import_screen.dart';
-import 'package:echo_frame/views/media/components/loading_view.dart';
+import 'package:echo_frame/views/media/components/media_list_skeleton.dart';
 import 'package:echo_frame/views/media/components/media_list_view.dart';
 import 'package:echo_frame/views/media/components/search_bar.dart';
 import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
@@ -171,7 +171,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
             ),
             Flexible(
               child: timelineAsync.when(
-                loading: () => const LoadingView(text: 'Loading library'),
+                loading: () => const MediaListSkeleton(),
                 error: (e, st) {
                   dev.log(
                     'Failed to load timeline: $e',
@@ -187,7 +187,7 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                   );
                 },
                 data: (timeline) {
-                  if (timeline.flatItems.isEmpty) {
+                  if (timeline.monthCounts.isEmpty) {
                     return EmptyView(
                       icon: Icons.photo_library_outlined,
                       title: timeline.query.isEmpty

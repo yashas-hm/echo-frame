@@ -2,11 +2,27 @@ import 'dart:io';
 
 import 'package:echo_frame/models/media/media.dart' show MediaItem;
 import 'package:echo_frame/theme/theme.dart';
-import 'package:echo_frame/utilities/utilities.dart' show ContextExtensions;
+import 'package:echo_frame/utilities/utilities.dart'
+    show ContextExtensions, ColorExtensions;
 import 'package:echo_frame/views/gallery/gallery_screen.dart';
 import 'package:echo_frame/views/media/provider/media_collection_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
+
+class PlaceholderTile extends StatelessWidget {
+  const PlaceholderTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final highlight = context.colors.borderPrimary;
+    return Shimmer.fromColors(
+      baseColor: highlight.hover,
+      highlightColor: highlight.splash,
+      child: ColoredBox(color: context.colors.surfacePrimary),
+    );
+  }
+}
 
 class PhotoTile extends StatelessWidget {
   const PhotoTile({super.key, required this.item, required this.source});
@@ -33,10 +49,16 @@ class PhotoTile extends StatelessWidget {
         tag: item.id,
         child: Image.file(
           File(item.filePath),
-          cacheWidth: item.width == null ? 180 : item.width! ~/ 10,
-          cacheHeight: item.height == null ? 180 : item.height! ~/ 10,
+          cacheWidth:
+              item.width == null ? 180 : (item.width! ~/ 10).clamp(1, 9999),
+          cacheHeight:
+              item.height == null ? 180 : (item.height! ~/ 10).clamp(1, 9999),
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _placeholder(colors),
+          frameBuilder: (_, child, frame, wasSynchronouslyLoaded) =>
+              wasSynchronouslyLoaded || frame != null
+                  ? child
+                  : const PlaceholderTile(),
+          errorBuilder: (_, err, ___) => _placeholder(colors),
         ),
       );
 
@@ -50,6 +72,10 @@ class PhotoTile extends StatelessWidget {
             tag: item.id,
             child: Image.file(
               File(thumb),
+              frameBuilder: (_, child, frame, wasSynchronouslyLoaded) =>
+                  wasSynchronouslyLoaded || frame != null
+                      ? child
+                      : const PlaceholderTile(),
               fit: BoxFit.cover,
             ),
           )
@@ -88,6 +114,6 @@ class PhotoTile extends StatelessWidget {
   }) =>
       ColoredBox(
         color: colors.surfacePrimary,
-        child: Icon(icon, color: colors.borderPrimary),
+        child: Icon(icon, color: colors.textSecondary),
       );
 }
